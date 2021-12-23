@@ -1,0 +1,260 @@
+
+
+<head><script>
+var nrspec=new Array();
+sftyo=0;
+function numberTBAA(nr){
+var neej=nr;
+cc=neej.toString(2);
+return cc;
+}
+function reverseString(str) {
+    var newString = "";
+    for (var i = str.length - 1; i >= 0; i--) {
+        newString += str[i];
+    }
+    return newString;
+}
+var tels=sftyo;
+a2=1;
+cd=1;
+c=0;
+function numberTBAA(nr){ var neej=nr; cc=neej.toString(2); return cc;}
+function reverseString(str) { var newString = ""; for (var i = str.length - 1; i >= 0; i--){ newString += str[i]; } return newString; }
+var tels=sftyo;
+a2=1;
+cd=1;
+c=0;
+rete=0;
+bb=8;
+ret=0;
+for(t=0;t<Math.pow(2,14);t+=1){
+		fs=t.toString(2);
+		fs2=reverseString(fs);
+		sf=parseInt(fs2,2);
+		ds=Math.floor(sf/2)*Math.pow(-1, (sf%2));
+		sdd=ds&sf;
+			bb+=sdd;
+				tw=t-1;
+			if( ((t>7 && bb<Math.pow(2,7)) || (bb>Math.pow(2,16) && bb<Math.pow(2,31)))){
+				//if(!(ret==0 ||  ret==4 ||  ret==6 || ret==8 ||  ret==10 || ret==14 || ret==17 || ret==18 || ret==19 || ret==21 || ret== 22 || ret==23 || ret==2 || bb==35 || bb==38 || bb==49 || bb==54 || bb==79)){
+				nrspec[rete]=bb;
+				rete++;			
+			//}
+			ret++;
+		
+		}
+		
+}
+bb=0;
+alert(nrspec.length);
+ret=rete;
+/*
+for(t=0;t<Math.pow(2,17);t+=1){
+		fs=t.toString(2);
+		fs2=reverseString(fs);
+		sf=parseInt(fs2,2);
+		ds=(sf/2)*Math.pow(-1, (sf%2));
+		sdd=ds&sf;
+		bb+=sdd;
+		if(bb>Math.pow(2,4) && bb<Math.pow(2,7)){
+
+		if(bb==35 || bb==38 || bb==49 || bb==54 || bb==79 ){
+		}
+		else{
+			nrspec[ret]=bb;
+			ret++;
+			}
+		}		
+}
+*/
+function onlyUnique(value, index, self) { 
+    return self.indexOf(value) === index;
+}
+function removewithfilter(arr) { 
+            let outputArray = arr.filter(function(v, i, self) 
+            { 
+                  
+                return i == self.indexOf(v); 
+            }); 
+              
+            return outputArray; 
+} 
+
+
+nrspec=removewithfilter(nrspec);
+
+var lines=new Array();
+var sliceheight=400;
+var slicelenth=200;
+var begs=0;
+var cellunr=Math.floor(nrspec.length*Math.random());
+var rule = 0;
+var starting = "r";
+var canvas, context;		
+var currstate, nextstate;
+var timer;
+var currrow = 0;
+function doStRuleNr() {		
+			canvas = document.getElementById("canvas");
+			context = canvas.getContext('2d');
+			tels=10;
+			rule_set((nrspec[(tels%nrspec.length)]-1));
+			rule_set(109);
+			document.title=nrspec[(tels%nrspec.length)]+" "+tels;
+			//tels++;			
+			doStRuleNrc();				
+			setTimeout("doStRuleNr()", 500);					
+}
+function wow() {
+			var scroll = false;					
+			if (!scroll || currrow < slicelenth - 1) {
+				currrow++;
+				currrow %= slicelenth;								
+			} else {
+				var data = context.getImageData(0, 1, sliceheight, slicelenth - 1);
+				context.putImageData(data, 0, 0);
+				tel++;
+			}
+			for (var i = 0; i < sliceheight; i++) {
+				if (currstate[i])
+					context.fillStyle = "rgb(255, 255, 255)";
+				else context.fillStyle = "rgb(0, 0, 0)";	
+				var element = document.getElementById('canvas');
+				var positionInfo = element.getBoundingClientRect();
+				var height = positionInfo.height;
+				var width = positionInfo.width
+				context.fillRect(Math.round(i*1), Math.round(currrow*1), Math.round(1*width/sliceheight), Math.round(1*height/slicelenth));
+			if(rule>=256){
+				var l,ll, c, r,rr;
+				if (i == 0) {
+					l = false;
+					ll= false;	
+					c = currstate[0]; 
+					r = currstate[1];
+					rr=currstate[2];
+				} 
+				else if(i==1){
+					ll=false;
+					l=currstate[0];
+					c=currstate[1];
+					r=currstate[2];
+					rr=currstate[3];
+				}
+				else if (i == sliceheight - 2) {
+					l = currstate[i-2]; 
+					ll=currstate[i-1]
+					c = currstate[i]; 
+					r = currstate[i+1];
+					rr=false;
+				}
+				
+				else if (i == sliceheight - 1) {
+					l = currstate[i-1];
+					ll = currstate[i-2];
+					c = currstate[i]; 
+					r = false;
+					rr=false;
+				} else {
+					l = currstate[i-1]; 
+					ll=currstate[i-2]
+					c = currstate[i]; 
+					r = currstate[i+1];
+					rr=currstate[i+2]
+				}	
+				var n = 0;
+				if (ll == true) n |= 16;
+				if (l == true) n |= 8;
+				if (c == true) n |= 4;
+				if (r == true) n |= 2;
+				if (rr == true) n |= 1;
+				}
+				else{
+					var l, c, r;
+					if (i == 0) {
+						l = false; c = currstate[0]; r = currstate[1];
+					} else if (i == sliceheight - 1) {
+						l = currstate[i-1]; c = currstate[i]; r = false;
+					} else {
+						l = currstate[i-1]; c = currstate[i]; r = currstate[i+1];
+					}	
+					var n = 0;
+					if (l == true) n |= 4;
+					if (c == true) n |= 2;
+					if (r == true) n |= 1;
+					nextstate[i] = (rule & Math.pow(2, n)) > 0;
+				}
+				nextstate[i] = (rule & Math.pow(2, n)) > 0;
+			}			
+			for (var i = 0; i < sliceheight; i++)
+				currstate[i] = nextstate[i];
+		lines[currrow]=currstate;			
+}	
+
+
+
+
+
+
+
+
+
+
+		
+			var currstatex = new Array(sliceheight);
+					
+			for (var i = 0; i < sliceheight; i++) {
+				switch (starting) {
+					case 'r':
+						if (Math.floor(Math.random() * 2))
+							currstatex[i] = true;
+						else currstatex[i] = false;
+						break;
+				}
+			}
+
+
+
+
+	
+function doStRuleNrc(){
+			context.clearRect(0, 0, sliceheight, slicelenth);
+			currstate = new Array(sliceheight);
+			nextstate = new Array(sliceheight);
+
+			d=Math.floor(currstatex.length*Math.random());
+			currstatex[d]=!currstatex[d];
+			
+			for (var i = 0; i < sliceheight; i++) {
+	
+				 currstate[i] = currstatex[i];
+					
+				
+			}
+	currrow = -1;
+	unt();
+}
+		
+
+		
+function unt() {
+	if(begs==0){
+		for(b=0;b<slicelenth;b++){
+			wow();
+		}
+	}
+	else{
+		wow();
+	}
+}
+		
+function rule_xor(num) {
+	rule ^= num;
+}
+		
+function rule_set(num) {
+		rule = num;	
+}				
+document.write("<canvas id='canvas' style='width:100%;height:100%'></canvas>");
+doStRuleNr();
+</script><title>-49</title></head>
