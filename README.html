@@ -1,0 +1,273 @@
+<a id='a'></a>
+<center>
+<a id='a'><div id='tool'></div></a>
+Enter from where you openend the other image File (please).<BR><BR> Step 1 of 2<br>
+<input type="file" id="inp"><BR><BR>
+<canvas id="canvas"></canvas>
+<script>
+(function (global, factory) {
+  if (typeof define === "function" && define.amd) {
+    define([], factory);
+  } else if (typeof exports !== "undefined") {
+    factory();
+  } else {
+    var mod = {
+      exports: {}
+    };
+    factory();
+    global.FileSaver = mod.exports;
+  }
+})(this, function () {
+  "use strict";
+
+
+
+  var _global = typeof window === 'object' && window.window === window ? window : typeof self === 'object' && self.self === self ? self : typeof global === 'object' && global.global === global ? global : void 0;
+
+  function bom(blob, opts) {
+    if (typeof opts === 'undefined') opts = {
+      autoBom: false
+    };else if (typeof opts !== 'object') {
+      console.warn('Deprecated: Expected third argument to be a object');
+      opts = {
+        autoBom: !opts
+      };
+    } // prepend BOM for UTF-8 XML and text/* types (including HTML)
+    // note: your browser will automatically convert UTF-16 U+FEFF to EF BB BF
+
+    if (opts.autoBom && /^\s*(?:text\/\S*|application\/xml|\S*\/\S*\+xml)\s*;.*charset\s*=\s*utf-8/i.test(blob.type)) {
+      return new Blob([String.fromCharCode(0xFEFF), blob], {
+        type: blob.type
+      });
+    }
+
+    return blob;
+  }
+
+  function download(url, name, opts) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', url);
+    xhr.responseType = 'blob';
+
+    xhr.onload = function () {
+      saveAs(xhr.response, name, opts);
+    };
+
+    xhr.onerror = function () {
+      console.error('could not download file');
+    };
+
+    xhr.send();
+  }
+
+  function corsEnabled(url) {
+    var xhr = new XMLHttpRequest(); // use sync to avoid popup blocker
+
+    xhr.open('HEAD', url, false);
+
+    try {
+      xhr.send();
+    } catch (e) {}
+
+    return xhr.status >= 200 && xhr.status <= 299;
+  } // `a.click()` doesn't work for all browsers (#465)
+
+
+  function click(node) {
+    try {
+      node.dispatchEvent(new MouseEvent('click'));
+    } catch (e) {
+      var evt = document.createEvent('MouseEvents');
+      evt.initMouseEvent('click', true, true, window, 0, 0, 0, 80, 20, false, false, false, false, 0, null);
+      node.dispatchEvent(evt);
+    }
+  } // Detect WebView inside a native macOS app by ruling out all browsers
+  // We just need to check for 'Safari' because all other browsers (besides Firefox) include that too
+  // https://www.whatismybrowser.com/guides/the-latest-user-agent/macos
+
+
+  var isMacOSWebView = /Macintosh/.test(navigator.userAgent) && /AppleWebKit/.test(navigator.userAgent) && !/Safari/.test(navigator.userAgent);
+  var saveAs = _global.saveAs || ( // probably in some web worker
+  typeof window !== 'object' || window !== _global ? function saveAs() {}
+  /* noop */
+  // Use download attribute first if possible (#193 Lumia mobile) unless this is a macOS WebView
+  : 'download' in HTMLAnchorElement.prototype && !isMacOSWebView ? function saveAs(blob, name, opts) {
+    var URL = _global.URL || _global.webkitURL;
+    var a = document.createElement('a');
+    name = name || blob.name || 'download';
+    a.download = name;
+    a.rel = 'noopener'; // tabnabbing
+    // TODO: detect chrome extensions & packaged apps
+    // a.target = '_blank'
+
+    if (typeof blob === 'string') {
+      // Support regular links
+      a.href = blob;
+
+      if (a.origin !== location.origin) {
+        corsEnabled(a.href) ? download(blob, name, opts) : click(a, a.target = '_blank');
+      } else {
+        click(a);
+      }
+    } else {
+      // Support blobs
+      a.href = URL.createObjectURL(blob);
+      setTimeout(function () {
+        URL.revokeObjectURL(a.href);
+      }, 4E4); // 40s
+
+      setTimeout(function () {
+        click(a);
+      }, 0);
+    }
+  } // Use msSaveOrOpenBlob as a second approach
+  : 'msSaveOrOpenBlob' in navigator ? function saveAs(blob, name, opts) {
+    name = name || blob.name || 'download';
+
+    if (typeof blob === 'string') {
+      if (corsEnabled(blob)) {
+        download(blob, name, opts);
+      } else {
+        var a = document.createElement('a');
+        a.href = blob;
+        a.target = '_blank';
+        setTimeout(function () {
+          click(a);
+        });
+      }
+    } else {
+      navigator.msSaveOrOpenBlob(bom(blob, opts), name);
+    }
+  } // Fallback to using FileReader and a popup
+  : function saveAs(blob, name, opts, popup) {
+    // Open a popup immediately do go around popup blocker
+    // Mostly only available on user interaction and the fileReader is async so...
+    popup = popup || open('', '_blank');
+
+    if (popup) {
+      popup.document.title = popup.document.body.innerText = 'downloading...';
+    }
+
+    if (typeof blob === 'string') return download(blob, name, opts);
+    var force = blob.type === 'application/octet-stream';
+
+    var isSafari = /constructor/i.test(_global.HTMLElement) || _global.safari;
+
+    var isChromeIOS = /CriOS\/[\d]+/.test(navigator.userAgent);
+
+    if ((isChromeIOS || force && isSafari || isMacOSWebView) && typeof FileReader !== 'undefined') {
+      // Safari doesn't allow downloading of blob URLs
+      var reader = new FileReader();
+
+      reader.onloadend = function () {
+        var url = reader.result;
+        url = isChromeIOS ? url : url.replace(/^data:[^;]*;/, 'data:attachment/file;');
+        if (popup) popup.location.href = url;else location = url;
+        popup = null; // reverse-tabnabbing #460
+      };
+
+      reader.readAsDataURL(blob);
+    } else {
+      var URL = _global.URL || _global.webkitURL;
+      var url = URL.createObjectURL(blob);
+      if (popup) popup.location = url;else location.href = url;
+      popup = null; // reverse-tabnabbing #460
+
+      setTimeout(function () {
+        URL.revokeObjectURL(url);
+      }, 4E4); // 40s
+    }
+  });
+  _global.saveAs = saveAs.saveAs = saveAs;
+
+  if (typeof module !== 'undefined') {
+    module.exports = saveAs;
+  }
+});
+
+
+
+function png(){
+var imaigg=new Image();
+imaigg.onload=function(){
+	dfgh=document.createElement('canvas');
+	dfgh.setAttribute("width",imaigg.width);
+	dfgh.setAttribute("height", imaigg.height);
+	oncct=dfgh.getContext('2d');
+      oncct.drawImage(imaigg,0,0,1920,1080);
+oldruledd="standard.img"+Math.round(10000000*Math.random());
+document.getElementById('a').setAttribute('href', imaigg.src);
+document.getElementById('a').setAttribute('download', oldruledd+".png");
+document.getElementById('a').click();
+	
+}
+imaigg.src="standard.img.png";
+
+
+
+}
+
+function pnrrg(){
+saveAs("standard.img.png", "appstracs.image.png");
+
+}
+
+
+  var img=new Image();
+
+var imgd=new Image();
+imgd.onerror=document.getElementById('tool').innerHTML="No Default Archive Found!. Browse to open other Places";
+imgd.onload=function(){
+  img = new Image();
+img.src=imgd.src;
+
+document.getElementById('tool').innerHTML="<a download title='Click &amp; Download (Source) Image of App' onclick='png()'><img src='standard.img.png' style='width:512px;height:512px'></a><br>Click Noise-src to Download Image  &amp; Select this File  (standard.img.png, from Downloads)";
+ 
+
+}
+imgd.src="standard.img.png";
+
+document.getElementById('inp').onchange = function(e) {
+  img = new Image();
+  img.onload = draw;
+  img.onerror = failed;
+  img.src = URL.createObjectURL(this.files[0]);
+};
+function draw() {
+  var canvas = document.getElementById('canvas');
+  canvas.width = img.width;
+  canvas.height = img.height;
+  var ctx = canvas.getContext('2d');
+  ctx.drawImage(img, 0,0);
+
+
+
+base64="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+		var pixelssas = ctx.getImageData(0, 0, img.width, img.height);
+str="";
+for(t=0;t<(img.width*img.height);t++){
+	offset=4*t;
+	r=pixelssas.data[offset];
+	g=pixelssas.data[(offset+1)];
+	b=pixelssas.data[(offset+2)];
+		
+	if(r==g && g==b){
+		rr=Math.round(r/4);
+		str=str+base64.charAt(rr);	
+	}
+
+
+
+}
+document.getElementById('a').setAttribute('href', 'data:text/html;base64,'+str);
+document.getElementById('a').setAttribute('download', 'HMidi-Ani_zw93.html');
+document.getElementById('a').click();
+console.log(str);
+alert("Step 1 Completed! Open your download and Extract that (Please, prepare for step 2)");
+
+}
+function failed() {
+  console.error("The provided file couldn't be loaded as an Image media");
+}
+</script>
+<a id='a'></a>
