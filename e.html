@@ -1,0 +1,1264 @@
+<canvas id='canvasx'></canvas>
+<script>
+var sliceheight=500;
+function reverseString4(str) { var newString = ""; for (var i = str.length - 1; i >= 0; i--){ newString += str[i]; } return newString; }
+a2=1;
+cd=1;
+c=0;
+var aofb=1;
+c=0;
+rete=0;
+bb=8;
+ret=0;
+
+a2=1;
+cd=1;
+c=0;
+rete=0;
+bbv=12;
+nrspecdd=new Array();
+bb=0; //Math.pow(2,3);
+ret=0;
+var twama=Math.pow(2,12);
+var nrspecdd=new Array();
+for(var tvv=0;tvv<twama;tvv+=1){
+		fs=tvv.toString(2);
+		fs2=reverseString4(fs);
+		sf=parseInt(fs2,2);
+		ds=Math.floor(sf/2)*Math.pow(-1, (sf%2));
+		sdd=ds & sf;
+		nrspecdd[rete]=bb;
+		bb+=sdd;
+		rete++;					
+		ret++;		
+			
+}
+
+nrspecdd.sort(function(a, b){return a - b});
+nmnmdf=new Array();
+bbbd=nrspecdd[0];
+for(qqt=1;qqt<twama;qqt+=1){
+nmnmdf[qqt-1]=bbbd;
+bbbd+=nrspecdd[qqt];
+}
+nrspecdd=nmnmdf;
+document.write("<canvas id='canvasmm' width=512 heeight=512 style='position:fixed;left:0;top:0;width:100%;height:100%;display:none'></canvas>");
+document.write("<canvas id='canvas2m' width=512 heeight=512 style='position:fixed;left:0;top:0;width:100%;height:100%;displday:none'></canvas>");
+var cancc=document.getElementById('canvasmm');
+var xtxtcx=cancc.getContext('2d');
+var pixelsers=xtxtcx.getImageData(0,0,sliceheight,sliceheight);
+var imgs=xtxtcx.getImageData(0,0,sliceheight,sliceheight);
+
+var can2w=document.getElementById('canvas2m');
+var xtxtcx2=can2w.getContext('2d');
+var pixelsers2=xtxtcx2.getImageData(0,0,sliceheight,sliceheight);
+var changeIt=100;
+
+
+var aaraar;
+var pxpyxtyt=new Array();
+var pxpydxdy=new Array();
+var aaraar2=new Array(sliceheight);
+var aaraar3=new Array(sliceheight);
+var eetels=0;
+var frameddder2=0;
+var currcustate_=new Array();
+var ewew_=new Array();
+
+var ertsh=new Array();
+
+function binit(){
+
+
+
+
+
+
+
+
+
+
+cancc=document.getElementById('canvasmm');
+xtxtcx=cancc.getContext('2d');
+pixelsers=xtxtcx.getImageData(0,0,sliceheight,sliceheight);
+imgs=xtxtcx.getImageData(0,0,sliceheight,sliceheight);
+
+can2w=document.getElementById('canvas2m');
+xtxtcx2=can2w.getContext('2d');
+pixelsers2=xtxtcx2.getImageData(0,0,sliceheight,sliceheight);
+changeIt=50+(25*Math.round(Math.random()*4) );
+
+
+
+
+
+wluur=window.location.href;
+zzzzio=wluur.split('rt=');
+if(zzzzio.length>1){
+	qwsaxz=zzzzio[1];
+	changeIt=qwsaxz.split("&");
+
+
+}
+
+pxpyxtyt=new Array();
+pxpydxdy=new Array();
+aaraar2=new Array(sliceheight);
+aaraar3=new Array(sliceheight);
+eetels=0;
+frameddder2=0;
+currcustate_=new Array();
+ewew_=new Array();
+
+
+
+
+
+
+
+
+
+
+frameddder2=0;
+
+aaraar=new Array(sliceheight);
+for(i=0;i<sliceheight;i++){
+aaraar[i]=[];
+}
+for(i=0;i<sliceheight;i++){
+	for(j=0;j<sliceheight;j++){
+		aaraar[i][j]=true;
+		if(Math.random()<.75){
+		aaraar[i][j]=false;
+	
+		}	
+		
+	}
+}
+
+pxpyxtyt=new Array();
+pxpydxdy=new Array();
+aaraar2=new Array(sliceheight);
+for(i=0;i<sliceheight;i++){
+aaraar2[i]=[];
+}
+intrr=0;
+for(i=0;i<sliceheight;i++){
+	for(j=0;j<sliceheight;j++){
+		aaraar2[i][j]=true;
+		if(Math.random()<.75){
+		aaraar2[i][j]=false;
+
+
+			if(Math.random()<.25){
+			p=new Array();
+			p[0]=i;
+			p[1]=j;
+			pxpyxtyt[intrr]=p;
+		
+
+			uua=Math.floor(8*Math.random());
+			if(uua==0){
+				dxu=1; dyu=0;	
+			}
+			if(uua==1){
+				dxu=1; dyu=1;	
+			}
+
+			if(uua==2){
+				dxu=0; dyu=1;	
+			}
+
+			if(uua==3){
+				dxu=-1; dyu=1;	
+			}
+
+			if(uua==4){
+				dxu=-1; dyu=0;	
+			}
+
+			if(uua==5){
+				dxu=-1; dyu=-1;	
+			}
+
+			if(uua==6){
+				dxu=0; dyu=-1;	
+			}
+
+			if(uua==7){
+				dxu=1; dyu=-1;	
+			}
+			puu=new Array();
+			puu[0]=dxu;
+			puu[1]=dyu;
+
+			pxpydxdy[intrr]=puu;
+			intrr++;
+}
+
+
+
+		}	
+		
+	}
+}
+
+
+
+aaraar3=new Array(sliceheight);
+for(i=0;i<sliceheight;i++){
+aaraar3[i]=[];
+}
+for(i=0;i<sliceheight;i++){
+	for(j=0;j<sliceheight;j++){
+		aaraar3[i][j]=true;
+		if(Math.random()<.75){
+		aaraar3[i][j]=false;
+	
+		}	
+		
+	}
+}
+
+
+
+eetels=0;
+telomder=0;
+tiot=0;
+
+
+
+
+
+
+ertsh=new Array(sliceheight);
+for(i=0;i<sliceheight;i++){
+ertsh[i]=[];
+}
+
+
+for(i=0;i<sliceheight;i++){
+	for(j=0;j<sliceheight;j++){
+	
+	ertsh[i][j]=true;
+}
+}
+
+rew=.1+(.1*Math.random());
+gh=Math.round(455+(292*Math.random()));
+for(g=0;g<gh;g++){
+
+	if(Math.random()<rew){
+
+
+		p0=15+Math.round((sliceheight-31)*Math.random());
+		q0=15+Math.round((sliceheight-31)*Math.random());
+
+
+		gv=Math.round(5+(25*Math.random()));
+		for(f=0;f<gv;f++){
+			l=Math.round(-15+(Math.random()*30));
+			u=Math.round(-15+(Math.random()*30));
+		
+			ertsh[p0+l][q0+u]=false;
+
+		}
+	}
+	else{
+
+		ertsh[Math.floor(sliceheight*Math.random())][Math.floor(sliceheight*Math.random())];
+	}
+
+
+}
+
+
+
+
+xtxtcx.clearRect(0,0,sliceheight,sliceheight);
+imgs=xtxtcx.getImageData(0,0,sliceheight,sliceheight);
+ewew0=nrspecdd[Math.floor(nrspecdd.length*Math.random())];
+ewew1=nrspecdd[Math.floor(nrspecdd.length*Math.random())];
+ewew_[0]=ewew0;
+ewew_[1]=ewew1;
+
+	currcustate_=new Array(sliceheight);
+	nextcustate_=new Array(sliceheight);
+	for(i=0;i<sliceheight;i++){
+		currcustate_[i]=false;
+		if(Math.random()<.5){
+		currcustate_[i]=true;
+		
+		}	
+	}
+
+}
+
+
+function ddraw(){
+	retttio=0;
+	for(i=0;i<sliceheight;i++){
+		for(j=0;j<sliceheight;j++){
+			gdt=retttio*4;
+			if(aaraar[i][j]){
+					pixelsers.data[gdt]=0;
+					pixelsers.data[gdt+1]=0;
+					pixelsers.data[gdt+2]=0;
+					pixelsers.data[gdt+3]=255;
+			}
+			else{
+					pixelsers.data[gdt]=255;
+					pixelsers.data[gdt+1]=255;
+					pixelsers.data[gdt+2]=255;
+					pixelsers.data[gdt+3]=255;
+			}	
+			retttio++;
+		}
+	}
+	xtxtcx.putImageData(pixelsers,0,0);
+
+}
+
+
+
+function doStep8(){
+
+if( (eetels%changeIt)==0){
+	aaraar=ertsh;
+
+fff=0;
+
+for(i=0;i<sliceheight;i++){
+	for(j=0;j<sliceheight;j++){
+		//aaraar[i][j]=aaraara[i][j];	
+		tredr=fff*4;
+		if(aaraar[i][j]){
+			imgs.data[tredr]=0;
+			imgs.data[tredr+1]=0;
+			imgs.data[tredr+2]=0;
+			imgs.data[tredr+3]=255;
+		}
+		else{
+
+			imgs.data[tredr]=255;
+			imgs.data[tredr+1]=255;
+			imgs.data[tredr+2]=255;
+			imgs.data[tredr+3]=255;
+	
+		}
+
+		fff++;	
+		
+	}
+}
+
+
+}
+
+
+function doStep(){
+
+var aaraara=new Array(sliceheight);
+for(i=0;i<sliceheight;i++){
+aaraara[i]=[];
+}
+for(i=0;i<sliceheight;i++){
+	for(j=0;j<sliceheight;j++){
+		aaraara[i][j]=aaraar[i][j];	
+		
+	}
+}
+eetels+=Math.round(changeIt/2);
+for(i=(1+0);i<sliceheight-1;i++){
+	for(j=(1+0);j<sliceheight-1;j++){
+		lu=aaraar[i-1][j-1];
+		lm=aaraar[i-1][j];
+		ld=aaraar[i-1][j+1];
+		cu=aaraar[i][j-1];
+		cm=aaraar[i][j];
+		cd=aaraar[i][j+1];
+		ru=aaraar[i+1][j-1];
+		rm=aaraar[i+1][j];
+		rd=aaraar[i+1][j+1];
+		tot=0;
+		if(lu){ tot++; }
+		if(lm){ tot++; }
+		if(ld){ tot++; }
+		if(cu){ tot++; }
+		//if(cm){ tot++; }
+		if(cd){ tot++; }
+		if(ru){ tot++; }
+		if(rm){ tot++; }
+		if(rd){ tot++; }
+		//if(tot<2 && cm){
+		//	aaraara[i][j]=false;
+		//}
+		if((tot==2  || tot==3) && cm){
+			aaraara[i][j]=true;
+		}
+		else if(tot==3  && !cm ){
+			aaraara[i][j]=true;
+		}
+		else{
+	aaraara[i][j]=false;
+		
+		}
+
+
+
+
+	}
+
+}
+
+
+fff=0;
+
+for(i=0;i<sliceheight;i++){
+	for(j=0;j<sliceheight;j++){
+		aaraar[i][j]=aaraara[i][j];	
+		tredr=fff*4;
+		if(aaraara[i][j]){
+			imgs.data[tredr]=0;
+			imgs.data[tredr+1]=0;
+			imgs.data[tredr+2]=0;
+			imgs.data[tredr+3]=255;
+		}
+		else{
+
+			imgs.data[tredr]=255;
+			imgs.data[tredr+1]=255;
+			imgs.data[tredr+2]=255;
+			imgs.data[tredr+3]=255;
+	
+		}
+
+		fff++;	
+		
+	}
+}
+
+}
+eetels++;
+
+
+}
+
+
+
+
+function doStepA(){
+
+if( (eetels%changeIt)==0){
+	aaraar=aaraar3;
+
+
+
+
+fffu=0;
+
+for(i=0;i<sliceheight;i++){
+	for(j=0;j<sliceheight;j++){
+		tredr=fffu*4;
+		if(aaraar[i][j]){
+			imgs.data[tredr]=0;
+			imgs.data[tredr+1]=0;
+			imgs.data[tredr+2]=0;
+			imgs.data[tredr+3]=255;
+		}
+		else{
+
+			imgs.data[tredr]=255;
+			imgs.data[tredr+1]=255;
+			imgs.data[tredr+2]=255;
+			imgs.data[tredr+3]=255;
+	
+		}
+
+		fffu++;	
+		
+	}
+}
+
+
+
+
+
+}
+
+	eetels++;
+
+}
+
+var tiot=0;
+
+var img=new Array();
+function doStepB(){
+
+
+
+
+if( (eetels%changeIt)==0){
+
+ert0t=new Array();
+ert0t[0]=aaraar2;
+ert0t[1]=aaraar3;
+aaraar=ert0t[(tiot%2)];
+
+
+
+var fsey=document.getElementById('canvasx');
+fsey.width=changeIt;
+fsey.height=sliceheight;
+var cffy=fsey.getContext('2d');
+pixelserss=cffy.getImageData(0,0,changeIt, sliceheight);
+ryr=0;
+
+for(x=0;x<sliceheight;x++){
+	for(y=0;y<sliceheight;y++){
+		rrry=(ryr*4);	
+		if(y>((tiot+0)*changeIt)  && y<((tiot+1)*changeIt)){
+			if(aaraar[y-((tiot+0)*changeIt) ][x]==true){
+				imgs.data[rrry]=0;
+				imgs.data[rrry+1]=0;
+				imgs.data[rrry+2]=0;
+				imgs.data[rrry+3]=255;
+
+			}
+			else{
+				imgs.data[rrry]=255;
+				imgs.data[rrry+1]=255;
+				imgs.data[rrry+2]=255;
+				imgs.data[rrry+3]=255;
+
+			}
+		}
+		ryr++;
+	}
+
+}
+
+
+//img[tiot]=pixelserss;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+tiot++;
+
+
+
+
+
+
+}
+
+
+
+eetels++;
+
+}
+
+
+
+
+
+function doStepv(){
+
+var aaraara=new Array(sliceheight);
+for(i=0;i<sliceheight;i++){
+aaraara[i]=[];
+}
+for(i=0;i<sliceheight;i++){
+	for(j=0;j<sliceheight;j++){
+		aaraara[i][j]=aaraar[i][j];	
+		
+	}
+}
+
+
+
+for(i=(1+0);i<sliceheight-1;i++){
+	for(j=(1+0);j<sliceheight-1;j++){
+		lu=aaraar[i-1][j-1];
+		lm=aaraar[i-1][j];
+		ld=aaraar[i-1][j+1];
+		cu=aaraar[i][j-1];
+		cm=aaraar[i][j];
+		cd=aaraar[i][j+1];
+		ru=aaraar[i+1][j-1];
+		rm=aaraar[i+1][j];
+		rd=aaraar[i+1][j+1];
+		tot=0;
+		if(lu){ tot++; }
+		if(lm){ tot++; }
+		if(ld){ tot++; }
+		if(cu){ tot++; }
+		//if(cm){ tot++; }
+		if(cd){ tot++; }
+		if(ru){ tot++; }
+		if(rm){ tot++; }
+		if(rd){ tot++; }
+		//if(tot<2 && cm){
+		//	aaraara[i][j]=false;
+		//}
+		if((tot==2  || tot==3) && cm){
+			aaraara[i][j]=true;
+		}
+		else if(tot==3  && !cm ){
+			aaraara[i][j]=true;
+		}
+		else{
+	aaraara[i][j]=false;
+		
+		}
+
+
+
+
+	}
+
+}
+
+
+
+if((eetels%changeIt)==0){
+var fset=document.getElementById('canvasx');
+fset.width=changeIt;
+fset.height=sliceheight;
+var cfft=fset.getContext('2d');
+pixelserss=cfft.getImageData(0,0,changeIt, sliceheight);
+rrttt=0;
+
+for(x=0;x<sliceheight;x++){
+	for(y=0;y<sliceheight;y++){
+		rrr4n=(rrttt*4);	
+		if(y>((tiot+0)*changeIt)  && y<((tiot+1)*changeIt)){
+			if(aaraara[y-((tiot+0)*changeIt) ][x]==true){
+				imgs.data[rrr4n]=0;
+				imgs.data[rrr4n+1]=0;
+				imgs.data[rrr4n+2]=0;
+				imgs.data[rrr4n+3]=255;
+
+			}
+			else{
+				imgs.data[rrr4n]=255;
+				imgs.data[rrr4n+1]=255;
+				imgs.data[rrr4n+2]=255;
+				imgs.data[rrr4n+3]=255;
+
+			}
+		}
+		rrttt++;
+	}
+
+}
+
+tiot++;
+}
+
+
+eetels+=1;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+function doStep7(){
+
+
+//ewew=208;
+if((eetels%changeIt)==0){
+//ewew=nrspecdd[Math.floor(nrspecdd.length*Math.random())];
+
+ewew=ewew_[(telomder%2)];
+achhhchcnumnerx=2;
+wluur=window.location.href;
+zzzzio=wluur.split('ruletype=');
+if(zzzzio.length>1){
+	qwsaxz=zzzzio[1];
+	ngeIt=qwsaxz.split("&");
+	fdgfhhh=ngeIt[0];
+	dfdsfdg=fdgfhhh.split("|");
+achhhchcnumnerx=	parseInt(dfdsfdg[0]);
+ewew=parseInt(dfdsfdg[1]);
+
+}
+
+
+telomder++;
+	currcustate=new Array(sliceheight);
+	nextcustate=new Array(sliceheight);
+	for(i=0;i<sliceheight;i++){
+		currcustate[i]=false; //currcustate_[i]; //false;
+		if(Math.random()<.5){
+		currcustate[i]=true;
+		
+		}	
+	}
+
+	for(i=0;i<sliceheight;i++){
+
+
+
+
+		for(biabia=0;biabia<sliceheight;biabia++){
+
+
+
+
+otgtruu=0;
+nraaraar__ru=new Array();
+
+				for(r__ricc=(biabia-achhhchcnumnerx);r__ricc<=(biabia+achhhchcnumnerx);r__ricc++){
+					if(r__ricc<0){
+						nraaraar__ru[otgtruu]=false;
+						}
+					else if(r__ricc>=(sliceheight)){
+						nraaraar__ru[otgtruu]=false;
+						}
+					else{
+						nraaraar__ru[otgtruu]=currcustate[r__ricc];
+						}
+					otgtruu++;
+					}
+				var aaaanua = 0;
+				for(var hpru=0;hpru<nraaraar__ru.length;hpru++){
+		
+				if(nraaraar__ru[hpru]==true) aaaanua |= Math.pow(2, hpru);
+					}
+				nextcustate[biabia] = ( ewew & Math.pow(2, aaaanua)) > 0;
+
+		}
+
+		for ( ixx = 0; ixx < sliceheight; ixx++){
+				currcustate[ixx] = nextcustate[ixx];
+
+		aaraar[ixx][i]=currcustate[ixx];
+
+}
+
+
+
+
+
+
+
+
+
+
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+fff=0;
+
+for(i=0;i<sliceheight;i++){
+	for(j=0;j<sliceheight;j++){
+		aaraar[i][j]=aaraar[i][j];	
+		tredr=fff*4;
+		if(aaraar[i][j]){
+			imgs.data[tredr]=0;
+			imgs.data[tredr+1]=0;
+			imgs.data[tredr+2]=0;
+			imgs.data[tredr+3]=255;
+		}
+		else{
+
+			imgs.data[tredr]=255;
+			imgs.data[tredr+1]=255;
+			imgs.data[tredr+2]=255;
+			imgs.data[tredr+3]=255;
+	
+		}
+
+		fff++;	
+		
+	}
+}
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+eetels++;
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function doStepC(){
+
+
+//ewew=208;
+if((eetels%changeIt)==0){
+//ewew=nrspecdd[Math.floor(nrspecdd.length*Math.random())];
+
+ewew=ewew_[(telomder%2)];
+
+
+telomder++;
+	currcustate=new Array(sliceheight);
+	nextcustate=new Array(sliceheight);
+	for(i=0;i<sliceheight;i++){
+		currcustate[i]=false; //currcustate_[i]; //false;
+		if(Math.random()<.5){
+		currcustate[i]=true;
+		
+		}	
+	}
+
+	for(i=0;i<sliceheight;i++){
+
+
+
+
+		for(biabia=0;biabia<sliceheight;biabia++){
+
+
+
+
+otgtruu=0;
+nraaraar__ru=new Array();
+achhhchcnumnerx=2;
+				for(r__ricc=(biabia-achhhchcnumnerx);r__ricc<=(biabia+achhhchcnumnerx);r__ricc++){
+					if(r__ricc<0){
+						nraaraar__ru[otgtruu]=false;
+						}
+					else if(r__ricc>=(sliceheight)){
+						nraaraar__ru[otgtruu]=false;
+						}
+					else{
+						nraaraar__ru[otgtruu]=currcustate[r__ricc];
+						}
+					otgtruu++;
+					}
+				var aaaanua = 0;
+				for(var hpru=0;hpru<nraaraar__ru.length;hpru++){
+		
+				if(nraaraar__ru[hpru]==true) aaaanua |= Math.pow(2, hpru);
+					}
+				nextcustate[biabia] = ( ewew & Math.pow(2, aaaanua)) > 0;
+
+		}
+
+		for ( ixx = 0; ixx < sliceheight; ixx++){
+				currcustate[ixx] = nextcustate[ixx];
+
+		aaraar[ixx][i]=currcustate[ixx];
+
+}
+
+
+
+
+
+
+
+
+
+
+	}
+
+
+
+
+
+
+var efse=document.getElementById('canvasx');
+efse.width=changeIt;
+efse.height=sliceheight;
+var ecff=efse.getContext('2d');
+pixelserss=ecff.getImageData(0,0,changeIt, sliceheight);
+eerr=0;
+
+	for(x=0;x<sliceheight;x++){
+for(y=0;y<sliceheight;y++){
+		errr=(eerr*4);	
+		if(y>((tiot+0)*changeIt)  && y<((tiot+1)*changeIt)){
+		if(aaraar[y-((tiot+0)*changeIt) ][x]==true){
+			imgs.data[errr]=0;
+			imgs.data[errr+1]=0;
+			imgs.data[errr+2]=0;
+			imgs.data[errr+3]=255;
+
+		}
+		else{
+			imgs.data[errr]=255;
+			imgs.data[errr+1]=255;
+			imgs.data[errr+2]=255;
+			imgs.data[errr+3]=255;
+
+		}
+		}
+		eerr++;
+	}
+
+}
+
+tiot++;
+
+	
+}
+
+
+
+
+eetels++;
+
+
+}
+
+
+
+
+
+
+function doStepD(){
+
+
+
+
+
+
+
+
+
+if((eetels%changeIt)==0){
+	frameddder2++;
+
+	if(frameddder2==2000 ){
+		frameddder2=2;
+	}
+
+	for(tassie=(frameddder2%2);tassie<(sliceheight-1);tassie+=2){
+		for(ussie=(frameddder2%2);ussie<(sliceheight-1);ussie+=2){
+			   _leftupper=aaraar[tassie][ussie];    _rightupper=aaraar[(tassie+1)][ussie];
+			
+			_leftunder=aaraar[tassie][(ussie+1)];   _rightunder=aaraar[(tassie+1)][(ussie+1)];		
+			if(Math.random()>.5){  //left
+				aaraar2[tassie][ussie]=_rightupper;     aaraar2[(tassie+1)][ussie]=_rightunder;				
+				aaraar2[tassie][(ussie+1)]=_leftupper;  aaraar2[(tassie+1)][(ussie+1)]=_leftunder;
+			}
+			else{
+				aaraar2[tassie][ussie]=_leftunder;     aaraar2[(tassie+1)][ussie]=_leftupper;
+				
+				aaraar2[tassie][(ussie+1)]=_rightunder;  aaraar2[(tassie+1)][(ussie+1)]=_rightupper;
+			}			
+		}
+	}
+	aaraar=aaraar2;	
+
+
+
+
+
+
+
+
+var fvse=document.getElementById('canvasx');
+fvse.width=changeIt;
+fvse.height=sliceheight;
+var vcff=fvse.getContext('2d');
+pixelserss=vcff.getImageData(0,0,changeIt, sliceheight);
+vvrr=0;
+
+	for(x=0;x<sliceheight;x++){
+for(y=0;y<sliceheight;y++){
+		vvrrr=(vvrr*4);	
+		if(y>((tiot+0)*changeIt)  && y<((tiot+1)*changeIt)){
+		if(aaraar[y-((tiot+0)*changeIt) ][x]==true){
+			imgs.data[vvrrr]=0;
+			imgs.data[vvrrr+1]=0;
+			imgs.data[vvrrr+2]=0;
+			imgs.data[vvrrr+3]=255;
+
+		}
+		else{
+			imgs.data[vvrrr]=255;
+			imgs.data[vvrrr+1]=255;
+			imgs.data[vvrrr+2]=255;
+			imgs.data[vvrrr+3]=255;
+
+		}
+		}
+		vvrr++;
+	}
+
+}
+
+tiot++;
+
+}
+
+	eetels++;
+
+}
+
+
+
+
+
+function doStepE(){
+
+if((eetels%changeIt)==0){
+	for(i=0;i<sliceheight;i++){
+		for(j=0;j<sliceheight;j++){
+			aaraar[i][j]=false;
+		}
+	}
+
+	for(a=0;a<pxpyxtyt.length;a++){
+		dire=pxpydxdy[a];
+		direx=dire[0];
+		direy=dire[1];
+
+		xpyp_=pxpyxtyt[a];
+		if((xpyp_[0]+dire[0])<=0 || (xpyp_[0]+dire[0])>=sliceheight){
+		direx=-1*direx;
+		}
+		if((xpyp_[1]+dire[1])<=0 || (xpyp_[1]+dire[1])>=sliceheight){
+		direy=-1*direy;
+		}
+		pxpyxtytxy=new Array();
+		pxpyxtytxy[0]=xpyp_[0]+direx;
+		pxpyxtytxy[1]=xpyp_[1]+direy;
+		aaraar[pxpyxtytxy[0]][pxpyxtytxy[1]]=true;
+		pxpyxtyt[a]=pxpyxtytxy;
+
+		xxxyyyd=new Array();
+		xxxyyyd[0]=direx;
+		xxxyyyd[1]=direy;
+		pxpydxdy[a]=xxxyyyd;
+
+		
+
+		
+			
+	}
+
+
+var ofse=document.getElementById('canvasx');
+ofse.width=changeIt;
+ofse.height=sliceheight;
+var ocff=ofse.getContext('2d');
+pixelserss=ocff.getImageData(0,0,changeIt, sliceheight);
+ror=0;
+
+	for(x=0;x<sliceheight;x++){
+for(y=0;y<sliceheight;y++){
+		orrr=(ror*4);	
+		if(y>((tiot+0)*changeIt)  && y<((tiot+1)*changeIt)){
+		if(aaraar[y-((tiot+0)*changeIt) ][x]==true){
+			imgs.data[orrr]=0;
+			imgs.data[orrr+1]=0;
+			imgs.data[orrr+2]=0;
+			imgs.data[orrr+3]=255;
+
+		}
+		else{
+			imgs.data[orrr]=255;
+			imgs.data[orrr+1]=255;
+			imgs.data[orrr+2]=255;
+			imgs.data[orrr+3]=255;
+
+		}
+		}
+		ror++;
+	}
+
+}
+
+tiot++;
+
+
+
+}
+
+	eetels++;
+}
+
+
+
+
+
+function loopss(all){
+
+
+	alll=all;
+	if((eetels%sliceheight)==0){
+binit();
+
+	//alll++;
+	}
+
+if((eetels%sliceheight)>=(sliceheight*.95)){
+
+	ahgjj=new Array(sliceheight);
+	for(h=0;h<sliceheight;h++){
+ahgjj[h]=[];	
+}
+
+//pixelsasas
+
+	reggh=0;
+	for(bi=0;bi<sliceheight;bi++){
+		for(fo=0;fo<sliceheight;fo++){
+
+			tyuu=reggh*4;
+			reggh++;
+			rooo=imgs.data[tyuu];
+			if(rooo==0){
+				ahgjj[bi][fo]=true;
+			}
+			else{
+	ahgjj[bi][fo]=false;
+
+			}
+
+		}
+
+	}
+	
+	return ahgjj;
+}
+else{
+
+	rrrhh=alll;
+	if(rrrhh==0){
+		doStep();
+	}
+	if(rrrhh==1){
+		doStepv();
+	}
+	if(rrrhh==2){
+		doStepA();
+	}
+	if(rrrhh==3){
+		doStepB();
+	}
+	if(rrrhh==4){
+		doStepC();
+	}
+	if(rrrhh==5){
+		doStepD();
+	}
+	if(rrrhh==6){
+		doStepE();
+	}
+
+
+	if(rrrhh==7){
+		doStep7();
+	}
+
+
+
+	if(rrrhh==8){
+		doStep8();
+	}
+
+
+	ddraw();
+	draw2();
+	//document.title=eetels+" "+rrrhh;
+	return loopss(alll);
+}
+}
+
+
+function draw2(){
+
+//x=eetels;
+//var can2=document.getElementById('canvas2');
+//var xtxtcx2=can2.getContext('2d');
+//pixelsers2s=xtxtcx.getImageData(eetels,0,100,sliceheight);
+//xtxtcx2.drawImage(pixelsers2ss,0,0, sliceheight, sliceheight);
+xtxtcx2.lineWidth=0;
+xtxtcx2.strokeStyle = "transparent";
+xtxtcx2.putImageData(imgs, 0,0);
+
+
+
+}
+//loopss(7);
+
+function aaa(){
+binit();
+loopss(8);
+setTimeout("aaa()", 2000);
+}
+aaa();
+
+</script>
