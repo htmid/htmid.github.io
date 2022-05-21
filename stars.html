@@ -1,0 +1,76 @@
+<body style='background-color:black'>
+<div id="canvas"></div>
+<script>
+
+
+function shuffle(a){ var j, x, i; for(i=a.length-1;i>0;i--){ 
+j=Math.floor(Math.random()*(i+1)); x=a[i]; a[i]=a[j]; a[j]=x; } return a; 
+}
+
+
+function plot(){
+
+str="";
+d=new Date();
+
+
+for(ff=0;ff<(d.getHours()/2+5);ff++){
+
+sas1=5+Math.round(10*Math.random());
+sas2=60+Math.round(120*Math.random());
+sas=6+Math.round(12*Math.random());
+
+sas2=20+Math.round(60*Math.random());
+sas1=20+Math.round(60*Math.random());
+sas=20+Math.round(60*Math.random());
+
+
+col="rgb("+(Math.round(sas*(4+d.getHours()/1)))+","+(Math.round(sas1*(2+d.getMinutes()/10)))+","+(Math.round(50+(4*d.getMinutes()*d.getHours())))+")";
+col="rgb("+sas+","+sas2+","+sas1+")";
+var x=new Array();
+max=120+(d.getSeconds()*2);
+change=8+(d.getMinutes()/1);
+x[0]=max/2;
+op=new Array();
+op[0]=(-change+(2*Math.random()*change));
+for(i=1;i<max;i++){
+p=(-change+(2*Math.random()*change));
+x[i]=x[i-1]+p;
+op[i]=p;
+}
+
+
+xx=x;
+xs=shuffle(op);
+maxx=Math.floor(max);
+for(i=0;i<maxx;i++){
+x[i+maxx]=x[i+maxx-1]+(-op[i]);
+}
+
+
+//x.sort(function(aNr, bNr){return aNr - bNr});
+
+xw=max/2;
+y=max/2;
+
+bc=Math.round(1+(Math.random()));
+left=Math.round(-(screen.width/12))+Math.round(screen.width/6*Math.random());
+for(i=0;i<x.length;i++){
+	xw=(screen.width/2)+left+((max/2)*Math.cos(Math.PI*2*i/x.length));
+	y=(screen.height/3)+x[i]+((max/2)*Math.sin(Math.PI*2*bc*i/x.length));
+
+	str+="<div style='background-color:"+col+";width:"+Math.round(20+(Math.random()*200))+"px;height:"+Math.round(10+(Math.random()*100))+"px;position:fixed;left:"+Math.round(xw)+"px;top:"+Math.round(y)+"px;border-radius:50%;opacity:.04123'></div>";
+
+}
+}
+document.getElementById('canvas').innerHTML=str;
+
+setTimeout("plot()", 2000);
+}
+plot();
+//alert(x.length);
+
+
+
+
+</script>
