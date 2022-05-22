@@ -1,0 +1,218 @@
+<div id='screen3' style='visibiflity:hidden;position:fixed;width:100%;height:100%;left:0;top:0;background-size:100% 100%'>
+		<canvas id='canvassdws0' width=250 height=250  style='width:100%;height:100%'></canvas>
+		</div>
+		<script>
+		var xsaasen=250;
+		var ysaasen=250;
+		strxy="";
+		var xy00xxyy=new Array();
+		var tenpvnp=new Array();
+		function init3(fvfresd){
+			for(gxksx=0;gxksx<ysaasen;gxksx++){
+				xxyy00=new Array();
+				for(gyksy=0;gyksy<xsaasen;gyksy++){
+					xxyy00[gyksy]=false;
+					if(fvfresd==0 ){
+						if(gxksx>(5/12*ysaasen) && gxksx<(7/12*ysaasen) &&  gyksy>(5/12*xsaasen) && gyksy<(7/12*xsaasen)){
+							xxyy00[gyksy]=true;
+							}
+						}
+					else{
+						if(Math.random()<.5){
+							xxyy00[gyksy]=true;
+							}
+						}
+					}
+				xy00xxyy[gxksx]=xxyy00;
+				tenpvnp[gxksx]=xxyy00;
+				}
+			}
+		var canvasssdada = document.getElementById("canvassdws0");
+		var xcttxa = canvasssdada.getContext('2d');
+		var pixelssasa = xcttxa.getImageData(0, 0, xsaasen, ysaasen);
+		var telih=0;
+		function lasstedp(fvfrefd){
+			if(fvfrefd==0){
+				for(u_=0;u_<(xsaasen-1);u_++){
+					for(t_=(telih%2);t_<(ysaasen-1);t_++){
+						    onder=xy00xxyy[(t_+1)];
+						    midden=xy00xxyy[(t_+0)];
+						    onder_=tenpvnp[(t_+1)];
+						    midden_=tenpvnp[(t_+0)];
+						_aaab=onder[u_];
+						_aaba=onder[u_+1]
+						_abaa=midden[u_];
+						_baaa=midden[u_+1];
+						if(Math.random()<.5){
+							_bbba=_aaba;
+							_bbab=_abaa;
+							_babb=_baaa;
+							_abbb=_aaab;
+							}
+						else{
+							_bbba=_baaa;
+							_bbab=_aaab;
+							_babb=_aaba;
+							_abbb=_abaa;
+							}
+						    onder_[u_]=_bbba;
+						onder_[u_+1]=_bbab;
+						midden_[u_]=_babb;
+						midden_[u_+1]=_abbb;
+						            }
+					        }
+				}
+			if(fvfrefd==1){
+				for(u_=1;u_<(xsaasen-1);u_++){
+					for(t_=1;t_<(ysaasen-1);t_++){
+						    onder=xy00xxyy[(t_-1)];
+						    midden=xy00xxyy[(t_+0)];
+						    midden_=tenpvnp[(t_+0)];
+						    boven=xy00xxyy[(t_+1)];
+						livv=0;
+						    __a0=onder[u_-1];
+						    __a1=onder[u_];
+						    __a2=onder[u_+1];
+						    __b0=midden[u_-1];
+						    __b1=midden[u_];
+						    __b2=midden[u_+1];
+						    __c0=boven[u_-1];
+						    __c1=boven[u_];
+						    __c2=boven[u_+1];
+						if(__a0==true){
+							livv++;
+							} 
+						if(__a1==true){
+							livv++; 
+							}
+						if(__a2==true){
+							livv++;
+							}
+						if( __b0==true){
+							livv++;
+							}
+						if( __b2==true){
+							livv++;
+							}
+						if( __b1==true){
+							livv++;
+							}
+						if(__c0==true ){
+							livv++;
+							}
+						if( __c1==true){
+							livv++;
+							}
+						if(__c2==true){
+							livv++;
+							}
+						if(livv<2 || livv>3){
+							midden_[u_]=false;
+							}
+						if( livv==3){
+							midden_[u_]=true;
+							}
+						            }
+					        }
+				}
+			if(fvfrefd==2){
+				for(u_=1;u_<(xsaasen-1);u_++){
+					for(t_=1;t_<(ysaasen-1);t_++){
+						    onder=xy00xxyy[(t_-1)];
+						    midden=xy00xxyy[(t_+0)];
+						    midden_=tenpvnp[(t_+0)];
+						    boven=xy00xxyy[(t_+1)];
+						livv=0;
+						    __a0=onder[u_-1];
+						    __a1=onder[u_];
+						    __a2=onder[u_+1];
+						    __b0=midden[u_-1];
+						    __b1=midden[u_];
+						    __b2=midden[u_+1];
+						    __c0=boven[u_-1];
+						    __c1=boven[u_];
+						    __c2=boven[u_+1];
+						if(__a0==true){
+							livv++;
+							} 
+						if(__a1==true){
+							livv++; 
+							}
+						if(__a2==true){
+							livv++;
+							}
+						if( __b0==true){
+							livv++;
+							}
+						if( __b2==true){
+							livv++;
+							}
+						if( __b1==true){
+							//livv++;
+							}
+						if(__c0==true ){
+							livv++;
+							}
+						if( __c1==true){
+							livv++;
+							}
+						if(__c2==true){
+							livv++;
+							}
+						if(livv<2 || livv>3){
+							midden_[u_]=false;
+							}
+						if(__b1==false && livv==3){
+							midden_[u_]=true;
+							}
+						            }
+					        }
+				}
+			telih++;
+			drs=xy00xxyy
+			dsr=tenpvnp;
+			xy00xxyy=dsr;
+			}
+		function draw__(){
+			fdff=0;
+			for(t_=0;t_<(ysaasen-0);t_++){
+				    __ond=xy00xxyy[t_];
+				for(u_=0;u_<(xsaasen-0);u_++){
+					ond_=0;
+					if(__ond[u_]==true){
+						ond_=255;
+						}
+					    var offset = fdff * 4;
+					    pixelssasa.data[offset + 0] = ond_;
+					    pixelssasa.data[offset + 1] =  ond_;
+					    pixelssasa.data[offset + 2] = ond_;
+					    pixelssasa.data[offset + 3] = 197;
+					fdff++;
+					  }
+				}
+			  xcttxa.putImageData(pixelssasa, 0, 0);
+			/*
+			for(t=0;t<(ysaasen-0);t++){
+				    ond=xy00xxyy[t];
+				for(u=0;u<(xsaasen-0);u++){
+					dsf=document.getElementById("_x"+u+"_y"+t);
+					if(ond[u]==false){
+						dsf.style.backgroundColor="black";
+						}
+					else{
+						dsf.style.backgroundColor="white";
+						}
+					}
+				}
+			*/
+			}
+		var x_x_x=-1;
+		var _x_x=1;
+		function tcu(){
+			lasstedp((_x_x%3));
+			draw__();
+			setTimeout("tcu()", 520);
+			}
+		init3(_x_x);
+		tcu();
+		</script>
