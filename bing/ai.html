@@ -1,0 +1,59 @@
+<script>
+function xorNeuralNetwork(x, y) {
+    // Define the sigmoid function
+    function sigmoid(x) {
+        return 1 / (1 + Math.exp(-x));
+    }
+
+    // Define the derivative of the sigmoid function
+    function sigmoidDerivative(x) {
+        return sigmoid(x) * (1 - sigmoid(x));
+    }
+
+    // Define the neural network architecture
+    let inputLayer = [x, y];
+    let hiddenLayer = [0, 0];
+    let outputLayer = 0;
+
+    // Define the weights
+    let weights1 = [[(-.5+(Math.random())), (.5+(Math.random()))], [(-.5+(Math.random())), (-.5+(Math.random()))]];
+    let weights2 = [(-.5+(Math.random())), (-.5+(Math.random()))];
+
+    // Train the neural network
+    for (let iteration = 0; iteration < 1000; iteration++) {
+        // Forward propagation
+        for (let i = 0; i < hiddenLayer.length; i++) {
+            hiddenLayer[i] = sigmoid(inputLayer[0] * weights1[0][i] + inputLayer[1] * weights1[1][i]);
+        }
+        outputLayer = sigmoid(hiddenLayer[0] * weights2[0] + hiddenLayer[1] * weights2[1]);
+
+        // Backward propagation
+
+	if(x<y || x==y){
+		d=0;
+	}
+	else{
+		d=1;
+	}
+        let outputError = d - outputLayer;
+        let outputDelta = outputError * sigmoidDerivative(outputLayer);
+
+        let hiddenError = [weights2[0] * outputDelta, weights2[1] * outputDelta];
+        let hiddenDelta = [hiddenError[0] * sigmoidDerivative(hiddenLayer[0]), hiddenError[1] * sigmoidDerivative(hiddenLayer[1])];
+
+        // Update the weights
+        for (let i = 0; i < weights2.length; i++) {
+            weights2[i] += hiddenLayer[i] * outputDelta;
+            for (let j = 0; j < weights1.length; j++) {
+                weights1[j][i] += inputLayer[j] * hiddenDelta[i];
+            }
+        }
+    }
+
+    return Math.round(outputLayer);
+}
+alert(xorNeuralNetwork(0, 0)+" "+xorNeuralNetwork(0, 1)+" "+xorNeuralNetwork(1, 0)+" "+ xorNeuralNetwork(1, 1));
+</script>
+
+Kopiëren
+This function takes two inputs x and y, and returns the result of the XOR operation on them. It uses a simple neural network with one input layer, one hidden layer, and one output layer. The neural network is trained using backpropagation to update the weights and minimize the error between the predicted output and the actual output. You can use this function to solve the XOR equation without using any external libraries. I hope this helps
