@@ -1,0 +1,304 @@
+<html>
+<head>
+<title>Home | Cellular Automata - (R) Ben Massoud</title>
+</head>
+<body>
+<div id='body'></div>
+<script>
+var nrsrsrec=new Array();
+sftyosftyo=0;
+function numberTBAdA(nr){
+var neej=nr;
+cc=neej.toString(2);
+return cc;
+}
+function reverStr(str) {
+    var newString = "";
+    for (var i = str.length - 1; i >= 0; i--) {
+        newString += str[i];
+    }
+    return newString;
+}
+var tllss=sftyosftyo;
+a2=1;
+cd=1;
+c=0;
+function numberTBAdA(nr){ var neej=nr; cc=neej.toString(2); return cc;}
+function reverStr(str) { var newString = ""; for (var i = str.length - 1; i >= 0; i--){ newString += str[i]; } return newString; }
+var tllss=sftyosftyo;
+a2=1;
+cd=1;
+c=0;
+bbtt=0; 
+rete=0;
+bbvv=12;
+var nrsrsrec=new Array();
+onrsrsrecnrsrsr=new Array();
+for(te=0;te<Math.pow(2,bbvv);te+=1){
+fsee=te.toString(2);
+fs2x=reverStr(fsee);
+sfff=parseInt(fs2x,2);
+dsgg=(sfff/2)*Math.pow(-1, (sfff%2));
+sddg=dsgg & sfff;
+bbtt+=sddg;
+
+onrsrsrecnrsrsr[rete]=bbtt;
+rete++;
+
+}
+onrsrsrecnrsrsr.sort(function(a, b){return a - b});
+nmnmv=new Array();
+rbbb=0; 
+terrr=0;
+for(t2o=0;t2o<Math.pow(2,bbvv);t2o+=1){
+rbbb+=onrsrsrecnrsrsr[t2o];
+nmnmv[terrr]=rbbb;
+terrr++;
+}
+nrsrsrec=nmnmv;
+ret=rete;
+
+function onlyUniqueee(value, index, self) { 
+    return self.indexOf(value) === index;
+}
+function removewithfilter(arr) { 
+            let outputArray = arr.filter(function(v, i, self) 
+            { 
+                  
+                return i == self.indexOf(v); 
+            }); 
+              
+            return outputArray; 
+} 
+
+
+nrsrsrec=removewithfilter(nrsrsrec);
+
+var lijnnnes=new Array();
+var sccliceheight=450;
+var scclicelenth=250;
+
+document.getElementById('body').innerHTML="<canvas width="+sccliceheight+" height="+scclicelenth+" style='position:fixed;left:0;top:0;width:100%;height:100%' id='oversz2'></canvas><div style='position:fixed;left:45%;top:0%;background-color:black;color:white' id='info'></div>";
+
+var obbegs=0;
+var cellunr=Math.floor(nrsrsrec.length*Math.random());
+var ruuule = 0;
+var starting = "r";
+var oversz2, contexttt;		
+var currsctate, nextsctate;
+var mijpiksels;
+var currrowvw = 0;
+var instells=0;
+var xyz=343;
+function doStRuleNrnNr() {		
+
+
+
+
+ruuule_set(nrsrsrec[xyz]-1);
+			d=Math.floor(currsctatex.length*Math.random());
+			currsctatex[d]=!currsctatex[d];
+			
+			for (var i = 0; i < sccliceheight; i++) {
+	
+				if(Math.random()>.5){
+				 currsctatex[i] =true;
+
+}
+else{
+				 currsctatex[i] =false;
+
+}
+					
+				
+			}
+
+
+			
+
+
+	
+			tllss++;			
+			doStRuleNrnNrcre();				
+							
+}
+function wwooooww() {
+			var scroll = false;					
+			if (!scroll || currrowvw < scclicelenth - 1) {
+				currrowvw++;
+				currrowvw %= scclicelenth;								
+			} else {
+			
+				contexttt.putImageData(mijpiksels, 0, 0);
+
+				telYUI++;
+			}
+
+			for (i = 0; i < sccliceheight; i++) {
+
+teghh=instells*4;
+
+				if (currsctate[i]){
+
+mijpiksels.data[teghh]=255;
+mijpiksels.data[teghh+1]=255;
+mijpiksels.data[teghh+2]=255;
+mijpiksels.data[teghh+3]=255;
+
+
+}
+				else { 
+//contexttt.fillStyle = "rgb(0, 0, 0)";	
+mijpiksels.data[teghh]=0;
+mijpiksels.data[teghh+1]=0;
+mijpiksels.data[teghh+2]=0;
+mijpiksels.data[teghh+3]=255;
+
+}
+
+
+
+
+
+instells++;
+
+
+
+
+achhhchcnumner=2;
+
+				tgtru=0;
+nraarruR=new Array();
+				for(rricc=(i-achhhchcnumner);rricc<=(i+achhhchcnumner);rricc++){
+					if(rricc<0){
+						nraarruR[tgtru]=false;
+						}
+					else if(rricc>=(sccliceheight-1)){
+						nraarruR[tgtru]=false;
+						}
+					else{
+						nraarruR[tgtru]=currsctate[rricc];
+						}
+					tgtru++;
+					}
+				var nrru = 0;
+				for(rhpr=0;rhpr<nraarruR.length;rhpr++){
+					if(nraarruR[rhpr]==true) nrru |= Math.pow(2, (tgtru-1-rhpr));
+					}
+				nextsctate[i] = ( ruuule & Math.pow(2, nrru)) > 0;
+				
+				}
+		
+
+
+
+
+
+
+
+						
+			for (var i = 0; i < sccliceheight; i++)
+				currsctate[i] = nextsctate[i];
+		lijnnnes[currrowvw]=currsctate;			
+}	
+
+
+
+
+
+
+
+
+
+
+		
+			var currsctatex = new Array(sccliceheight);
+					
+			for (var i = 0; i < sccliceheight; i++) {
+				switch (starting) {
+					case 'r':
+						if (Math.floor(Math.random() * 2))
+							currsctatex[i] = true;
+						else currsctatex[i] = false;
+						break;
+				}
+			}
+
+
+
+
+	
+function doStRuleNrnNrcre(){
+			
+			currsctate = new Array(sccliceheight);
+			nextsctate = new Array(sccliceheight);
+
+
+
+
+
+
+			d=Math.floor(currsctatex.length*Math.random());
+			currsctatex[d]=!currsctatex[d];
+			
+			for ( i = 0; i < sccliceheight; i++) {
+	
+				 currsctate[i] = currsctatex[i];
+					
+				
+			}
+	currrowvw = -1;
+	untttu();
+}
+		
+
+	var obbegss=0;	
+function untttu() {
+obbegss++;
+	if(obbegss<scclicelenth){
+
+			wwooooww();
+untttu();
+		
+
+	}
+	else{
+obbegss=0;
+
+
+		
+		console.log(nrsrsrec[xyz]);
+
+
+
+xyz=Math.floor(Math.random()*Math.pow(2,12) );
+
+
+
+
+		instells=0;
+	contexttt.putImageData(mijpiksels, 0, 0);
+		setTimeout("doStRuleNrnNr()", 3800);	
+	}
+}
+		
+function ruuule_xor(num) {
+	ruuule ^= num;
+}
+		
+function ruuule_set(num) {
+
+		ruuule = num;	
+
+}	
+
+
+			oversz2 = document.getElementById("oversz2");
+			contexttt = oversz2.getContext('2d');
+			mijpiksels=contexttt.getImageData(0,0,sccliceheight, scclicelenth);			
+doStRuleNrnNr();
+
+
+</script>
+</body>
+</html>
