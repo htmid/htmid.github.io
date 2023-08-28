@@ -1,0 +1,437 @@
+
+<html>
+<head>
+<title>Home | Cellular Automata - (R) Ben Massoud</title>
+</head>
+<body>
+<div id='body'></div>
+<script>
+var cnrsrsrec=new Array();
+sftyosftyo=0;
+function numberTBAdA(nr){
+var neej=nr;
+cc=neej.toString(2);
+return cc;
+}
+function reverStr(str) {
+    var newString = "";
+    for (var i = str.length - 1; i >= 0; i--) {
+        newString += str[i];
+    }
+    return newString;
+}
+var tllss=sftyosftyo;
+a2=1;
+cd=1;
+c=0;
+function numberTBAdA(nr){ var neej=nr; cc=neej.toString(2); return cc;}
+function reverStr(str) { var newString = ""; for (var i = str.length - 1; i >= 0; i--){ newString += str[i]; } return newString; }
+var tllss=sftyosftyo;
+a2=1;
+cd=1;
+c=0;
+bbtt=0; 
+rete=0;
+bbvv=12;
+var cnrsrsrec=new Array();
+ocnrsrsrecnrsrsr=new Array();
+for(te=0;te<Math.pow(2,bbvv);te+=1){
+fsee=te.toString(2);
+fs2x=reverStr(fsee);
+sfff=parseInt(fs2x,2);
+dsgg=(sfff/2)*Math.pow(-1, (sfff%2));
+sddg=dsgg & sfff;
+bbtt+=sddg;
+
+ocnrsrsrecnrsrsr[rete]=bbtt;
+rete++;
+
+}
+ocnrsrsrecnrsrsr.sort(function(a, b){return b - a});
+nmnmv=new Array();
+rbbb=0; 
+terrr=0;
+for(t2o=0;t2o<Math.pow(2,bbvv);t2o+=1){
+rbbb+=ocnrsrsrecnrsrsr[t2o];
+nmnmv[terrr]=rbbb;
+terrr++;
+}
+cnrsrsrec=nmnmv;
+ret=rete;
+
+function onlyUniqueee(value, index, self) { 
+    return self.indexOf(value) === index;
+}
+function removewithfilter(arr) { 
+            let outputArray = arr.filter(function(v, i, self) 
+            { 
+                  
+                return i == self.indexOf(v); 
+            }); 
+              
+            return outputArray; 
+} 
+
+
+cnrsrsrec=removewithfilter(cnrsrsrec);
+
+var lijnnnes=new Array();
+var sccliceccheight=500;
+var scclicecclenth=500;
+
+ur=window.location.href;
+uuui=ur.split("wh=");
+if(uuui.length>1){
+nas=uuui[1];
+regg=nas.split("&");
+rdfg=regg[0];
+mmmk=rdfg.split(":");
+sccliceccheight=parseInt(mmmk[0]);
+scclicecclenth=parseInt(mmmk[1]);
+
+}
+
+document.getElementById('body').innerHTML="<canvas width="+sccliceccheight+" height="+scclicecclenth+" style='position:fixed;left:0;top:0;width:100%;height:100%' id='coverscz2'></canvas><div style='position:fixed;left:45%;top:0%;background-color:black;color:white' id='info'></div>";
+
+var cobbegs=0;
+var ccellunr=Math.floor(cnrsrsrec.length*Math.random());
+var cruuule = 0;
+var starting = "r";
+var coverscz2, contextttc;		
+var currsctatec, nextsctatec;
+var mijpikselscc;
+var currrowvwc = 0;
+var instellsc=0;
+var xyzc=4043662725;
+var niewss=null;
+function dooeStRuleNrnNr() {		
+
+clearTimeout(niewss);
+
+
+ur=window.location.href;
+uuui=ur.split("rule=");
+if(uuui.length>1){
+nas=uuui[1];
+regg=nas.split("&");
+xyzc=parseInt(regg[0]);
+
+
+}
+
+ur=window.location.href;
+uuui=ur.split("nr=");
+if(uuui.length>1){
+nas=uuui[1];
+regg=nas.split("&");
+xyzc=parseInt(regg[0]);
+
+
+}
+
+ur=window.location.href;
+uuui=ur.split("number=");
+if(uuui.length>1){
+nas=uuui[1];
+regg=nas.split("&");
+xyzc=parseInt(regg[0]);
+
+
+}
+
+ur=window.location.href;
+uuui=ur.split("n=");
+if(uuui.length>1){
+nas=uuui[1];
+regg=nas.split("&");
+xyzc=parseInt(regg[0]);
+
+
+}
+
+
+ur=window.location.href;
+uuui=ur.split("x=");
+if(uuui.length>1){
+nas=uuui[1];
+regg=nas.split("&");
+xyzc=parseInt(regg[0]);
+
+
+}
+
+cruuule_set(xyzc);
+
+
+			d=Math.floor(currsctatecx.length*Math.random());
+			currsctatecx[d]=!currsctatecx[d];
+			
+			for (var i = 0; i < sccliceccheight; i++) {
+	
+				if(Math.random()>.5){
+				 currsctatecx[i] =true;
+
+}
+else{
+				 currsctatecx[i] =false;
+
+}
+					
+				
+			}
+
+
+			
+
+
+	
+			tllss++;			
+			dooeStRuleNrnNrcre();				
+							
+}
+function wwooooww() {
+			var scroll = false;					
+			if (!scroll || currrowvwc < scclicecclenth - 1) {
+				currrowvwc++;
+				currrowvwc %= scclicecclenth;								
+			} else {
+			
+				contextttc.putImageData(mijpikselscc, 0, 0);
+
+				telYUI++;
+			}
+
+			for (i = 0; i < sccliceccheight; i++) {
+
+teghh=instellsc*4;
+
+				if (currsctatec[i]){
+
+mijpikselscc.data[teghh]=0;
+mijpikselscc.data[teghh+1]=0;
+mijpikselscc.data[teghh+2]=0;
+mijpikselscc.data[teghh+3]=255;
+
+
+}
+				else { 
+//contextttc.fillStyle = "rgb(0, 0, 0)";	
+mijpikselscc.data[teghh]=255;
+mijpikselscc.data[teghh+1]=255;
+mijpikselscc.data[teghh+2]=255;
+mijpikselscc.data[teghh+3]=255;
+
+}
+
+
+
+
+
+instellsc++;
+
+
+
+
+
+				tgtru=0;
+nraarruR=new Array();
+				for(rricc=(i-achhhchcnumner);rricc<=(i+achhhchcnumner);rricc++){
+					if(rricc<0){
+						nraarruR[tgtru]=false;
+						}
+					else if(rricc>=(sccliceccheight-1)){
+						nraarruR[tgtru]=false;
+						}
+					else{
+						nraarruR[tgtru]=currsctatec[rricc];
+						}
+					tgtru++;
+					}
+				var nrru = 0;
+				for(rhpr=0;rhpr<nraarruR.length;rhpr++){
+					if(nraarruR[rhpr]==true) nrru |= Math.pow(2, (tgtru-rhpr-1));
+					}
+				nextsctatec[i] = ( cruuule & Math.pow(2, nrru)) > 0;
+				
+				}
+		
+
+
+
+
+
+
+
+						
+			for (var i = 0; i < sccliceccheight; i++)
+				currsctatec[i] = nextsctatec[i];
+		lijnnnes[currrowvwc]=currsctatec;			
+}	
+
+
+
+
+
+
+
+
+
+
+		
+			var currsctatecx = new Array(sccliceccheight);
+					
+			for (var i = 0; i < sccliceccheight; i++) {
+				switch (starting) {
+					case 'r':
+						if (Math.floor(Math.random() * 2))
+							currsctatecx[i] = true;
+						else currsctatecx[i] = false;
+						break;
+				}
+			}
+
+
+
+
+	
+function dooeStRuleNrnNrcre(){
+			
+			currsctatec = new Array(sccliceccheight);
+			nextsctatec = new Array(sccliceccheight);
+
+
+
+
+
+
+			d=Math.floor(currsctatecx.length*Math.random());
+			currsctatecx[d]=!currsctatecx[d];
+			
+			for ( i = 0; i < sccliceccheight; i++) {
+	
+				 currsctatec[i] = currsctatecx[i];
+					
+				
+			}
+	currrowvwc = -1;
+	untttu();
+}
+		
+
+	var cobbegss=0;	
+function untttu() {
+cobbegss++;
+	if(cobbegss<scclicecclenth){
+
+			wwooooww();
+untttu();
+		
+
+	}
+	else{
+cobbegss=0;
+
+
+		
+		console.log(xyzc);
+
+
+
+
+
+
+
+
+		instellsc=0;
+	
+
+
+
+//var imageData = contextttc.getImageData(0, 0, sccliceccheight, sccliceccheight);
+
+//rotateImageLeftOnCanvasByPixels(mijpikselscc,  coverscz2);
+
+
+contextttc.putImageData(mijpikselscc, 0, 0);
+
+
+niewss=setTimeout("dooeStRuleNrnNr()", 1000);
+
+
+
+}
+}
+
+
+
+
+
+
+
+
+
+var achhhchcnumner=2;
+
+		
+function cruuule_xor(num) {
+	cruuule ^= num;
+}
+		
+function cruuule_set(num) {
+
+		cruuule = num;	
+
+}	
+
+
+			coverscz2 = document.getElementById("coverscz2");
+			contextttc = coverscz2.getContext('2d');
+			mijpikselscc=contextttc.getImageData(0,0,sccliceccheight, scclicecclenth);
+
+function nextNr(){
+
+xyzc=cnrsrsrec[Math.floor(Math.random()*Math.pow(2,12) )];
+document.getElementById('infos').innerHTML=xyzc;
+}
+			
+dooeStRuleNrnNr();
+
+document.body.ondblclick=function(){
+	d=document.getElementById('a');
+
+
+
+image=new Image();
+image.onload=function(){
+    const canvas = document.createElement('canvas');
+    canvas.width = image.naturalHeight;
+    canvas.height = image.naturalWidth;
+
+    // Get the canvas context and rotate it
+    const ctx = canvas.getContext('2d');
+    ctx.rotate(-Math.PI / 2);
+    ctx.translate(-image.naturalHeight, 0);
+
+    // Draw the image onto the rotated canvas
+    ctx.drawImage(image, 0, 0);
+
+	d.setAttribute('href', canvas.toDataURL('image/png'));
+	d.setAttribute('download',xyzc+'.png');
+	d.click();
+};
+image.src=coverscz2.toDataURL('image/png');
+
+};
+
+
+
+
+</script>
+<a id='a' style='display:none'></a>
+</body>
+
+<div style='width:14%;height:2%;position:fixed;left:43%;bottom:12%;color:white;background-color:black;text-align:center' id='infos'></div>
+
+<button style='width:14%;height:4%;position:fixed;left:43%;bottom:5%;color:white;background-color:blue' onclick='nextNr()'>Volgende  Nummer</button>
+
+</html>
