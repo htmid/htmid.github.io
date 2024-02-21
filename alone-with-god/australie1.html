@@ -1,0 +1,312 @@
+
+
+
+<canvas id='canvas' width=350 height=350 style='width:100%;height:100%'></canvas>
+<script>
+
+
+var eetels=0;
+var slicelength=350;
+var sliceheight=350;
+var aaraarx=new Array();
+var aaraarx2=new Array();
+var aaraarx=new Array();
+var aaraarx2=new Array();
+var tempx="";
+var refvgame5=0;
+var gridgame5=new Array();
+var gridgame52=new Array();
+
+
+var can=document.getElementById('canvas');
+var ctx=can.getContext('2d');
+var pixels=ctx.getImageData(0,0,slicelength, sliceheight);
+
+
+
+
+var percentag6523=.0011;
+var maxstts=Math.floor(percentag6523*sliceheight*sliceheight);
+
+var particlessw=new Array(maxstts);
+var radsss=40;
+var maxradiaaals=14;
+for(e=0;e<maxstts;e++){
+
+	var propses=new Array();
+	var propsesR=new Array();	
+	ccc=0;
+	nrOfn=1+Math.round(Math.random()*2);
+	for(cc=0;cc<nrOfn;cc++){
+		var dxddyd=new Array();
+
+
+		fty=Math.floor(Math.random()*8);
+	
+		if(fty==0){
+			dx=0;
+			dy=-1;
+		}
+
+		if(fty==1){
+			dx=1;
+			dy=-1;	
+		}
+
+		if(fty==2){
+			dx=1;
+			dy=0;
+		}
+		if(fty==3){
+			dx=1;
+			dy=1;
+		}
+		if(fty==4){
+			dx=0;
+			dy=1;
+		}
+
+		if(fty==5){
+			dx=-1;
+			dy=1;	
+		}
+
+		if(fty==6){
+			dx=-1;
+			dy=0;
+		}
+		if(fty==7){
+			dx=-1;
+			dy=1;
+		}
+	
+		dxddyd[0]=dx;
+		dxddyd[1]=dy;
+
+
+		if(nrOfn==1){
+			propsesR[ccc]=dxddyd;
+			ccc++;
+		}
+		if(nrOfn==2){
+			propsesR[ccc]=dxddyd;
+			ccc++;
+			var exts = new Array();
+			exts[0]=-dx;
+			exts[1]=-dy;
+			propsesR[ccc]=exts;
+			ccc++;
+		}
+
+		if(nrOfn==3){
+			propsesR[ccc]=dxddyd;
+			ccc++;
+			var exts = new Array();
+			exts[0]=-dx;
+			exts[1]=dy;
+			propsesR[ccc]=exts;
+			ccc++;
+			exts[0]=dx;
+			exts[1]=-dy;
+			propsesR[ccc]=exts;
+			ccc++;
+			exts[0]=-dx;
+			exts[1]=-dy;
+			propsesR[ccc]=exts;
+			ccc++;
+
+		}
+	propsesR[cc]=propsesR;
+		
+	}
+	
+
+	
+	propses[0]=propsesR;
+	mnx=2+Math.floor(Math.random()*maxradiaaals);
+	
+	propses[1]=mnx;
+	
+	mnxx=mnx+Math.floor(Math.random()*(sliceheight-(2*mnx)));
+	mnyy=mnx+Math.floor(Math.random()*(sliceheight-(2*mnx)));
+
+	propses[2]=mnxx;
+	propses[3]=mnyy;
+	propses[4]=0;
+
+	particlessw[e]=propses;
+
+    }
+
+
+
+var timestul=0;
+function doStep14(){
+
+aaraar=new Array();
+for(xf=0;xf<sliceheight;xf++){
+aaraar[xf]=[];
+}	
+for(xf=0;xf<sliceheight;xf++){
+for(yf=0;yf<sliceheight;yf++){
+aaraar[xf][yf]=false;
+
+}
+}
+ctx.clearRect(0,0,sliceheight,sliceheight);
+ctx.fillStyle='black';
+ctx.fillRect(0,0,sliceheight,sliceheight);
+
+pixels=ctx.getImageData(0,0,slicelength, sliceheight);
+	for(e=0;e<maxstts;e++){
+		propses=particlessw[e];
+		propsesR=propses[0];
+		dtdt=propses[4];	
+		dmmx=propses[1];	
+		mnxx=propses[2];
+		mnyy=propses[3];
+		dtdt++;
+		
+		if(dtdt>=dmmx){
+			dtdt=0;
+			propsesR=new Array();
+			//mnxx=dmmx+Math.floor(Math.random()*(sliceheight-(2*dmmx)));
+			//mnyy=dmmx+Math.floor(Math.random()*(sliceheight-(2*dmmx)));
+			var propsesR=new Array();	
+			ccc=0;
+			nrOfn=1+Math.round(Math.random()*2);
+			for(cc=0;cc<nrOfn;cc++){
+				var dxddyd=new Array();
+				fty=Math.floor(Math.random()*8);
+				if(fty==0){
+					dx=0;
+					dy=-1;
+				}
+
+				if(fty==1){
+					dx=1;
+					dy=-1;	
+				}
+
+				if(fty==2){
+					dx=1;
+					dy=0;
+				}
+				if(fty==3){
+					dx=1;
+					dy=1;
+				}
+				if(fty==4){
+					dx=0;
+					dy=1;
+				}
+
+				if(fty==5){
+					dx=-1;
+					dy=1;	
+				}
+
+				if(fty==6){
+					dx=-1;
+					dy=0;
+				}
+				if(fty==7){
+					dx=-1;
+					dy=1;
+				}
+	
+				dxddyd[0]=dx;
+				dxddyd[1]=dy;
+
+
+				if(nrOfn==1){
+					propsesR[ccc]=dxddyd;
+					ccc++;
+				}
+				if(nrOfn==2){
+					propsesR[ccc]=dxddyd;
+					ccc++;
+					var exts = new Array();
+					exts[0]=-dx;
+					exts[1]=-dy;
+					propsesR[ccc]=exts;
+					ccc++;
+				}
+
+				if(nrOfn==3){
+					propsesR[ccc]=dxddyd;
+					ccc++;
+					var exts = new Array();
+					exts[0]=-dx;
+					exts[1]=dy;
+					propsesR[ccc]=exts;
+					ccc++;
+					exts[0]=dx;
+					exts[1]=-dy;
+					propsesR[ccc]=exts;
+					ccc++;
+					exts[0]=-dx;
+					exts[1]=-dy;
+					propsesR[ccc]=exts;
+					ccc++;
+
+				}
+				
+		
+			}
+			
+
+		
+
+dmmx=	2+Math.floor(Math.random()*maxradiaaals);
+
+
+
+		}
+			
+		pp=new Array();
+		pp[0]=propsesR;
+		pp[1]=dmmx;
+		pp[2]=mnxx;
+		pp[3]=mnyy;
+		pp[4]=dtdt
+
+
+
+		for(j=0;j<propsesR.length;j++){
+
+			nxy=propsesR[j];
+			x=mnxx+(nxy[0]*dtdt);
+			y=mnyy+(nxy[1]*dtdt);
+			if(x>=0 && x<sliceheight && y>=0 && y<sliceheight){
+			aaraar[x][y]=true;
+			}
+
+			offs=(y*sliceheight)+x;
+			ofs=4*offs;
+			pixels.data[ofs]=255;
+			pixels.data[ofs+1]=255;
+			pixels.data[ofs+2]=255;
+			pixels.data[ofs+3]=255;		
+		}
+
+
+		particlessw[e]=pp;
+
+		}
+		
+			ctx.putImageData(pixels,0,0);
+	//window.requestAnimationFrame(doStep14)
+
+setTimeout("doStep14()", 176);
+	}
+
+
+
+
+
+
+
+
+doStep14();
+</script>

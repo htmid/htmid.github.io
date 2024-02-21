@@ -1,0 +1,129 @@
+
+
+<canvas id='canvas' width=350 height=350 style='width:100%;height:100%'></canvas>
+<script>
+
+
+var eetels=0;
+var slicelength=350;
+var sliceheight=350;
+var aaraarx=new Array();
+var aaraarx2=new Array();
+var aaraarx=new Array();
+var aaraarx2=new Array();
+var tempx="";
+var refvgame5=0;
+var gridgame5=new Array();
+var gridgame52=new Array();
+
+
+var can=document.getElementById('canvas');
+var ctx=can.getContext('2d');
+var pixels=ctx.getImageData(0,0,slicelength, sliceheight);
+
+
+
+
+var percentag6ru=.003;
+var maxsttru=Math.floor(percentag6ru*sliceheight*sliceheight);
+
+var particlesru=new Array(maxsttru);
+var radsssru=40;
+
+
+function initprugame17(){
+
+ percentag6ru=.003;
+ maxsttru=Math.floor(percentag6ru*sliceheight*sliceheight);
+
+ particlesru=new Array(maxsttru);
+ radsssru=800;
+
+
+
+for(e=0;e<maxsttru;e++){
+
+	var props=new Array();
+	fty=Math.random();
+	mnx=Math.floor(Math.random()*(sliceheight));
+	mny=Math.floor(Math.random()*(sliceheight));
+	props[0]=fty;
+	props[1]=mnx;
+	props[2]=mny;
+
+	fsd=Math.round(Math.random()*1);
+	props[3]=Math.pow(-1, fsd);	
+
+	particlesru[e]=props;
+
+    
+}
+telsmaaai=0;
+
+}
+
+var telsmaaai=0;
+
+function doStep17(){
+telsmaaai++;
+if(eetels==0){
+initprugame17();
+}
+ctx.clearRect(0,0,sliceheight,sliceheight);
+ctx.fillStyle='black';
+ctx.fillRect(0,0,sliceheight,sliceheight);
+
+pixels=ctx.getImageData(0,0,slicelength, sliceheight);
+	for(e=0;e<maxsttru;e++){
+		props=particlesru[e];
+		maxxxe=props[0];
+
+		x=props[1];
+		y=props[2];
+		tij=props[3];
+		
+		if((Math.random())>maxxxe){
+			tij=tij*-1;
+		}
+
+
+		pp=new Array();
+		pp[0]=maxxxe;
+		pp[1]=x;
+		pp[2]=y;
+		pp[3]=tij;
+
+		particlesru[e]=pp;
+
+
+
+if(tij==1){
+		offs=(y*sliceheight)+x;
+	ofs=4*offs;
+
+
+		pixels.data[ofs]=255;
+		pixels.data[ofs+1]=255;
+		pixels.data[ofs+2]=255;
+
+		pixels.data[ofs+3]=255;
+
+	}	
+
+
+
+		
+	}
+eetels++;
+	ctx.putImageData(pixels,0,0);
+	setTimeout("doStep17()", 185);
+	//window.requestAnimationFrame(doStep17);
+
+}
+
+
+
+
+
+doStep17();
+</script>

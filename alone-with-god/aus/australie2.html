@@ -1,0 +1,163 @@
+
+<canvas id='canvas' width=350 height=350 style='width:100%;height:100%'></canvas>
+<script>
+
+
+var eetels=0;
+var slicelength=350;
+var sliceheight=350;
+var aaraarx=new Array();
+var aaraarx2=new Array();
+var aaraarx=new Array();
+var aaraarx2=new Array();
+var tempx="";
+var refvgame5=0;
+var gridgame5=new Array();
+var gridgame52=new Array();
+for(c=0;c<sliceheight;c++){
+gridgame5[c]=[];
+gridgame52[c]=[];
+}
+var opslagjes=new Array();
+
+for(x=0;x<sliceheight;x++){
+				for(y=0;y<sliceheight;y++){
+					if( x>200 && x<240 && y>220 && y<240){
+						gridgame5[x][y]=true;
+	gridgame5[x][y]=true;
+					}
+					else{
+						gridgame5[x][y]=false;
+	gridgame5[x][y]=false;		
+					}					
+				}				
+}
+
+
+
+
+var can=document.getElementById('canvas');
+var ctx=can.getContext('2d');
+var pixels=ctx.getImageData(0,0,slicelength, sliceheight);
+
+
+
+
+function initgame5(){
+ tempx="";
+opslagjes=new Array();
+ refvgame5=0;
+ gridgame5=new Array();
+ gridgame52=new Array();
+for(c=0;c<sliceheight;c++){
+gridgame5[c]=[];
+gridgame52[c]=[];
+}
+for(x=0;x<sliceheight;x++){
+				for(y=0;y<sliceheight;y++){
+					if( Math.random()<.0042){
+						gridgame5[x][y]=true;
+	gridgame5[x][y]=true;
+					}
+					else{
+						gridgame5[x][y]=false;
+	gridgame5[x][y]=false;		
+					}					
+				}				
+}
+
+}
+var sintellerts=0;
+
+
+function wielsieder(){
+return Math.random();
+}
+
+function drawgame5(){
+eeeb=0;
+/*
+    imjg2 = new Array();
+    for (ez = 0; ez < slicelength; ez++) {
+        imjg2[ez] = [];
+    }
+*/
+
+r=0;
+    for (zn0 = 0; zn0 < slicelength; zn0++) {
+        for (zo0 = 0; zo0 < sliceheight; zo0++) {
+    
+	ofs=r*4;
+	r++;
+	fff=gridgame5[zn0][zo0];
+	if(fff==true){
+		rd=255;		
+		
+	}
+	else{
+		rd=0;
+	}
+
+	pixels.data[ofs]=rd;
+	pixels.data[ofs+1]=rd;	
+	pixels.data[ofs+2]=rd;	
+	pixels.data[ofs+3]=255;	
+	
+
+       }
+    }
+	ctx.putImageData(pixels,0,0);
+    //themoslices[eetels ] = imjg2;
+   
+eetels++;
+
+//window.requestAnimationFrame(doStepD);
+
+setTimeout("doStepD()", 153);
+}
+
+function doStepD(){
+if(eetels==0){
+	initgame5();
+}
+refvgame5++;
+for(xx9=(1+(refvgame5%2));xx9<sliceheight;xx9+=2){
+for(yy9=(1+(refvgame5%2));yy9<(sliceheight-1);yy9+=2){
+		revd=wielsieder();
+			li9=xx9-1; 	
+                        bo9=yy9-1;      
+			hi9=xx9;		                                       		
+		   	ii9=yy9; 		        
+			ai9=gridgame5[li9][bo9];
+			bi9=gridgame5[hi9][bo9];
+			ci9=gridgame5[li9][ii9];
+			di9=gridgame5[hi9][ii9];	
+		if(revd<.5){
+			gridgame5[li9][bo9]=bi9;
+			gridgame5[hi9][bo9]=di9;
+			gridgame5[li9][ii9]=ai9;
+			gridgame5[hi9][ii9]=ci9;		
+		}
+		else{		
+			gridgame5[li9][bo9]=ci9;
+			gridgame5[hi9][bo9]=ai9;
+			gridgame5[li9][ii9]=di9;
+			gridgame5[hi9][ii9]=bi9;		
+		}		
+}
+}
+drawgame5();
+}
+
+
+
+
+
+
+
+
+
+
+
+doStepD();
+</script>

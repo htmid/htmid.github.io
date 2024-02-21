@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+#div1 {
+  position: fixed;
+  height: 100vh;
+  width: 100vw;
+  margin-left: 0;
+  margin-top: 0;
+left:0;
+top:0;	
+
+  perspective: 20vw;
+}
+
+#div2, #div4 {
+  padding: 0;
+position:fixed;
+left:0;top:0;
+width:50vw;
+height:100vh;
+  position: absolute;
+  border: 1px solid black;
+  background: rgba(100,100,100,0.5); 
+
+  transform: rotateY(75deg);
+}
+
+#div3 {
+  position: relative;
+  height: 150px;
+  width: 150px;
+  margin-left: 60px;
+  perspective: none;
+}
+</style>
+</head>
+<body>
+
+
+<div id="div1">
+
+<iframe style='width:100%;height:100%;' frameborder=0 border=0 scrolling='no'  scrollbars='no' src='europe.html'></iframe>
+  <div id="div2"><iframe style='opacity:.76;width:100%;height:100%' frameborder=0 border=0 scrolling='no'  scrollbars='no' src='jij.html'></iframe></div>
+</div>
+
+<script>
+document.getElementById('div2').style.boxShadow="0 0 50px white";
+document.getElementById('div1').style.boxShadow="0 0 25px white";
+</script>
+</body>
+</html>

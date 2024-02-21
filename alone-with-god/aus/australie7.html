@@ -1,0 +1,237 @@
+
+<body style='background-color:black'>
+<canvas width=500 height=500 id="canvasx" style='position:fixed;left:0;top:0;width:100%;height:100%'></canvas>
+<script>
+var can=document.getElementById('canvasx');
+var ctx=can.getContext('2d');
+
+function shuffle(a){ var j, x, i; for(i=a.length-1;i>0;i--){ 
+j=Math.floor(Math.random()*(i+1)); x=a[i]; a[i]=a[j]; a[j]=x; } return a; 
+}
+
+
+    function fillCircle(c,x, y, radius, color) {
+
+        c.fillStyle = color;
+
+        c.beginPath();
+        c.arc(x, y, radius, 0, 2 * Math.PI);
+        c.fill();
+    }
+
+
+
+function plot(){
+ctx.beginPath();
+
+ctx.fillStyle="black";
+ctx.fillRect(0,0,500,500);
+
+str="";
+d=new Date();
+h=20;
+
+
+
+
+
+
+
+for(hh=0;hh<h;hh++){
+	fr2=Math.pow(1.1,Math.round((Math.random()*1)));
+fr=fr2; //*Math.round(1+(1*Math.random()));	
+fillCircle(ctx,Math.round(Math.random()*500),Math.round(500*Math.random()) , Math.round((fr+fr2)/4),"#ffffff");
+}
+
+for(ff=0;ff<15;ff++){
+
+sas1=5+Math.round(10*Math.random());
+sas2=60+Math.round(120*Math.random());
+sas=6+Math.round(12*Math.random());
+
+sas2=20+Math.round(60*Math.random());
+sas1=20+Math.round(60*Math.random());
+sas=20+Math.round(60*Math.random());
+
+
+col="rgba("+(Math.round(sas*(4+d.getHours()/1)))+","+(Math.round(sas1*(2+d.getMinutes()/10)))+","+(Math.round(50+(4*d.getMinutes()*d.getHours())))+",.0412)";
+col="rgba("+sas+","+sas2+","+sas1+",.0412)";
+var x=new Array();
+max=100; 
+change=25;
+x[0]=max/2;
+op=new Array();
+op[0]=(-change+(2*Math.random()*change));
+for(i=1;i<max;i++){
+p=(-change+(2*Math.random()*change));
+x[i]=x[i-1]+p;
+op[i]=p;
+}
+
+
+xx=x;
+xs=shuffle(op);
+maxx=Math.floor(max);
+for(i=0;i<maxx;i++){
+x[i+maxx]=x[i+maxx-1]+(-op[i]);
+}
+
+
+//x.sort(function(aNr, bNr){return aNr - bNr});
+
+xw=max/2;
+y=max/2;
+
+bc=Math.round(1+(Math.random()));
+left=Math.round(-(500/12))+Math.round(500/6*Math.random());
+for(i=0;i<x.length;i++){
+	xw=(500/2)+left+((max/2)*Math.cos(Math.PI*2*i/x.length));
+	y=(500/3)+x[i]+((max/2)*Math.sin(Math.PI*2*bc*i/x.length));
+
+
+
+
+fillCircle(ctx,xw, y,  Math.round(20+(Math.random()*10)) ,col);
+
+
+}
+
+
+
+
+
+
+}
+
+
+
+
+
+setTimeout("plot()", 30000);
+
+}
+//plot();
+//alert(x.length);
+
+
+
+
+</script>
+
+  <canvas    id="canvastars"    style="position:fixed;left:0;top:0;width: 100%; height: 100%; padding: 0;margin: 0;opacity:.43" ></canvas>
+  <script>
+    const canvassst = document.getElementById("canvastars");
+    const cstarst = canvassst.getContext("2d");
+
+    let wstar;
+    let hstar;
+
+    const setCanvasExtents = () => {
+      wstar = document.body.clientWidth;
+      hstar = document.body.clientHeight;
+      canvassst.width = wstar;
+      canvassst.height = hstar;
+    };
+
+    setCanvasExtents();
+
+    window.onresize = () => {
+      setCanvasExtents();
+    };
+
+    const makeStars = count => {
+      const out = [];
+      for (let i = 0; i < count; i++) {
+hsh=0;
+	if(Math.random()>.88){
+	hsh=(Math.random() * 3);
+	}
+
+        const s = {
+          x: Math.random() * 1600 - 800,
+          y: Math.random() * 900 - 450,
+          z: Math.random() * 1000,
+		sz:0+hsh
+        };
+        out.push(s);
+      }
+      return out;
+    };
+
+    let stars = makeStars(6000);
+
+    const clear = () => {
+      cstarst.fillStyle = "black";
+      cstarst.fillRect(0, 0, canvassst.width, canvassst.height);
+    };
+
+    const putPixel = (x, y, brightness) => {
+      const intensity = brightness * 255;
+      const rgb = "rgb(" + intensity + "," + intensity + "," + intensity + ")";
+      cstarst.fillStyle = rgb;
+      cstarst.fillRect(x, y, 1, 1);
+    };
+
+    const moveStars = distance => {
+      const count = stars.length;
+      for (var i = 0; i < count; i++) {
+        const s = stars[i];
+        s.z -= distance;
+        while (s.z <= 1) {
+          s.z += 1000;
+        }
+      }
+    };
+
+    let prevTime;
+    const init0 = time => {
+      prevTime = time;
+      requestAnimationFrame(tick0);
+    };
+
+    const tick0 = time => {
+      let elapsed = time - prevTime;
+      prevTime = time;
+
+      moveStars(elapsed * 0.1);
+
+      clear();
+
+      const cx = wstar / 2;
+      const cy = hstar / 2;
+
+      const count = stars.length;
+      for (var i = 0; i < count; i++) {
+        const star = stars[i];
+
+        const x = cx + star.x / (star.z * 0.001);
+        const y = cy + star.y / (star.z * 0.001);
+
+        if (x < 0 || x >= wstar || y < 0 || y >= hstar) {
+          continue;
+        }
+
+        const d = star.z / 1000.0;
+        const b = 1 - d * d;
+
+	
+	for(g=-(star.sz);g<(star.sz);g++){
+	for(h=-(star.sz);h<(star.sz);h++){
+
+        putPixel((x+g), (y+h), b);
+	}
+	}
+
+      }
+
+      requestAnimationFrame(tick0);
+    };
+
+    requestAnimationFrame(init0);
+  </script>
+
+
+<script>
+
+
+
