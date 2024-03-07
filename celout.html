@@ -1,0 +1,150 @@
+<html>
+<head>
+<canvas style='width:100%;height:100%' id='myCanvas'></canvas>
+<script>
+var ruleTypes=new Array();
+tmpCounter=0;
+tmpRule_=0;
+oruleTypesnrsrsr=new Array();
+for(var n=0;n<Math.pow(2,12);n+=1){
+	var nbin=n.toString(2);
+	var nbinrev = ""; 
+	for (var i = nbin.length - 1; i >= 0; i--)
+	{
+		nbinrev += nbin[i]; 
+	}
+        nbinrevnt=parseInt(nbinrev,2);
+	tmpRule_+=(nbinrevnt/2)*Math.pow(-1, (nbinrevnt%2)) & nbinrevnt;
+	ruleTypes[tmpCounter]=tmpRule_;
+	tmpCounter++;
+}
+ruleTypes.sort(function(a, b){
+	return (a - b); 
+});
+ruleTypes_=new Array();
+tempSum=0;
+terrr=0;
+for(var n=0;n<Math.pow(2,12);n+=1){
+	tempSum+=ruleTypes[n];
+	ruleTypes_[n]=tempSum;
+}
+ruleTypes=ruleTypes_;
+
+var canvasheight=450;
+var canvaswidth=250;
+myCanvas_ = document.getElementById("myCanvas");
+myCanvas.width=canvasheight;
+myCanvas.height=canvaswidth;
+myCanvasContext = myCanvas.getContext('2d');
+myPixelsCanvas=myCanvasContext.getImageData(0,0,canvasheight, canvaswidth);
+var tmpcanvaswidthcntnr=0;
+
+var oversz2, myCanvasContext;		
+var currsctate, nextsctate;
+var currrowvw = 0;
+var instells=0;
+var xyz=343;
+
+function doStRuleNrnNr() {		
+	ruuule_set(ruleTypes[xyz]);
+	d=Math.floor(currsctatex.length*Math.random());
+	currsctatex[d]=!currsctatex[d];
+	for (var i = 0; i < canvasheight; i++) {
+		if(Math.random()>.5){
+			 currsctatex[i] =true;
+
+		}
+		else{
+			 currsctatex[i] =false;
+		}			
+	}
+	currsctate = new Array(canvasheight);
+	nextsctate = new Array(canvasheight);
+	d=Math.floor(currsctatex.length*Math.random());
+	currsctatex[d]=!currsctatex[d];
+	for ( i = 0; i < canvasheight; i++) {
+		 currsctate[i] = currsctatex[i];
+						
+	}
+	currrowvw = -1;
+	untttu();										
+}
+
+function untttu() {
+	tmpcanvaswidthcntnrs++;
+	if(tmpcanvaswidthcntnrs<canvaswidth){
+		var scroll = false;					
+			if (!scroll || currrowvw < canvaswidth - 1) {
+				currrowvw++;
+				currrowvw %= canvaswidth;								
+			} else {
+				myCanvasContext.putImageData(myPixelsCanvas, 0, 0);
+
+			}
+
+			for (i = 0; i < canvasheight; i++) {
+				teghh=instells*4;
+
+				if (currsctate[i]){
+					myPixelsCanvas.data[teghh]=255;
+					myPixelsCanvas.data[teghh+1]=255;
+					myPixelsCanvas.data[teghh+2]=255;
+					myPixelsCanvas.data[teghh+3]=255;
+				}
+				else { 
+					myPixelsCanvas.data[teghh]=0;
+					myPixelsCanvas.data[teghh+1]=0;
+					myPixelsCanvas.data[teghh+2]=0;
+					myPixelsCanvas.data[teghh+3]=255;
+				}
+				instells++;
+				achhhchcnumner=2;
+				tgtru=0;
+				nraarruR=new Array();
+				for(rricc=(i-achhhchcnumner);rricc<=(i+achhhchcnumner);rricc++){
+					if(rricc<0){
+						nraarruR[tgtru]=false;
+						}
+					else if(rricc>=(canvasheight-1)){
+						nraarruR[tgtru]=false;
+						}
+					else{
+						nraarruR[tgtru]=currsctate[rricc];
+						}
+					tgtru++;
+					}
+				var nrru = 0;
+				for(rhpr=0;rhpr<nraarruR.length;rhpr++){
+					if(nraarruR[rhpr]==true) nrru |= Math.pow(2, (tgtru-1-rhpr));
+					}
+				nextsctate[i] = ( ruuule & Math.pow(2, nrru)) > 0;
+				
+			}					
+			for (var i = 0; i < canvasheight; i++)
+				currsctate[i] = nextsctate[i];
+			untttu();			
+	}
+	else{
+		tmpcanvaswidthcntnrs=0;
+		document.title=(ruleTypes[xyz]-1);
+		xyz=Math.floor(Math.random()*Math.pow(2,12) );
+		instells=0;
+		myCanvasContext.putImageData(myPixelsCanvas, 0, 0);
+		setTimeout("doStRuleNrnNr()", 3800);	
+	}
+}
+		
+function ruuule_set(num) {
+		ruuule = num;	
+}
+var currsctatex = new Array(canvasheight);
+for (var i = 0; i < canvasheight; i++) {
+	if (Math.floor(Math.random() * 2))
+		currsctatex[i] = true;
+	else 
+		currsctatex[i] = false;					
+}
+var tmpcanvaswidthcntnrs=0;	
+doStRuleNrnNr();
+</script>
+
