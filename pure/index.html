@@ -1,0 +1,553 @@
+<body onclick="mixf()">
+<canvas id='myCanvas' style='width:100%;height:100%;display:none' width=500 height=500></canvas>
+<div id='dcan000' style='display:none'><canvas  style='position:fixed;top:0;left:0;width:100%;height:100%;' width=500 height=500 id='dcan0000'></canvas></div>
+<canvas id='tcan' style='width:100%;height:100%;position:fixed;left:0;top:0' width=500 height=500></canvas>
+<script>
+var sliceheight=500;
+var slicelength=500;
+
+
+var ucanvsas = document.getElementById('myCanvas');
+var cccttt = ucanvsas.getContext('2d', {
+    willReadFrequently: true
+});
+
+var modulus113 = Math.pow(2, 32);
+var modulus101 = Math.pow(2, 32);
+var a113 = 1664525;
+var c11333 = 1013904223;
+var a11xx33 = 1664525;
+var sseed11=4000;
+function wielsieder() {
+    sseed11 = (a11xx33 * sseed11 + c11333) % modulus113;
+    return (sseed11 / modulus101);
+}
+
+
+
+
+
+
+var ruleTypes=new Array();
+tmpCounter=0;
+tmpRule_=0;
+oruleTypesnrsrsr=new Array();
+for(var n=0;n<Math.pow(2,12);n+=1){
+	var nbin=n.toString(2);
+	var nbinrev = ""; 
+	for (var i = nbin.length - 1; i >= 0; i--)
+	{
+		nbinrev += nbin[i]; 
+	}
+        nbinrevnt=parseInt(nbinrev,2);
+	tmpRule_+=(nbinrevnt/2)*Math.pow(-1, (nbinrevnt%2)) & nbinrevnt;
+	ruleTypes[tmpCounter]=tmpRule_;
+	tmpCounter++;
+}
+ruleTypes.sort(function(a, b){
+	return (a - b); 
+});
+ruleTypes_=new Array();
+tempSum=0;
+terrr=0;
+for(var n=0;n<Math.pow(2,12);n+=1){
+	tempSum+=ruleTypes[n];
+	ruleTypes_[n]=tempSum-1;
+}
+ruleTypes=ruleTypes_;
+
+
+
+function shuffle(a){ var j, x, i; for(i=a.length-1;i>0;i--){
+  j=Math.floor(wielsieder()*(i+1)); x=a[i]; a[i]=a[j]; a[j]=x; } return a;
+ }
+
+
+function ncolou(angle) {
+  // Normalize angle to 0-360 degrees
+  angle = angle % 360;
+  if (angle < 0) angle += 360;
+
+  // Calculate color channel values based on angle
+  const h = angle / 60;
+  const i = Math.floor(h);
+  const f = h - i;
+
+  const colors = [
+    [255, 0, 0], // Red
+    [255, 255, 0], // Yellow
+    [0, 255, 0], // Green
+    [0, 255, 255], // Cyan
+    [0, 0, 255], // Blue
+    [255, 0, 255], // Magenta
+  ];
+
+  let r, g, b;
+  switch (i) {
+    case 0:
+      r = colors[0][0];
+      g = colors[0][1] * f + colors[1][1] * (1 - f);
+      b = colors[0][2];
+      break;
+    case 1:
+      r = colors[1][0] * (1 - f) + colors[2][0] * f;
+      g = colors[1][1];
+      b = colors[1][2] * f + colors[2][2] * (1 - f);
+      break;
+    case 2:
+      r = colors[2][0] * (1 - f) + colors[3][0] * f;
+      g = colors[2][1];
+      b = colors[2][2];
+      break;
+    case 3:
+      r = colors[3][0] * f + colors[4][0] * (1 - f);
+      g = colors[3][1] * (1 - f) + colors[4][1] * f;
+      b = colors[3][2];
+      break;
+    case 4:
+      r = colors[4][0];
+      g = colors[4][1] * (1 - f) + colors[5][1] * f;
+      b = colors[4][2] * (1 - f) + colors[5][2] * f;
+      break;
+    default:
+      r = colors[5][0] * (1 - f) + colors[0][0] * f;
+      g = colors[5][1];
+      b = colors[5][2];
+  }
+
+  // Return the RGB string
+  return 'rgb('+Math.round(r)+','+Math.round(g)+','+ Math.round(b)+')';
+}
+
+
+
+var imger =new Image();
+var tmermangmt=0;
+var iminim=new Array();
+var __w=0;
+var __h=0;
+var loi=1;
+var weermaitz=0;
+var imgggg=new Array();
+var goooplaat=0;
+var dasss=0;
+var dassss=0;
+var kiiing=0;
+
+
+ var   coll0 ;
+ var   coll1 ;
+  var  coll2 ;
+ var   gg015;	
+  var  gg115;	
+  var  gg215;	
+  var  gh015;	
+  var  gh115;	
+   var gh215;
+
+
+    var xyxy;
+    var err1;
+    var errey;
+    var errrey;
+    var errex = new Array();
+    var errrex;
+    var curri = 0;
+    var currj = 0;
+    var arcoll;
+    var arcoll2;
+    var arcoll3;
+
+
+    var arcoll4;
+    var arcoll5;
+    var arcoll6;
+    var arcoll3;
+
+var gh015;	
+var     gh115;	
+var     gh215;	
+    var ondit;
+    var onctx;
+    var onpixels;
+    var aaraar;
+    var currcustate;
+    var nextcustate;
+    achhhchcnumnerx = 2;
+    var noi = 0;
+    var inmu = 0;
+    var inmv = 0;
+var ruleTip;
+var g15=(Math.PI*wielsieder()*.666);
+var pixelsach;
+function mixf() {
+sseed11=ontsa;
+ruleTip=new Array();
+for(t=0;t<256;t++){
+ruleTip[t]=ruleTypes[Math.floor(ruleTypes.length*wielsieder())];
+}
+var WIDTH=sliceheight;
+var HEIGHT=sliceheight;
+var linesadssds = new Array();
+var dindsfv = 0;
+var timepersk = 0;
+var httells = 0;
+var tittiosd = 0;
+var reesdsd = null;
+var ditel=0;
+var reesdsdrr = null;
+var ucanvsasx = document.getElementById('dcan0000');
+var ccctttx = ucanvsasx.getContext('2d', {
+    willReadFrequently: true
+});
+achtersd=Math.floor(255*wielsieder());
+asss="rgb("+achtersd+",0,0)";
+ccctttx.fillStyle = asss; 
+ccctttx.fillRect(0,0, WIDTH,HEIGHT);
+for(vv=0;vv<17;vv++){
+ccctttx.beginPath();
+www=Math.round(wielsieder()*WIDTH*2);
+uuu=Math.round(wielsieder()*HEIGHT*2);
+var nrofffs=10+Math.round(25*wielsieder());
+var listers=new Array();
+var listers2=new Array();
+var signlisters=new Array();
+var signlisters2=new Array();
+var sorteds=new Array();
+var dir=1;
+var dir2=1;
+for(i=0;i<nrofffs;i++){
+	var pai=new Array();
+	signlisters[i]=dir;
+
+
+if(i>Math.floor(3/4*nrofffs) && i< (2+Math.floor(3/4*nrofffs))  && vv>15){
+
+	pai[0]=-.2+(.4*wielsieder());
+	pai[0]=-.2+(.4*Math.random());
+
+}
+else{
+	pai[0]=-.2+(.4*wielsieder());
+
+}
+	pai[1]=dir;
+	listers[i]=new Array();
+	listers[i]=pai;
+	var pai2=new Array();
+	signlisters2[i]=dir2;
+	pai2[0]=-.2+(.4*wielsieder());
+	pai2[1]=dir2;
+	listers2[i]=new Array();
+	listers2[i]=pai2;
+
+	if(i>Math.floor(3/4*nrofffs) && i<Math.floor(4/5*nrofffs)){
+		
+	}
+	loi=1;
+
+	for(uw=0;uw<loi;uw++){
+
+	if(wielsieder()<.1){
+		dir=dir*-1;
+	}
+	if(wielsieder()<.1){
+		dir2=dir2*-1;
+	}
+}
+	sorteds[i]=i;	
+}
+var randsshuf=shuffle(sorteds);
+var randsshuf2=shuffle(sorteds);
+jioo=0;
+var extrasse=new Array();
+var extrasse2=new Array();
+for(i=nrofffs;i<(2*nrofffs);i++){
+	var ghh=listers[randsshuf[jioo]];
+	var nexstar=new Array();
+	a0=ghh[0];
+	a1=ghh[1];
+	a1=a1*-1;
+	nexstar[0]=a0;
+	nexstar[1]=a1;
+	extrasse[jioo]=nexstar;
+	var ghh=listers2[randsshuf2[jioo]];
+	var nexstar=new Array();
+	a0=ghh[0];
+	a1=ghh[1];
+	a1=a1*-1;
+	nexstar[0]=a0;
+	nexstar[1]=a1;
+	extrasse2[jioo]=nexstar;
+	jioo++;	
+}
+jioo=0;
+for(i=nrofffs;i<(2*nrofffs);i++){
+	listers[i]=extrasse[jioo];
+	listers2[i]=extrasse2[jioo];
+	jioo++;
+}
+var sumi=.5;
+var sumi2=.5;
+i=0;
+erfg=listers[i];
+sumi=sumi+(erfg[0]*erfg[1]);
+erfg2=listers2[i];
+sumi2=sumi2+(erfg2[0]*erfg2[1]);
+xc=(www/2)+((www/4)*sumi*Math.cos(i/(2*nrofffs)*Math.PI*2));
+yc=(uuu/2)+((uuu/4)*sumi2*Math.sin(i/(2*nrofffs)*Math.PI*2));
+cccttt.moveTo(Math.round(xc),Math.round(yc));
+for(i=1;i<(2*nrofffs);i++){
+	erfg=listers[i];
+	sumi=sumi+(erfg[0]*erfg[1]);
+	erfg2=listers2[i];
+	sumi2=sumi2+(erfg2[0]*erfg2[1]);
+	xc=(www/2)+((www/4)*sumi*Math.cos(i/(2*nrofffs)*Math.PI*2));
+	yc=(uuu/2)+((uuu/4)*sumi2*Math.sin(i/(2*nrofffs)*Math.PI*2));
+	ccctttx.lineTo(Math.round(xc),Math.round(yc));
+}
+i=0;
+sumi=.5;
+sumi2=.5;
+erfg=listers[i];
+sumi=sumi+(erfg[0]*erfg[1]);
+erfg2=listers2[i];
+sumi2=sumi2+(erfg2[0]*erfg2[1]);
+xc=(www/2)+((www/4)*sumi*Math.cos(i/(2*nrofffs)*Math.PI*2));
+yc=(uuu/2)+((uuu/4)*sumi2*Math.sin(i/(2*nrofffs)*Math.PI*2));
+ccctttx.lineTo(Math.round(xc),Math.round(yc));
+ccctttx.closePath();
+asss=ncolou(360*vv/17);
+achtersd=Math.floor(255*wielsieder());
+asss="rgb("+achtersd+",0,0)";
+ccctttx.fillStyle = asss; 
+ccctttx.fill();
+}
+pixelsach=ccctttx.getImageData(0,0,sliceheight, sliceheight);
+if(true){
+    oppf = 3+Math.round(1 * wielsieder());
+    ll = Math.floor(3 + (1 * wielsieder()));
+    xyxy = new Array();
+    for (g = 0; g <= ll; g++) {
+        xyxy[g] = new Array();
+    }
+    err1 = new Array();
+    for (t = 0; t < ll / 2; t++) {
+        err1[t] = ruleTypes[Math.floor(ruleTypes.length * wielsieder())];
+    }
+    for (g = 0; g <= ll; g++) {
+        for (h = 0; h <= ll; h++) {
+            xyxy[g][h] = err1[Math.floor(err1.length * wielsieder())];
+        }
+    }
+     errey = new Array();
+    for (t = 0; t < ll; t++) {
+        errey[t] = Math.floor(sliceheight * wielsieder());
+    }
+     errrey = errey.sort(function(a, b) {
+        return (a - b);
+    });
+     errex = new Array();
+    for (t = 0; t < ll; t++) {
+        errex[t] = Math.floor(sliceheight * wielsieder());
+    }
+     errrex = errex.sort(function(a, b) {
+        return (a - b);
+    });
+     curri = 0;
+     currj = 0;
+     
+	var unedate=new Date();	
+    arcoll = wielsieder() * Math.PI * 2;
+    arcoll2 = wielsieder() * Math.PI * 2;
+    arcoll3 = wielsieder() * Math.PI * 2;
+    arcoll4 = wielsieder() * Math.PI * 2;
+    arcoll5 = wielsieder() * Math.PI * 2;
+    arcoll6 = wielsieder() * Math.PI * 2;
+    arcoll7 = wielsieder() * Math.PI * 2;
+    coll0 = .5+(wielsieder() * Math.PI / 2);
+    coll1 = .5+(wielsieder() * Math.PI / 2);
+    coll2 = .5+(wielsieder() * Math.PI / 2);
+    gg015=.5+(1*wielsieder());	
+    gg115=.5+(1*wielsieder());	
+    gg215=.5+(1*wielsieder());	
+    gh015=.5+(1.5*wielsieder());	
+    gh115=.5+(1.5*wielsieder());	
+    gh215=.5+(1.5*wielsieder());	
+     ondit = document.getElementById('tcan');
+    ondit.width = sliceheight;
+    ondit.height = sliceheight;
+     onctx = ondit.getContext('2d', {willReadFrequently: true});
+     onpixels = onctx.getImageData(0, 0, sliceheight, sliceheight);
+    aaraar = new Array(sliceheight);
+    for (q = 0; q < sliceheight; q++) {
+        aaraar[q] = [];
+    }
+    dasss = ruleTypes[Math.floor(ruleTypes.length * wielsieder())];
+    currcustate = new Array(sliceheight);
+    nextcustate = new Array(sliceheight);
+    for (i = 0; i < (slicelength); i++) {
+        currcustate[i] = false;
+        nextcustate[i] = false;
+        if (wielsieder() < .5) {
+            currcustate[i] = true;
+            nextcustate[i] = true;
+        }
+    }
+    achhhchcnumnerx = 2;
+    anoi = 0;
+    inmu = 0;
+     inmv = 0;
+     aihi=0;
+tingrtel++;
+g15=(Math.PI*wielsieder()*.666);
+
+totaaalruless="";
+	console.log("hier.......");
+	mixnexter();
+}
+}
+var anoi=0;
+var aihi=0;
+var totaaalruless="";
+var tingrtel=0;
+var onpoop;
+function mixnexter(){
+    //window.cancelAnimationFrame(onpoop);
+    if (aihi < slicelength) {
+        if (errrex[currj] == aihi) {
+            currj++;
+        }
+        curri = 0;
+        for (biabia = 0; biabia < (sliceheight); biabia++) {
+            if (errrey[curri] == biabia) {
+                dasss = xyxy[(curri)][(currj)];
+
+		tfdwwf=totaaalruless.split("_"+dasss);
+		if(tfdwwf.length<2){
+			totaaalruless+="_"+dasss;
+		}
+                curri++;
+            }
+            inmu++;
+            var teruj = new Array();
+            teruj[0] = true;
+            teruj[1] = false;
+            otgtruu = 0;
+            nraaraar__ru = new Array();
+            for (r__ricc = (biabia - achhhchcnumnerx); r__ricc <= (biabia + achhhchcnumnerx); r__ricc++) {
+                if (r__ricc < 0) {
+                    nraaraar__ru[otgtruu] = false;
+                } else if (r__ricc > (sliceheight-1)) {
+                    nraaraar__ru[otgtruu] = false;
+                } else {
+                    nraaraar__ru[otgtruu] = currcustate[r__ricc];
+                }
+                otgtruu++;
+            }
+            aaaanua = 0;
+            for (hprue = 0; hprue < nraaraar__ru.length; hprue++) {
+                if (nraaraar__ru[hprue] == true) aaaanua |= Math.pow(2, (nraaraar__ru.length-1-hprue));
+            }
+	    dassss=ruleTip[pixelsach.data[4*((aihi*1)+(biabia*sliceheight))]];
+            nextcustate[biabia] = (dassss & Math.pow(2, aaaanua)) > 0;
+        }
+        for (ixxe = 0; ixxe < sliceheight; ixxe++) {
+            currcustate[ixxe] = nextcustate[ixxe];
+		aaraar[aihi][ixxe] = currcustate[ixxe];
+        }
+       }
+    if (aihi < slicelength) {
+	  for (ixxe = 0; ixxe < sliceheight; ixxe++) {    
+
+   dasssss=Math.max((ruleTip[pixelsach.data[4*((aihi*1)+(ixxe*sliceheight))]]%sliceheight), (sliceheight-(ruleTip[pixelsach.data[4*((aihi*1)+(ixxe*sliceheight))]]%sliceheight)));
+                    
+            if (aaraar[aihi][ixxe] != true){ // teruj[((1*aihi) % 2)]) {
+  		 p0=  127+Math.round(127*Math.sin(arcoll+(Math.PI/gg015*ixxe/sliceheight*1)));
+		 p1=  127+Math.round(127*Math.cos(arcoll2+(Math.PI*1*gg115*(aihi+(0))/sliceheight*1)));
+	         p2=  127+Math.round(127*Math.cos(arcoll3-(Math.PI*gg215*ixxe/sliceheight*1)));
+
+
+  		 p0=  127+Math.round(127*Math.sin(arcoll+(Math.PI/gg015*ixxe/sliceheight*1)));
+		 p1=  127+Math.round(127*Math.cos(arcoll2+(Math.PI*1*gg115*(aihi+(0))/sliceheight*1)));
+	         p2=  127+Math.round(127*Math.cos(arcoll3-(Math.PI*gg215*ixxe/dasssss*1)));
+
+
+	   if(tingrtel%9==0 && false ){
+		ppp0=0; 
+		p0=ppp0;
+		p1=ppp0;
+		p2=ppp0;
+	   }
+           onpixels.data[anoi] = p0;
+           onpixels.data[anoi + 1] = p1;
+           onpixels.data[anoi + 2] = p2;
+           onpixels.data[anoi + 3] = 255;
+    } else {
+  		 p0=  127+Math.round(127*Math.sin(arcoll-(Math.PI/gg015*ixxe/sliceheight*1)));
+		 p1=  127+Math.round(127*Math.cos(arcoll2-(Math.PI*tips*gg115*(aihi+(0))/sliceheight*g15)));
+	         p2=  127+Math.round(127*Math.cos(arcoll3+(Math.PI*gg215*ixxe/sliceheight*1)));
+
+
+ 		 p0=  127+Math.round(127*Math.sin(arcoll-(Math.PI/gg015*ixxe/sliceheight*1)));
+		 p1=  127+Math.round(127*Math.cos(arcoll2-(Math.PI*tips*gg115*(aihi+(0))/dasssss*g15)));
+	         p2=  127+Math.round(127*Math.cos(arcoll3+(Math.PI*gg215*ixxe/dasssss*1)));
+
+	   if(tingrtel%9==0 && false){
+		ppp1=255; 
+		p0=ppp1;
+		p1=ppp1;
+		p2=ppp1;
+	   }
+                onpixels.data[anoi] = p0;
+                onpixels.data[anoi + 1] = p1;
+                onpixels.data[anoi + 2] = p2;
+                onpixels.data[anoi + 3] = 255;
+            }
+            anoi += 4;
+        }
+    }
+   if(aihi<slicelength){
+	gewaittet=0;
+	aihi++;
+	//onpoop=window.requestAnimationFrame(mixnexter)
+mixnexter();
+   }
+   else{
+	gewaittet=2;
+        onctx.putImageData(onpixels, 0, 0);
+        aimg = ondit.toDataURL("image/jpeg");
+        gelijkklaar=true;
+	imd=new Image();
+	imd.src=aimg;
+	
+cccttt.drawImage(imd,0,0,sliceheight,sliceheight);
+
+
+
+   }
+}
+var tips=1;
+var gelijkklaar=true;
+
+var hss;
+
+function mixff(){
+clearTimeout(hss);
+
+mixf();
+hss=setTimeout("mixff()", 100)
+}
+
+var onsta=1000;
+function llll(){
+ontsa=Math.floor(10000000*Math.random());
+clearTimeout(hss);
+mixff();
+setTimeout("llll()", 10000);
+}
+llll();
+
+</script>
+
+</body>
