@@ -1,0 +1,29 @@
+<video id='vid' style='position:fixed;left:-0%;top:-0%;width:100%;filter: grayscale(0.55) brightness(1.2);' src='cosmos.mp4?dfff=fdf' muted  autostart autoplay loop repeat></video>
+
+<img src='rot.gif' style='position:fixed;left:33%;top:-35%;width:50%;height:70%;opacity:.70'>
+
+<iframe src='wavesobinw.html' border=0 frameborder=0  style='height:66%;width:66%;position:fixed;top:33%;left:33%;opacity:.44; ' id='iff'>
+</iframe>
+<script>
+
+
+document.getElementById('vid').addEventListener('loadedmetadata', function() {
+this.currentTime = Math.round(Math.random()*6*60);
+}, false);
+
+var til=0;
+var graa=0;
+function mooj(){
+graa++;
+if(graa==360){
+graa=0;
+}
+document.getElementById('iff').style.filter = 'hue-rotate('+graa+'deg)';
+
+setTimeout("mooj()", 200)
+}
+mooj();
+
+</script>
+
+

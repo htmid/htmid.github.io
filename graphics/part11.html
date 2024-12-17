@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        #container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+          
+        }
+        .formula {
+            position: absolute;
+            white-space: nowrap;
+            font-size: 1.5em;
+        }
+body{
+overflow:hidden;
+}
+    </style>
+    <title>Dynamic Formula Animation</title>
+</head>
+<body>
+
+<img style='position:fixed;left:-25vw;top:-25vw;width:150vw;height:150vw' id='bg' src='OIG3.UOXDz1L8Jc8Isterrenwolk.jpg'>
+<img style='position:fixed;left:0%;top:-0;width:100%;height:100%' src='ffut5.png'>
+
+<div id='ifrmm'></div>
+
+
+
+    <div id="container" style='font-size:150%'></div>
+
+
+    <script>
+
+
+document.getElementById('ifrmm').innerHTML="<iframe style='position:fixed;left:-1%;top:-1%;width:102%;height:102%;' src='_part11.html?c="+Math.random()+"' frameborder=0 border=0></iframe><iframe style='position:fixed;left:-1%;top:-1%;width:102%;height:102%;' src='_part11.html?s="+Math.random()+"' frameborder=0 border=0></iframe>";
+
+
+function kijken(){
+for(t=0;t<13;t++){
+	if(Math.random()>(11/13)){
+		document.getElementById('fut'+t).style.display='';
+	}
+else{
+		document.getElementById('fut'+t).style.display='none';
+
+}
+}
+
+setTimeout("kijken()", 850);
+}
+
+
+
+
+
+
+
+var tell=0;
+function roor(){
+tell+=.125;
+document.getElementById('bg').style.transform="rotate("+tell+"deg)";
+setTimeout("roor()", 160);
+
+}
+roor();
+
+</script>
+
+</body>
+</html>

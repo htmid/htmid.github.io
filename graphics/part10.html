@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        #container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+          
+        }
+        .formula {
+            position: absolute;
+            white-space: nowrap;
+            font-size: 1.5em;
+        }
+body{
+overflow:hidden;
+}
+    </style>
+    <title>Dynamic Formula Animation</title>
+</head>
+<body>
+<iframe src='h.html' style='position:fixed;left:0,top:0;width:15%;height:15%;z-index:92132324343535;border:none;border:0;frameborder:0' border=0 frameborder=0 scrolling='no' scrollbars='no'></iframe>
+<img style='position:fixed;left:0%;top:-25vw;width:100vw%;height:100vw' id='bg' src='writings.gif'>
+<img style='position:fixed;left:0%;top:-25vw;width:100vw%;height:100vw' id='bg2' src='writingsk.gif?fs=r'>
+    <div id="container" style='font-size:150%'></div>
+
+
+    <script>const container = document.getElementById('container');
+
+function shufflew(a){ var j, x, i; for(i=a.length-1;i>0;i--){
+  j=Math.floor(Math.random()*(i+1)); x=a[i]; a[i]=a[j]; a[j]=x; } return a;
+ }
+
+var yp=new Array();
+for(t=0;t<90;t++){
+yp[t]=t;
+}
+var yyy=shufflew(yp);
+
+
+
+var ys=new Array();
+
+const symbols = ["+", "-", "*", "/", "∧", "∨", "¬", "⊕", "⇒", "⇔", "∀", "∃", "∂"];
+const variables = ["x", "y", "z", "α", "β", "γ", "θ", "λ", "μ"];
+let formulaCount = 1;
+var ys=45;
+var tt=0;
+function generateFormula() {
+    let formula = "";
+    const length = Math.floor(Math.random() * 10) + 10; // Random length between 5 and 15
+    for (let i = 0; i < length; i++) {
+        formula += variables[Math.floor(Math.random() * variables.length)] +
+                   symbols[Math.floor(Math.random() * symbols.length)] +
+                   Math.floor(Math.random() * 10) + " ";
+    }
+    return formula.trim();
+}
+
+function createFormulaElement(text) {
+    const div = document.createElement('div');
+div.style.zIndex=tt;
+div.style.backgroundColor='#fff';
+	tt++;
+    div.className = 'formula';
+    div.textContent = text;
+	ys=ys+(5*Math.pow(-1, Math.round(Math.random())))
+
+	if(ys<5 || ys>65){
+ys=45;
+}
+
+    div.style.top = `${ys}vh`;
+    div.style.left = `${Math.random() * 40 + 100}vw`;
+    return div;
+}
+
+function animateFormula(element) {
+    const left = parseInt(element.style.left);
+    const newLeft = left - 1; // Move 1vw per frame
+    element.style.left = `${newLeft}vw`;
+
+    if (newLeft < -20) { // Remove element when it's completely out of view
+        container.removeChild(element);
+    } else {
+        setTimeout(() => animateFormula(element), 100);
+    }
+}
+
+function addFormula() {
+
+for(h=0;h<1;h++){
+
+    var formula = generateFormula();
+    var element = createFormulaElement(formula);
+    container.appendChild(element);
+
+    animateFormula(element);
+}
+}
+
+setInterval(addFormula, 1000);
+
+
+var tell=0;
+function roor(){
+tell++;
+document.getElementById('bg').style.transform="rotate("+tell+"deg)";
+document.getElementById('bg2').style.transform="rotate("+(-tell*1.33)+"deg)";
+
+setTimeout("roor()", 80);
+
+}
+roor();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,302 @@
+<html>
+<body>
+<div id='er' style='display:none'></div>
+<div id='er2'></div>
+<script>
+
+
+
+var imgse='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAVgAAAFYAQMAAAAsonYDAAAABlBMVEVya3VMTnAW8WTkAAAAAXRSTlMAQObYZgAAAAFiS0dEAIgFHUgAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAHdElNRQfoDAQRHgSymXuYAAAAHWlUWHRDb21tZW50AAAAAABDcmVhdGVkIHdpdGggR0lNUGQuZQcAAAOMSURBVGje7ZlLrtwgEEVtIYVJJJbAQiKFnQVHWUC25IyyDS+BIQML0m1sgz/NrZLSUj7c0RucZxf1x911TU1NTU1NTU1NTU1N/7I+MFjJYX9OdDY6Bjsz2MBg47vY4W9iuxjpgTOMYGiG0zTD4Ac70u2ls5bHTgzWMez1DD+Qg6EivTJEpAejjzxHBIYjyF57OIJssXqy1LyMI8MKlo+ffgPJJkPx4AlFbM5/euisMQcEBWw/vgaeeLrV5/bjQYJlV5mq1+QhXqpqcIrtkN+CciaHoMqaI2tn4LIiXMYDlxVe1a6eL7GodxY7QTYHY0Ds/Hn3b4dYbygjPLHOboHxkJ3WIJtqXST268raar0t7CxWBpTFcjSZ2B704OVoK4u2nqXcdGIVaA8Luya7Bc3PxO9bYWjUorSXa8HBTtKpUa0sbpNyMIlVuFf3iR2WwkOddPyUitMSpuG4nG3qKV3dLR3CiUjYClLRe0WZLKmZzJoyLFKTKjsrapSRNI/FzuKFp99ZwoS1DNZsLHXCE1nJsEHQ/bC1a9pCsB1uZhwu/AEsKxjD72XtTTAmlJSZ7T3Is6Iw+hnUEGbNLRuqmQPZeJArzntx1jcqO6v4Y3mxBmw6/aP3usLB/p5d12i5xNVekl1cnuteJqW8sNPhJWVSqnhOgvFl1et49uxwrvohB/O8R14ybbxnH0C4hG/KKX2KWrhku3/Jzpdce8kad6m4Of/zsfbMeMn3kON2ZPVYaatnttZWzbHBfrzJ+enmpa9ahCOwF6dV2IvTKjuzPLNqwsOTwO4Gb2Yqh6462RE1VpyMqLHdador32EjVisUXvJ3t1XZPAkSG0jjfsTscYSrSB/hgD0Uh6oPO1EmPGB3gwOBNYURiC1ngQSsKoyQYFMqt1DEimK7FfgLx54TAmxgeTmIY09nXQe27IL1HdjsCjYw2NiBba1kJ7StJcqQNrCECNI6bFNpWgprUt5oytXErN2awuq1ijVhJd9YSbhKqe1pHNbiVV/lrgNZubESr+9iPz1m+/QtYtijAhLC62cQFIkN9umsHrN27+wCXo9szlyDrsCmyBp0RdP0i9zW/UispF7WM0v6gi/oF7nLFz3KeCF/kad+Z1/yS9NY9XSYpP2KsHzT7Rk/HtY/wJ4teRMrGayg/7726mZ6r8BgvzBYzWDl8B5WjAynMZ7b1NTU1NTU1NTU1NTU1PQf6Bf+GIh/y5KotgAAAABJRU5ErkJggg=='
+
+var pokselas2;
+var myimm=new Image();
+myimm.src=imgse;
+
+function shuffle(a) {
+    var j, x, i;
+    for (i = a.length - 1; i > 0; i--) {
+        j = Math.floor(Math.random() * (i + 1));
+        x = a[i];
+        a[i] = a[j];
+        a[j] = x;
+    }
+    return a;
+}
+var sheight = 344;
+var swidth = 344;
+
+var HEIGHT = sheight;
+var WIDTH = swidth;
+document.getElementById('er').innerHTML="<canvas  style='position:fixed;top:0;left:0;width:100%;height:100%;' width="+swidth+" height="+sheight+" id='dcan0'></canvas>";
+
+document.getElementById('er2').innerHTML="<canvas  style='position:fixed;top:0;left:0;width:100%;height:100%;' width="+swidth+" height="+sheight+" id='dcan00'></canvas>";
+
+
+var linesadssds = new Array();
+var dindsfv = 0;
+var timepersk = 0;
+var httells = 0;
+var tittiosd = 0;
+var reesdsd = null;
+var ditel=0;
+var reesdsdrr = null;
+var ucanvsas = document.getElementById('dcan0');
+var cccttt = ucanvsas.getContext('2d', {
+    willReadFrequently: true
+});
+
+
+var ucanvsas2 = document.getElementById('dcan00');
+var cccttt2 = ucanvsas2.getContext('2d', {
+    willReadFrequently: true
+});
+
+
+
+function init111() {
+
+ WIDTH = sheight;
+ HEIGHT = swidth;
+//document.getElementById('er').innerHTML="<canvas  style='position:fixed;top:0;left:0;width:100%;height:100%;' width="+swidth+" height="+sheight+" id='dcan0'></canvas>";
+
+
+
+ linesadssds = new Array();
+ dindsfv = 0;
+ timepersk = 0;
+ httells = 0;
+ tittiosd = 0;
+ reesdsd = null;
+
+ reesdsdrr = null;
+ ucanvsas = document.getElementById('dcan0');
+ cccttt = ucanvsas.getContext('2d', {
+    willReadFrequently: true
+});
+     punten = 40+Math.round(20*Math.random());
+     plusmin = new Array();
+    dir = 1;
+    k = 0;
+    for (t = 0; t < (punten / 1); t++) {
+        if (Math.random() < .2) {
+            dir = dir * -1;
+        }
+     k = k + (dir*(.2*Math.random()));       
+        plusmin[t] = k;
+    }
+    var chainsx = plusmin;
+    cccttt.fillStyle = "#fff";
+    cccttt.fillRect(0, 0, WIDTH, HEIGHT);
+    t = 0;
+
+
+
+
+
+        cccttt.drawImage(myimm,0,0,344,344)
+       
+
+
+t = 0;
+
+            pixe10 = cccttt.getImageData(0, 0, WIDTH, HEIGHT);
+linesadssds=new Array(WIDTH);
+    for (x1 = 0; x1 < WIDTH; x1 = x1 + 1) {
+        ab91 = new Array();
+        for (y1 = 0; y1 < HEIGHT; y1 = y1 + 1) {
+		nj=HEIGHT*x1+y1;
+		gdgh=4*nj;
+
+            pixe1 = pixe10.data[gdgh];
+            ru1 = pixe1;
+            if (ru1 >= 127) {
+                ab91[y1] = true;
+            } else {
+                ab91[y1] = false;
+            }
+        }
+        linesadssds[x1] = ab91;
+    }
+}
+
+function doLlivevve() {
+    clearTimeout(reesdsdrr);
+
+inin=true;
+
+   // window.cancelAnimationFrame(reesdsdrr);
+    if (true) {
+      
+        cccttt.fillStyle = "white";
+        cccttt.fillRect(0, 0, Math.round(swidth * 1), sheight);
+
+        pokselas = cccttt.getImageData(0, 0, swidth, sheight);
+ cccttt2.fillStyle = "transparent";
+        cccttt2.clearRect(0, 0, Math.round(swidth * 1), sheight);
+   pokselas2 = cccttt2.getImageData(0, 0, swidth, sheight);
+        rresse = new Array();
+        tittiosd++;
+        arr32 = linesadssds[0];
+        ap32 = new Array();
+        for (b = 0; b < swidth; b++) {
+            ap32[b] = arr32[b];
+        }
+        rresse[0] = ap32;
+        arr32 = linesadssds[ 0];
+        ap32 = new Array();
+        for (b = 0; b < swidth; b++) {
+            ap32[b] = arr32[b];
+        }
+        rresse[(linesadssds.length - 1)] = ap32;
+        for (a88 = 1; a88 < (sheight - 1); a88++) {
+            arrb = linesadssds[(a88 - 1)];
+            arro = linesadssds[(a88 + 1)];
+            arrtrr = linesadssds[a88];
+            ter32 = new Array();
+            for (b88 = 1; b88 < (swidth - 1); b88++) {
+                l66 = arrtrr[(b88 - 1)];
+                lb66 = arrb[(b88 - 1)];
+                lo66 = arro[(b88 - 1)];
+                r66 = arrtrr[(b88 + 1)]
+                rb66 = arrb[(b88 + 1)];
+                ro66 = arro[(b88 + 1)]
+                o66 = arro[b88];
+                be66 = arrb[b88];
+                c66 = arrtrr[b88];
+                Lliveing = 0;
+                if (l66 == true) {
+                    Lliveing += 1;
+                }
+                if (lb66 == true) {
+                    Lliveing += 1;
+                }
+                if (lo66 == true) {
+                    Lliveing += 1;
+                }
+                if (r66 == true) {
+                    Lliveing += 1;
+                }
+                if (ro66 == true) {
+                    Lliveing += 1;
+                }
+                if (rb66 == true) {
+                    Lliveing += 1;
+                }
+                if (o66 == true) {
+                    Lliveing += 1;
+                }
+                if (be66 == true) {
+                    Lliveing += 1;
+                }
+                niw6 = c66;
+		if((ditel%2)==0){
+                	if (c66  && (Lliveing < 8) && (Lliveing>=0)) {
+	                    niw6 = !c66;
+        	        }
+			if(c66==false ){
+				niw6=false;
+			}
+		}
+		else{
+			if(c66==false && Lliveing>1 ){
+				niw6=true;
+			}
+
+		}
+                ter32[b88] = niw6;
+            }
+            ter32[0] = arrtrr[0];
+            ter32[(swidth - 1)] = arrtrr[(swidth -1)];
+            rresse[a88] = ter32;
+        }
+        klopper = 0;
+        var itskl = 0;
+        for (a77 = 0; a77 < sheight; a77++) {
+            ab66 = rresse[a77];
+            sdfdsds = new Array();
+            for (b77 = 0; b77 < swidth; b77++) {
+                neenee = klopper * 4;
+                klopper++;
+                sdfdsds[b77] = ab66[b77];
+                if (ab66[b77] == false) {
+                    if (b77 < (swidth )) {
+                        itskl = 0;
+                        if (((a77 / sheight) >=0 && (a77 / sheight) <=1  && (b77 / swidth) >=0  && (b77 / swidth) <= 1)) {
+                        }
+                    } else {
+                        itskl = 0;
+                    }
+                    if (b77 > (swidth )) {
+                        itskl = 0;
+                    }
+
+		    if(itskl==0 && a77>=0 && a77<(sheight-0) && b77>=0 && b77<(swidth-0)){
+		    inin=false;
+                    }
+		    if(itskl==0){
+
+
+         	  pokselas.data[neenee] = 76;
+                    pokselas.data[neenee + 1] = 78;
+                    pokselas.data[neenee + 2] = 112;
+                    pokselas.data[neenee + 3] = 255;
+
+
+         	  pokselas2.data[neenee] = 0;
+                    pokselas2.data[neenee + 1] = 0;
+                    pokselas2.data[neenee + 2] = 0;
+                    pokselas2.data[neenee + 3] = 255;
+
+
+		    }
+		    else{
+
+
+         	  pokselas.data[neenee] = 255;
+                    pokselas.data[neenee + 1] = 255;
+                    pokselas.data[neenee + 2] = 255;
+                    pokselas.data[neenee + 3] = 255;
+
+
+       	  pokselas2.data[neenee] = 255;
+                    pokselas2.data[neenee + 1] = 255;
+                    pokselas2.data[neenee + 2] = 255;
+                    pokselas2.data[neenee + 3] = 0;
+		    }		
+         
+
+
+
+                }
+            }
+            linesadssds[a77] = sdfdsds;
+        }
+        cccttt.putImageData(pokselas, 0, 0);
+
+     cccttt2.putImageData(pokselas2, 0, 0);
+
+        httells++;
+    }
+
+	     pixe11 = cccttt.getImageData(Math.floor(swidth/4), Math.floor(swidth/4), 1, 1);
+            ru11 = parseInt("" + pixe11.data[0]);
+
+	     pixe11 = cccttt.getImageData(Math.floor(3*swidth/4), Math.floor(3*swidth/4), 1, 1);
+            ru22 = parseInt("" + pixe11.data[0]);
+		if(ru11==76 && ru22==76){
+inin=true;
+		}
+
+if(inin==true ){
+
+
+ditel++;
+init111();
+}
+    reesdsdrr = setTimeout("doLlivevve()", 100);
+}
+init111();
+doLlivevve();
+</script>
+</body>
+</html>

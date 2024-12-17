@@ -1,0 +1,218 @@
+<video id='vid' style='position:fixed;left:-0%;top:-0%;height:100%;filter: grayscale(0.55) brightness(1.2);' src='_ether_.mp4' muted  autostart autoplay loop repeat></video>
+
+
+<script>
+let vid = document.getElementById("vid");
+vid.playbackRate = 0.5;
+
+document.getElementById('vid').addEventListener('loadedmetadata', function() {
+this.currentTime = Math.round(Math.random()*16*60);
+}, false);
+</script>
+
+<img id='foo' src='FFWIJ.png?d=ed' style='opacity:1;position:fixed;left:0;top:0;width:100%;height:100%'>
+<img id='m' src='kaalmeisjes.png' style='position:fixed;left:60%;top:-1%;width:20%;height:63%;opacity:.5'>
+<img  src='kaal2.png' style='position:fixed;left:60%;top:-1%;width:20%;height:63%;opacity:.25'>
+
+
+
+<div id='docsj'></div>
+<script>
+
+
+
+
+var dd=document.getElementById('m');
+var d=0;
+
+</script>
+
+<textarea  style='display:none' id='onzinii2'>
+
+<body >
+
+<canvas id='canvas' width=400 height=400 style='width:100%;height:100%'></canvas>
+<script>
+
+
+var eetels=0;
+var slicelength=400;
+var sliceheight=400;
+var aaraarx=new Array();
+var aaraarx2=new Array();
+var aaraarx=new Array();
+var aaraarx2=new Array();
+var tempx="";
+var refvgame5=0;
+var gridgame5=new Array();
+var gridgame52=new Array();
+
+
+var can=document.getElementById('canvas');
+var ctx=can.getContext('2d');
+var pixels=ctx.getImageData(0,0,slicelength, sliceheight);
+
+
+
+
+var percentag6=.003;
+var maxstt=Math.floor(percentag6*sliceheight*sliceheight);
+
+var particles=new Array(maxstt);
+var radsss=40;
+
+for(e=0;e<maxstt;e++){
+
+	var props=new Array();
+	
+
+	fty=Math.floor(Math.random()*8);
+	
+	if(fty==0){
+		dx=0;
+		dy=-1;
+	}
+
+	if(fty==1){
+		dx=1;
+		dy=-1;	
+	}
+
+	if(fty==2){
+		dx=1;
+		dy=0;
+	}
+	if(fty==3){
+		dx=1;
+		dy=1;
+	}
+	if(fty==4){
+		dx=0;
+		dy=1;
+	}
+
+	if(fty==5){
+		dx=-1;
+		dy=1;	
+	}
+
+	if(fty==6){
+		dx=-1;
+		dy=0;
+	}
+	if(fty==7){
+		dx=-1;
+		dy=1;
+	}
+	
+
+	props[0]=dx;
+	props[1]=dy;
+
+
+	
+
+	mnx=radsss+Math.floor(Math.random()*(sliceheight-(1*radsss)));
+	mxx=mnx+Math.round(Math.random()*radsss);
+	mxx=sliceheight-mnx-radsss;
+
+	mny=radsss+Math.floor(Math.random()*(sliceheight-(1*radsss)));
+	mxy=mny+Math.round(Math.random()*radsss)
+	mxy=sliceheight-mny-radsss;
+
+
+
+
+    	props[2]=mnx;
+	props[3]=mxx;
+	props[4]=mny;
+	props[5]=mxy;
+	props[6]=Math.floor((mnx+mxx)/2);
+	props[7]=Math.floor((mny+mxy)/2);
+
+	particles[e]=props;
+
+    
+}
+
+function doStepE(){
+ctx.clearRect(0,0,sliceheight,sliceheight);
+ctx.fillStyle='transparent';
+ctx.fillRect(0,0,sliceheight,sliceheight);
+
+pixels=ctx.getImageData(0,0,slicelength, sliceheight);
+	for(e=0;e<maxstt;e++){
+		props=particles[e];
+		dx=props[0];
+		dy=props[1];
+		
+
+	mnx=props[2];
+		mxx=props[3];
+		mny=props[4];
+		mxy=props[5];
+		x=props[6];
+		y=props[7];
+
+		x=x-dx;
+		y=y-dy;
+
+		if(x<=mnx || x>=mxx){
+			dx=dx*-1;
+
+dy=dy*-1;
+			
+		}
+
+		if(y<=mny || y>=mxy){
+
+		dx=dx*-1;
+			dy=dy*-1;
+			
+		}
+
+		pp=new Array();
+		pp[0]=dx;
+		pp[1]=dy;
+
+
+		pp[2]=mnx;
+		pp[3]=mxx;
+		pp[4]=mny;
+		pp[5]=mxy;
+		pp[6]=x;
+		pp[7]=y;
+		particles[e]=pp;
+
+		offs=(x*sliceheight)+y;
+	ofs=4*offs;
+		pixels.data[ofs]=255;
+		pixels.data[ofs+1]=255;
+		pixels.data[ofs+2]=255;
+		pixels.data[ofs+3]=255;
+
+		
+		
+	}
+	ctx.putImageData(pixels,0,0);
+	//window.requestAnimationFrame(doStepE);
+	setTimeout("doStepE()", 131);
+
+}
+
+
+
+
+
+doStepE();
+</script>
+
+</textarea>
+<script>
+
+onzinifr=document.getElementById('onzinii2').value;
+document.getElementById('docsj').innerHTML="<iframe style='position:fixed;left:22%;top:-20%;width:55%;height:55%;' border=0 frameborder=0 src='data:text/html;base64,"+window.btoa(onzinifr)+"'></iframe>";
+
+</script>
+
+<img src='66.png' id='plane' style='width:5%;position:fixed;top:10%;left:44%'>

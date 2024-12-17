@@ -1,0 +1,42 @@
+<body style='overflow:hidden'>
+<div id='aboo'></div>
+<script>
+st="";
+var maxii=13;
+for(r=0;r<maxii;r++){
+st=st+"<iframe id='if"+r+"' style='position:fixed;left:-1%;top:-1%;width:102%;height:102%' frameborder=0 border=0 src='part"+r+".html?v="+Math.random()+"'></iframe>";
+}
+document.getElementById('aboo').innerHTML=st;
+
+</script>
+
+<script>
+var t=0;
+var oldm=-1;
+var d=new Date();
+function sec(){
+d=new Date();
+mi=d.getMinutes();
+if(mi!=oldm){
+oldm=mi;
+
+for(h=0;h<(maxii-1);h++){
+document.getElementById('if'+((h+d.getMinutes())%maxii)).style.opacity=0;
+}
+document.getElementById('if'+(((maxii-1)+d.getMinutes())%maxii)).style.opacity=1;
+
+document.getElementById('if'+(d.getMinutes()%maxii)).src="part"+(d.getMinutes()%maxii)+".html?axa="+Math.random();
+for(h=1;h<(maxii-1);h++){
+document.getElementById('if'+((h+d.getMinutes())%maxii)).src="empty.html?axa=12"; 
+}
+
+}
+
+setTimeout("sec()", 1000);
+
+}
+sec();
+
+</script>
+</body>
+

@@ -1,0 +1,63 @@
+<body style='overflow:hidden'>
+<iframe id='if0' style='position:fixed;left:-1%;top:-1%;width:102%;height:102%' frameborder=0 border=0 src='part0.html?axa=12'></iframe>
+<iframe id='if1' style='position:fixed;left:-1%;top:-1%;width:102%;height:102%' frameborder=0 border=0 src='part1.html?axa=12'></iframe>
+<iframe id='if2' style='position:fixed;left:-1%;top:-1%;width:102%;height:102%' frameborder=0 border=0 src='part2.html?axa=12'></iframe>
+<iframe id='if3' style='position:fixed;left:-1%;top:-1%;width:102%;height:102%' frameborder=0 border=0 src='part3.html?axa=12'></iframe>
+<iframe id='if4' style='position:fixed;left:-1%;top:-1%;width:102%;height:102%' frameborder=0 border=0 src='part4.html?axa=12'></iframe>
+<iframe id='if5' style='position:fixed;left:-1%;top:-1%;width:102%;height:102%' frameborder=0 border=0 src='part5.html?axa=12'></iframe>
+<iframe id='if6' style='position:fixed;left:-1%;top:-1%;width:102%;height:102%' frameborder=0 border=0 src='part6.html?axa=12'></iframe>
+<iframe id='if7' style='position:fixed;left:-1%;top:-1%;width:102%;height:102%' frameborder=0 border=0 src='part7.html?axa=12'></iframe>
+<iframe id='if8' style='position:fixed;left:-1%;top:-1%;width:102%;height:102%' frameborder=0 border=0 src='part8.html?axa=12'></iframe>
+<iframe id='if9' style='position:fixed;left:-1%;top:-1%;width:102%;height:102%' frameborder=0 border=0 src='part9.html?axa=12'></iframe>
+<iframe id='if10' style='position:fixed;left:-1%;top:-1%;width:102%;height:102%' frameborder=0 border=0 src='part10.html?axa=12'></iframe>
+<iframe id='if11' style='position:fixed;left:-1%;top:-1%;width:102%;height:102%' frameborder=0 border=0 src='part11.html?axa=12'></iframe>
+<iframe id='if12' style='position:fixed;left:-1%;top:-1%;width:102%;height:102%' frameborder=0 border=0 src='part12.html?axa=12'></iframe>
+
+<script>
+var t=0;
+var oldm=-1;
+var d=new Date();
+function sec(){
+d=new Date();
+mi=d.getMinutes();
+if(mi!=oldm){
+oldm=mi;
+
+document.getElementById('if'+(d.getMinutes()%13)).style.opacity=0;
+document.getElementById('if'+((1+d.getMinutes())%13)).style.opacity=0;
+document.getElementById('if'+((2+d.getMinutes())%13)).style.opacity=0;
+document.getElementById('if'+((3+d.getMinutes())%13)).style.opacity=0;
+document.getElementById('if'+((4+d.getMinutes())%13)).style.opacity=0;
+document.getElementById('if'+((5+d.getMinutes())%13)).style.opacity=0;
+document.getElementById('if'+((6+d.getMinutes())%13)).style.opacity=0;
+document.getElementById('if'+((7+d.getMinutes())%13)).style.opacity=0;
+document.getElementById('if'+((8+d.getMinutes())%13)).style.opacity=0;
+document.getElementById('if'+((9+d.getMinutes())%13)).style.opacity=0;
+document.getElementById('if'+((10+d.getMinutes())%13)).style.opacity=0;
+document.getElementById('if'+((11+d.getMinutes())%13)).style.opacity=0;
+document.getElementById('if'+((12+d.getMinutes())%13)).style.opacity=1;
+
+document.getElementById('if'+(d.getMinutes()%13)).src="part"+(d.getMinutes()%13)+".html?axa=12";
+document.getElementById('if'+((1+d.getMinutes())%13)).src="empty.html?axa=12"; 
+document.getElementById('if'+((2+d.getMinutes())%13)).src="empty.html?axa=12";
+document.getElementById('if'+((3+d.getMinutes())%13)).src="empty.html?axa=12";
+document.getElementById('if'+((4+d.getMinutes())%13)).src="empty.html?axa=12";
+document.getElementById('if'+((5+d.getMinutes())%13)).src="empty.html?axa=12";
+document.getElementById('if'+((6+d.getMinutes())%13)).src="empty.html?axa=12";
+document.getElementById('if'+((7+d.getMinutes())%13)).src="empty.html?axa=12";
+document.getElementById('if'+((8+d.getMinutes())%13)).src="empty.html?axa=12";
+document.getElementById('if'+((9+d.getMinutes())%13)).src="empty.html?axa=12";
+document.getElementById('if'+((10+d.getMinutes())%13)).src="empty.html?axa=12";
+document.getElementById('if'+((11+d.getMinutes())%13)).src="empty.html?axa=12";
+
+}
+
+setTimeout("sec()", 1000);
+
+}
+sec();
+
+</script>
+<iframe id='ere' style='position:fixed;left:-1%;top:-1%;width:102%;height:102%' frameborder=0 border=0 src='muziek.html?v=13'></iframe>
+</body>
+

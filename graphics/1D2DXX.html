@@ -1,0 +1,361 @@
+
+
+<html>
+<body onclick='repaint()' style='background-size:100% 100%;background-image:url("EMA.jpg")'>
+<canvas  style='position:fixed;top:0;left:0;position:fixed;width:100%;height:100%;overflow:hidden;opacity:.86' width=250 height=250 id='dcan0'></canvas>
+<script>
+
+function wielsieder(){
+return Math.random();
+}
+
+
+
+var tolss=0;
+var aaa=[255,96];
+var bbb=[222,154];
+var ccc=[150,255];
+
+
+
+var sliceheight=500;
+var slicelength=500;
+var slicksawceheight=250;
+var slicksawcelength=250;
+var linesadssds=new Array();
+var dindsfv=0;
+var timepersk=0;
+var httells=0;
+var tittiosd=0;
+var reesdsd=null;
+var klaargespil=.5;
+function init111(){
+init111doStepgo();
+} 
+init111();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   var cellSize = 1;
+
+    // Create initial gridgameof
+    var gridgameof = [];
+ var aaraarr = [];
+
+    for (var y = 0; y < sliceheight / cellSize; y++) {
+      gridgameof[y] = [];
+      for (var x = 0; x < sliceheight / cellSize; x++) {
+        gridgameof[y][x] = wielsieder() < 0.5; // Randomly initialize cells
+      }
+    }
+
+function init111doStepgo(){
+gridgameof = [];
+    for (var y = 0; y < sliceheight / cellSize; y++) {
+      gridgameof[y] = [];
+	
+      for (var x = 0; x < sliceheight / cellSize; x++) {
+        gridgameof[y][x] = Math.random() < 0.5; // Randomly initialize cells
+      }
+    }
+}
+
+
+    // Function to count live neighbeurs
+    function countneighbeursgo(x, y) {
+      var count = 0;
+      for (var dx_dx = -1; dx_dx <= 1; dx_dx++) {
+        for (var dy_dy = -1; dy_dy <= 1; dy_dy++) {
+          // Skip current cell and avoid going out of bounds
+          if (dx_dx === 0 && dy_dy === 0) continue;
+          var neighbeurX = x + dx_dx;
+          var neighbeurY = y + dy_dy;
+          if (neighbeurX >= 0 && neighbeurX < gridgameof[0].length &&
+              neighbeurY >= 0 && neighbeurY < gridgameof.length) {
+            count += gridgameof[neighbeurY][neighbeurX];
+          }
+        }
+      }
+      return count;
+    }
+
+    // Function to update the gridgameof
+    function updategridgameof() {
+      var newgridgameof = [];
+      for (var y = 0; y < gridgameof.length; y++) {
+        newgridgameof[y] = [];
+        for (var x = 0; x < gridgameof[0].length; x++) {
+          var liveneighbeurs = countneighbeursgo(x, y);
+          var isAliveIs = gridgameof[y][x];
+          
+          // Apply Game of Life rules
+          if (isAliveIs) {
+            newgridgameof[y][x] = liveneighbeurs === 2 || (liveneighbeurs%8) > 3;
+          } else {
+            newgridgameof[y][x] = (liveneighbeurs%8) > 3;
+          }
+        }
+      }
+      gridgameof = newgridgameof;
+    }
+
+    // Function to draw the gridgameof
+    function drawgridgameof() {
+     
+      for (var y = 0; y < gridgameof.length; y++) {
+        for (var x = 0; x < gridgameof[0].length; x++) {
+          if( gridgameof[y][x]){
+		aaraarr[y][x]=true;
+	}
+
+        }
+      }
+    }
+var eetelss=0;
+var ucanvsas=document.getElementById('dcan0');
+var cccttt=ucanvsas.getContext('2d', {willReadFrequently: true});
+var klaargespil=0.5;
+var reesdsdrr=null;
+function doLlivevve(){
+//clearTimeout(reesdsdrr);
+if(eetelss==0){
+init111doStepgo();
+}
+
+
+
+
+
+
+
+
+
+aaraarr = [];
+    for (var y = 0; y < sliceheight / cellSize; y++) {
+      aaraarr[y] = [];
+	
+      for (var x = 0; x < sliceheight / cellSize; x++) {
+        aaraarr[y][x] = false; // Randomly initialize cells
+      }
+    }
+
+cccttt.clearRect(0,0,sliceheight, sliceheight);
+pokselas=cccttt.getImageData(0,0,sliceheight, sliceheight );
+
+
+
+      updategridgameof();
+      drawgridgameof();
+
+r=0;
+    for (zn0 = 0; zn0 < slicelength; zn0++) {
+        for (zo0 = 0; zo0 < sliceheight; zo0++) {
+    
+	ofs=r*4;
+	r++;
+	fff=aaraarr[zn0][zo0];
+	if(fff==true){
+			pokselas.data[ofs]=233;
+	pokselas.data[ofs+1]=71;	
+	pokselas.data[ofs+2]=133;	
+	pokselas.data[ofs+3]=180;	
+		
+	}
+	else{
+			pokselas.data[ofs]=aaa[tolss]
+	pokselas.data[ofs+1]=bbb[tolss];	
+	pokselas.data[ofs+2]=ccc[tolss];	
+	pokselas.data[ofs+3]=180;
+	}
+
+	
+	
+
+       }
+    }
+	cccttt.putImageData(pokselas,0,0);
+
+
+
+//reesdsdrr=setTimeout("doLlivevve()", 1024);
+
+window.requestAnimationFrame(doLlivevve);
+
+
+
+
+
+    eetelss += 1;
+        httells++;
+
+
+
+
+	}
+
+
+
+
+
+var ruleTypes=new Array();
+tmpCounter=0;
+tmpRule_=0;
+
+
+
+
+
+oruleTypesnrsrsr=new Array();
+for(var n=0;n<Math.pow(2,12);n+=1){
+	var nbin=n.toString(2);
+	var nbinrev = ""; 
+	for (var i = nbin.length - 1; i >= 0; i--)
+	{
+		nbinrev += nbin[i]; 
+	}
+        nbinrevnt=parseInt(nbinrev,2);
+	tmpRule_+=(nbinrevnt/2)*Math.pow(-1, (nbinrevnt%2)) & nbinrevnt;
+	ruleTypes[tmpCounter]=tmpRule_;
+	tmpCounter++;
+}
+ruleTypes.sort(function(a, b){
+	return (a - b); 
+});
+ruleTypes_=new Array();
+tempSum=0;
+terrr=0;
+for(var n=0;n<Math.pow(2,12);n+=1){
+	tempSum+=ruleTypes[n];
+	ruleTypes_[n]=tempSum-1;
+}
+ruleTypes=ruleTypes_;
+
+
+st="2863767972 269774879 2776702324 3610705309 3342091 1361944837 3092 2176033250 93098380 75732558";
+//st="3295861251 3295861251"
+
+st="1055552 226917381 625069834 286299251 3428369933 346182817 2844588688 478144672 3863263270";
+sts=st.split(" ");
+ruleTypes=new Array();
+for(a=0;a<sts.length;a++){
+ruleTypes[a]=parseInt(sts[a]);
+}
+
+
+
+function doStep7(){
+
+var aaraar=new Array();
+for(e=0;e<sliceheight;e++){
+	aaraar[e]=[];
+}
+
+
+ rrradial = 2;
+
+            ewew0 = ruleTypes[Math.floor(Math.random()*ruleTypes.length)];
+console.log(ewew0);
+        wwruuleee = ewew0;
+        achhhchcnumnerx = 2;
+        wluur = window.location.href;
+        zzzzio = wluur.split('ruletype7=');
+        if (zzzzio.length > 1) {
+            qwsaxz = zzzzio[1];
+            ngeIt = qwsaxz.split("&");
+            fdgfhhh = ngeIt[0];
+            dfdsfdg = fdgfhhh.split(":");
+            ewew0 = parseInt(dfdsfdg[0]);
+            rrradial = parseInt(dfdsfdg[1]);
+        }
+
+        currcustate0 = new Array( sliceheight);
+        nextcustate0 = new Array( sliceheight);
+        for (i0 = 0; i0 < (sliceheight ); i0++) {
+            currcustate0[i0] = false;
+            if (wielsieder() < .5) {
+                currcustate0[i0] = true;
+            }
+        }
+
+        for (i0 = 0; i0 < slicelength; i0++) {
+            for (biabia = 0; biabia < ( sliceheight); biabia++) {
+                otgtruu = 0;
+                nraaraar__ru = new Array();
+                for (r__ricc = (biabia - rrradial); r__ricc <= (biabia + rrradial); r__ricc++) {
+                    if (r__ricc < 0) {
+                        nraaraar__ru[otgtruu] = false;
+                    } else if (r__ricc >= ((4 * sliceheight)-1)) {
+                        nraaraar__ru[otgtruu] = false;
+                    } else {
+                        nraaraar__ru[otgtruu] = currcustate0[r__ricc];
+                    }
+                    otgtruu++;
+                }
+                var aaaanua = 0;
+                for (var hpru0 = 0; hpru0 < nraaraar__ru.length; hpru0++) {
+                    if (nraaraar__ru[hpru0] == true) aaaanua |= Math.pow(2, (nraaraar__ru.length-1-hpru0)); //Math.pow(2, hpru0);
+                }
+                nextcustate0[biabia] = (ewew0 & Math.pow(2, aaaanua)) > 0;
+            }
+            var currcustate0_ = new Array();
+            for (ixx0 = 0; ixx0 <  sliceheight; ixx0++) {
+                currcustate0[ixx0] = nextcustate0[ixx0];
+                currcustate0_[ixx0] = nextcustate0[ixx0];
+            }
+            var currcustate0_ = new Array();
+            for (ixx0 = 0; ixx0 < sliceheight; ixx0++) {
+                aaraar[i0][ixx0] = currcustate0[ixx0];
+            }
+        }
+    
+return aaraar;
+
+
+
+}
+
+
+
+
+
+function repaint(){
+gridgameof=doStep7();
+
+}
+
+
+doLlivevve();
+
+
+function topl(){
+tolss++;
+
+repaint();
+if(tolss==2){
+tolss=0;
+}
+setTimeout("topl()", 9876);
+}
+topl();
+
+</script>
+</body>
+</html>
