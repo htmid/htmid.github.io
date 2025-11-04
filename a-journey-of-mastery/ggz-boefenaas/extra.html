@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>127-Patch Cycling Melody Synth</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #121212;
+            color: #E0E0E0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+        .container {
+            background: #1e1e1e;
+            padding: 2.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            width: 90%;
+            max-width: 600px;
+            transition: all 0.3s ease;
+        }
+        button {
+            transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-weight: 700;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        .play-button {
+            background-color: #4CAF50; /* Green */
+            color: white;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+        }
+        .play-button:hover {
+            background-color: #66BB6A;
+            transform: translateY(-1px);
+        }
+        .play-button:active {
+            transform: translateY(1px);
+        }
+        .stop-button {
+            background-color: #F44336; /* Red */
+            color: white;
+            box-shadow: 0 4px 15px rgba(244, 67, 54, 0.4);
+        }
+        .stop-button:hover {
+            background-color: #E57373;
+            transform: translateY(-1px);
+        }
+        .stop-button:active {
+            transform: translateY(1px);
+        }
+        .info-card {
+            background-color: #2a2a2a;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1.5rem;
+            border-left: 4px solid #BB86FC;
+        }
+        .patch-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #BB86FC;
+        }
+    </style>
+    <!-- Firebase Imports for Guideline Compliance -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+
+        if (Object.keys(firebaseConfig).length > 0) {
+            try {
+                const app = initializeApp(firebaseConfig);
+                const db = getFirestore(app);
+                const auth = getAuth(app);
+                setLogLevel('Debug'); // For debugging
+
+                const authPromise = typeof __initial_auth_token !== 'undefined' && __initial_auth_token
+                    ? signInWithCustomToken(auth, __initial_auth_token)
+                    : signInAnonymously(auth);
+
+                authPromise.catch(error => {
+                    console.error("Firebase authentication error:", error);
+                });
+            } catch (e) {
+                console.error("Firebase initialization failed:", e);
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <div class="container">
+        <h1 class="text-3xl font-bold text-center mb-6">127-Patch Melody Generator</h1>
+
+        <div id="controls" class="flex justify-center space-x-4 mb-6">
+            <button id="playButton" class="play-button">Play</button>
+            <button id="stopButton" class="stop-button" disabled>Stop</button>
+        </div>
+
+        <div id="status" class="text-center text-lg text-gray-400 mb-4">
+            Click 'Play' to start the music.
+        </div>
+
+        <div id="info" class="info-card">
+            <p class="text-sm font-medium mb-1 text-gray-400">Current Patch:</p>
+            <p class="patch-name" id="currentPatchName">---</p>
+            <p class="text-xs text-gray-500 mt-2">The melody cycles through all 127 distinct patches.</p>
+        </div>
+    </div>
+
+    <script>
+        // --- SYNTH PATCHES (127 ENTRIES) ---
+        // Defines 127 unique instrument timbres based on General MIDI categories.
+        // Parameters: wave, A, D, S, R (ADSR), filter, math (pitch glide), lfoRate, modDepth
+
+
+
+
+
+        // --- SYNTH PATCHES (127 ENTRIES) ---
+        // Defines 127 unique instrument timbres based on General MIDI categories.
+        // Parameters: wave, A, D, S, R (ADSR), filter, math (pitch glide), lfoRate, modDepth
+        const SYNTH_PATCHES = [
+            // ----------------------------------------------------------------------
+            // 001-008: PIANO
+            // ----------------------------------------------------------------------
+            { name: 'Acoustic Grand Piano (1)', wave: 'triangle', A: 0.005, D: 0.3, S: 0.0, R: 0.5, filter: { type: 'lowpass', freq: 4000, Q: 0.5 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+    { name: 'Bright Acoustic Piano (2)', wave: 'sawtooth', A: 0.005, D: 0.25, S: 0.0, R: 0.4, filter: { type: 'lowpass', freq: 6000, Q: 0.5 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+    { name: 'Electric Grand Piano (3)', wave: 'square', A: 0.01, D: 0.4, S: 0.1, R: 0.5, filter: { type: 'lowpass', freq: 3000, Q: 0.5 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+    { name: 'Honky-tonk Piano (4)', wave: 'sawtooth', A: 0.005, D: 0.2, S: 0.0, R: 0.3, filter: { type: 'lowpass', freq: 3500, Q: 2.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+    { name: 'Electric Piano 1 (5)', wave: 'sine', A: 0.01, D: 0.5, S: 0.5, R: 0.5, filter: { type: 'lowpass', freq: 2500, Q: 1.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+    { name: 'Electric Piano 2 (6)', wave: 'triangle', A: 0.01, D: 0.6, S: 0.3, R: 0.7, filter: { type: 'lowpass', freq: 4000, Q: 1.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+    { name: 'Harpsichord (7)', wave: 'square', A: 0.001, D: 0.2, S: 0.0, R: 0.3, filter: { type: 'highpass', freq: 2000, Q: 0.5 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+    { name: 'Clavinet (8)', wave: 'square', A: 0.005, D: 0.1, S: 0.8, R: 0.2, filter: { type: 'lowpass', freq: 5000, Q: 0.8 }, math: 'exponential', lfoRate: 5.0, modDepth: 0.01 },
+            // ----------------------------------------------------------------------
+            // 009-016: CHROMATIC PERCUSSION
+            // ----------------------------------------------------------------------
+            { name: '009: Celesta', wave: 'sine', A: 0.01, D: 0.3, S: 0.0, R: 0.8, filter: { type: 'lowpass', freq: 8000, Q: 0.1 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '010: Glockenspiel', wave: 'triangle', A: 0.001, D: 0.2, S: 0.0, R: 0.5, filter: { type: 'highpass', freq: 4000, Q: 0.1 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '011: Music Box', wave: 'sine', A: 0.01, D: 0.5, S: 0.0, R: 0.6, filter: { type: 'lowpass', freq: 5000, Q: 0.5 }, math: 'exponential', lfoRate: 5.0, modDepth: 0.1 },
+            { name: '012: Vibraphone', wave: 'sine', A: 0.05, D: 0.5, S: 0.1, R: 0.5, filter: { type: 'lowpass', freq: 4000, Q: 0.5 }, math: 'exponential', lfoRate: 6.0, modDepth: 0.05 },
+            { name: '013: Marimba', wave: 'sawtooth', A: 0.005, D: 0.2, S: 0.0, R: 0.4, filter: { type: 'lowpass', freq: 1500, Q: 1.0 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '014: Xylophone', wave: 'square', A: 0.001, D: 0.1, S: 0.0, R: 0.3, filter: { type: 'highpass', freq: 2500, Q: 0.5 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '015: Tubular Bells', wave: 'triangle', A: 0.05, D: 1.0, S: 0.0, R: 1.5, filter: { type: 'lowpass', freq: 6000, Q: 0.5 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '016: Dulcimer', wave: 'sawtooth', A: 0.005, D: 0.3, S: 0.0, R: 0.5, filter: { type: 'lowpass', freq: 3000, Q: 1.0 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+
+            // ----------------------------------------------------------------------
+            // 017-024: ORGAN
+            // ----------------------------------------------------------------------
+       { name: 'Drawbar Organ (17)', wave: 'sawtooth', A: 0.01, D: 0.1, S: 0.8, R: 0.2, filter: { type: 'lowpass', freq: 4000, Q: 0.5 }, math: 'linear', lfoRate: 5.0, modDepth: 0.05 },
+    { name: 'Percussive Organ (18)', wave: 'sawtooth', A: 0.01, D: 0.1, S: 0.7, R: 0.2, filter: { type: 'lowpass', freq: 4000, Q: 0.5 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+    { name: 'Rock Organ (19)', wave: 'square', A: 0.01, D: 0.2, S: 0.9, R: 0.3, filter: { type: 'lowpass', freq: 3000, Q: 0.8 }, math: 'linear', lfoRate: 1.0, modDepth: 0.01 },
+    { name: 'Church Organ (20)', wave: 'sine', A: 0.1, D: 0.5, S: 1.0, R: 0.5, filter: { type: 'lowpass', freq: 2000, Q: 0.5 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+    { name: 'Reed Organ (21)', wave: 'sawtooth', A: 0.05, D: 0.5, S: 0.8, R: 0.5, filter: { type: 'lowpass', freq: 2500, Q: 0.5 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+    { name: 'Accordion (22)', wave: 'sawtooth', A: 0.05, D: 0.5, S: 0.8, R: 0.5, filter: { type: 'lowpass', freq: 3500, Q: 0.5 }, math: 'linear', lfoRate: 5.0, modDepth: 0.01 },
+    { name: 'Harmonica (23)', wave: 'square', A: 0.05, D: 0.4, S: 0.7, R: 0.4, filter: { type: 'bandpass', freq: 1000, Q: 2.0 }, math: 'linear', lfoRate: 5.0, modDepth: 0.02 },
+    { name: 'Tango Accordion (24)', wave: 'sawtooth', A: 0.05, D: 0.5, S: 0.8, R: 0.5, filter: { type: 'lowpass', freq: 2000, Q: 0.5 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+            // ----------------------------------------------------------------------
+            // 025-032: GUITAR
+            // ----------------------------------------------------------------------
+          { name: 'Acoustic Guitar (25)', wave: 'triangle', A: 0.005, D: 0.4, S: 0.0, R: 0.5, filter: { type: 'lowpass', freq: 4000, Q: 0.5 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+    { name: 'Electric Guitar Jazz (26)', wave: 'sine', A: 0.01, D: 0.5, S: 0.2, R: 0.6, filter: { type: 'lowpass', freq: 2000, Q: 0.5 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+    { name: 'Electric Guitar Clean (27)', wave: 'triangle', A: 0.01, D: 0.6, S: 0.4, R: 0.7, filter: { type: 'lowpass', freq: 3500, Q: 0.5 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+    { name: 'Electric Guitar Muted (28)', wave: 'square', A: 0.001, D: 0.05, S: 0.0, R: 0.1, filter: { type: 'lowpass', freq: 1000, Q: 1.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+    { name: 'Overdriven Guitar (29)', wave: 'sawtooth', A: 0.05, D: 0.5, S: 0.5, R: 0.5, filter: { type: 'lowpass', freq: 2500, Q: 0.5 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+    { name: 'Distortion Guitar (30)', wave: 'square', A: 0.05, D: 0.6, S: 0.6, R: 0.6, filter: { type: 'lowpass', freq: 2000, Q: 0.5 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+    { name: 'Guitar Harmonics (31)', wave: 'sine', A: 0.01, D: 0.8, S: 0.0, R: 1.0, filter: { type: 'highpass', freq: 5000, Q: 1.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+    { name: 'Acoustic Bass (32)', wave: 'triangle', A: 0.01, D: 0.4, S: 0.3, R: 0.5, filter: { type: 'lowpass', freq: 300, Q: 1.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+            // ----------------------------------------------------------------------
+            // 033-040: BASS
+            // ----------------------------------------------------------------------
+  { name: 'Electric Bass (Finger) (33)', wave: 'sawtooth', A: 0.005, D: 0.3, S: 0.5, R: 0.4, filter: { type: 'lowpass', freq: 500, Q: 1.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+    { name: 'Electric Bass (Pick) (34)', wave: 'square', A: 0.001, D: 0.2, S: 0.6, R: 0.3, filter: { type: 'lowpass', freq: 700, Q: 1.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '035: Electric Bass (Pick)', wave: 'square', A: 0.005, D: 0.2, S: 0.5, R: 0.5, filter: { type: 'lowpass', freq: 1000, Q: 1.5 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '036: Fretless Bass', wave: 'sine', A: 0.1, D: 0.5, S: 0.3, R: 1.0, filter: { type: 'lowpass', freq: 600, Q: 0.8 }, math: 'linear', lfoRate: 0.5, modDepth: 5 }, // Glide for fretless
+            { name: '037: Slap Bass 1', wave: 'sawtooth', A: 0.001, D: 0.05, S: 0.0, R: 0.2, filter: { type: 'highpass', freq: 200, Q: 1.5 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '038: Slap Bass 2', wave: 'square', A: 0.001, D: 0.1, S: 0.0, R: 0.3, filter: { type: 'lowpass', freq: 1000, Q: 2.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '039: Synth Bass 1 (Acid)', wave: 'sawtooth', A: 0.05, D: 0.2, S: 0.9, R: 0.4, filter: { type: 'lowpass', freq: 500, Q: 5.0 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '040: Synth Bass 2 (Sub)', wave: 'sine', A: 0.1, D: 0.3, S: 0.7, R: 0.5, filter: { type: 'lowpass', freq: 300, Q: 0.5 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+
+            // ----------------------------------------------------------------------
+            // 041-048: STRINGS
+            // ----------------------------------------------------------------------
+            { name: '041: Violin', wave: 'triangle', A: 0.1, D: 0.4, S: 0.6, R: 0.5, filter: { type: 'lowpass', freq: 3000, Q: 0.8 }, math: 'exponential', lfoRate: 5.0, modDepth: 0.05 },
+            { name: '042: Viola', wave: 'sawtooth', A: 0.1, D: 0.3, S: 0.7, R: 0.5, filter: { type: 'lowpass', freq: 2500, Q: 1.0 }, math: 'exponential', lfoRate: 4.5, modDepth: 0.03 },
+            { name: '043: Cello', wave: 'sine', A: 0.15, D: 0.5, S: 0.8, R: 0.6, filter: { type: 'lowpass', freq: 1500, Q: 1.2 }, math: 'exponential', lfoRate: 4.0, modDepth: 0.02 },
+            { name: '044: Contrabass', wave: 'square', A: 0.2, D: 0.6, S: 0.8, R: 0.7, filter: { type: 'lowpass', freq: 800, Q: 1.5 }, math: 'exponential', lfoRate: 3.0, modDepth: 0.01 },
+            { name: '045: Tremolo Strings', wave: 'sawtooth', A: 0.05, D: 0.2, S: 0.7, R: 0.4, filter: { type: 'lowpass', freq: 4000, Q: 0.5 }, math: 'exponential', lfoRate: 12.0, modDepth: 0.1 },
+            { name: '046: Pizzicato Strings', wave: 'triangle', A: 0.001, D: 0.1, S: 0.0, R: 0.3, filter: { type: 'lowpass', freq: 5000, Q: 0.5 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '047: Orchestral Harp', wave: 'sine', A: 0.005, D: 0.5, S: 0.0, R: 1.0, filter: { type: 'bandpass', freq: 1500, Q: 8 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '048: Timpani', wave: 'square', A: 0.01, D: 0.3, S: 0.0, R: 0.5, filter: { type: 'lowpass', freq: 300, Q: 5.0 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+
+            // ----------------------------------------------------------------------
+            // 049-056: ENSEMBLE
+            // ----------------------------------------------------------------------
+            { name: '049: String Ensemble 1 (Fast)', wave: 'sawtooth', A: 0.2, D: 0.5, S: 0.9, R: 0.8, filter: { type: 'lowpass', freq: 3500, Q: 0.7 }, math: 'exponential', lfoRate: 0.5, modDepth: 0.05 },
+            { name: '050: String Ensemble 2 (Slow)', wave: 'triangle', A: 0.5, D: 1.0, S: 0.8, R: 1.0, filter: { type: 'lowpass', freq: 3000, Q: 0.5 }, math: 'exponential', lfoRate: 0.2, modDepth: 0.08 },
+            { name: '051: Synth Strings 1', wave: 'square', A: 0.1, D: 0.3, S: 0.7, R: 0.5, filter: { type: 'lowpass', freq: 2500, Q: 2.0 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '052: Synth Strings 2', wave: 'sawtooth', A: 0.05, D: 0.4, S: 0.6, R: 0.6, filter: { type: 'highpass', freq: 1000, Q: 1.0 }, math: 'linear', lfoRate: 1.0, modDepth: 0.1 },
+            { name: '053: Choir Aahs', wave: 'sine', A: 0.3, D: 0.5, S: 0.9, R: 1.0, filter: { type: 'lowpass', freq: 1500, Q: 0.5 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '054: Voice Oohs', wave: 'triangle', A: 0.4, D: 0.6, S: 0.8, R: 1.2, filter: { type: 'bandpass', freq: 800, Q: 2.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '055: Synth Voice', wave: 'square', A: 0.15, D: 0.4, S: 0.8, R: 0.7, filter: { type: 'lowpass', freq: 1000, Q: 3.0 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '056: Orchestra Hit', wave: 'sawtooth', A: 0.001, D: 0.5, S: 0.0, R: 0.5, filter: { type: 'bandpass', freq: 4000, Q: 10.0 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+
+            // ----------------------------------------------------------------------
+            // 057-064: BRASS
+            // ----------------------------------------------------------------------
+            { name: '057: Trumpet', wave: 'sawtooth', A: 0.05, D: 0.2, S: 0.7, R: 0.3, filter: { type: 'highpass', freq: 1500, Q: 0.5 }, math: 'exponential', lfoRate: 5.0, modDepth: 0.05 },
+            { name: '058: Trombone', wave: 'square', A: 0.08, D: 0.3, S: 0.8, R: 0.4, filter: { type: 'lowpass', freq: 1000, Q: 1.0 }, math: 'exponential', lfoRate: 4.0, modDepth: 0.03 },
+            { name: '059: Tuba', wave: 'triangle', A: 0.15, D: 0.5, S: 0.8, R: 0.6, filter: { type: 'lowpass', freq: 500, Q: 0.8 }, math: 'exponential', lfoRate: 3.0, modDepth: 0.02 },
+            { name: '060: Muted Trumpet', wave: 'sine', A: 0.05, D: 0.2, S: 0.6, R: 0.3, filter: { type: 'lowpass', freq: 800, Q: 2.0 }, math: 'exponential', lfoRate: 5.0, modDepth: 0.05 },
+            { name: '061: French Horn', wave: 'sawtooth', A: 0.3, D: 0.4, S: 0.8, R: 0.7, filter: { type: 'lowpass', freq: 2000, Q: 0.5 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '062: Brass Section', wave: 'square', A: 0.1, D: 0.3, S: 0.7, R: 0.5, filter: { type: 'lowpass', freq: 3000, Q: 0.7 }, math: 'exponential', lfoRate: 0.5, modDepth: 0.05 },
+            { name: '063: Synth Brass 1', wave: 'sawtooth', A: 0.05, D: 0.2, S: 0.9, R: 0.4, filter: { type: 'lowpass', freq: 1500, Q: 3.0 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '064: Synth Brass 2', wave: 'square', A: 0.1, D: 0.3, S: 0.8, R: 0.5, filter: { type: 'lowpass', freq: 2000, Q: 2.5 }, math: 'exponential', lfoRate: 0.5, modDepth: 5.0 },
+
+            // ----------------------------------------------------------------------
+            // 065-072: REED
+            // ----------------------------------------------------------------------
+            { name: '065: Soprano Sax', wave: 'sine', A: 0.05, D: 0.2, S: 0.7, R: 0.3, filter: { type: 'lowpass', freq: 4000, Q: 1.5 }, math: 'exponential', lfoRate: 6.0, modDepth: 0.05 },
+            { name: '066: Alto Sax', wave: 'triangle', A: 0.08, D: 0.3, S: 0.8, R: 0.4, filter: { type: 'lowpass', freq: 3000, Q: 2.0 }, math: 'exponential', lfoRate: 5.5, modDepth: 0.04 },
+            { name: '067: Tenor Sax', wave: 'sawtooth', A: 0.1, D: 0.4, S: 0.8, R: 0.5, filter: { type: 'lowpass', freq: 2500, Q: 2.5 }, math: 'exponential', lfoRate: 5.0, modDepth: 0.03 },
+            { name: '068: Baritone Sax', wave: 'square', A: 0.15, D: 0.5, S: 0.7, R: 0.6, filter: { type: 'lowpass', freq: 1500, Q: 3.0 }, math: 'exponential', lfoRate: 4.0, modDepth: 0.02 },
+            { name: '069: Oboe', wave: 'sine', A: 0.1, D: 0.3, S: 0.6, R: 0.4, filter: { type: 'bandpass', freq: 2000, Q: 4.0 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '070: English Horn', wave: 'triangle', A: 0.15, D: 0.4, S: 0.7, R: 0.5, filter: { type: 'bandpass', freq: 1500, Q: 3.0 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '071: Bassoon', wave: 'sawtooth', A: 0.2, D: 0.5, S: 0.7, R: 0.6, filter: { type: 'lowpass', freq: 800, Q: 1.5 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '072: Clarinet', wave: 'square', A: 0.05, D: 0.2, S: 0.8, R: 0.3, filter: { type: 'lowpass', freq: 3500, Q: 1.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+
+            // ----------------------------------------------------------------------
+            // 073-080: PIPE
+            // ----------------------------------------------------------------------
+            { name: '073: Piccolo', wave: 'triangle', A: 0.01, D: 0.2, S: 0.6, R: 0.3, filter: { type: 'highpass', freq: 6000, Q: 0.5 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '074: Flute', wave: 'sine', A: 0.05, D: 0.3, S: 0.8, R: 0.4, filter: { type: 'lowpass', freq: 5000, Q: 0.5 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '075: Recorder', wave: 'square', A: 0.08, D: 0.4, S: 0.7, R: 0.5, filter: { type: 'lowpass', freq: 4000, Q: 1.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '076: Pan Flute', wave: 'sawtooth', A: 0.05, D: 0.3, S: 0.7, R: 0.4, filter: { type: 'bandpass', freq: 3000, Q: 5.0 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '077: Blown Bottle', wave: 'sine', A: 0.1, D: 0.5, S: 0.0, R: 0.6, filter: { type: 'lowpass', freq: 2000, Q: 0.8 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '078: Shakuhachi', wave: 'triangle', A: 0.15, D: 0.6, S: 0.0, R: 0.7, filter: { type: 'lowpass', freq: 1500, Q: 1.0 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '079: Whistle', wave: 'sine', A: 0.01, D: 0.2, S: 0.9, R: 0.3, filter: { type: 'highpass', freq: 7000, Q: 0.5 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '080: Ocarina', wave: 'square', A: 0.1, D: 0.4, S: 0.8, R: 0.5, filter: { type: 'lowpass', freq: 2500, Q: 1.5 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+
+            // ----------------------------------------------------------------------
+            // 081-088: SYNTH LEAD
+            // ----------------------------------------------------------------------
+            { name: '081: Lead 1 (Square)', wave: 'square', A: 0.01, D: 0.1, S: 0.9, R: 0.2, filter: { type: 'lowpass', freq: 5000, Q: 1.0 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '082: Lead 2 (Saw)', wave: 'sawtooth', A: 0.01, D: 0.15, S: 0.8, R: 0.3, filter: { type: 'lowpass', freq: 4000, Q: 2.0 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '083: Lead 3 (Calliope)', wave: 'triangle', A: 0.05, D: 0.2, S: 0.9, R: 0.4, filter: { type: 'lowpass', freq: 6000, Q: 0.5 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '084: Lead 4 (Chiff)', wave: 'sine', A: 0.005, D: 0.3, S: 0.0, R: 0.5, filter: { type: 'bandpass', freq: 4000, Q: 5.0 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '085: Lead 5 (Charang)', wave: 'sawtooth', A: 0.01, D: 0.3, S: 0.5, R: 0.5, filter: { type: 'lowpass', freq: 3000, Q: 3.0 }, math: 'exponential', lfoRate: 8.0, modDepth: 0.2 },
+            { name: '086: Lead 6 (Voice)', wave: 'square', A: 0.1, D: 0.2, S: 0.8, R: 0.3, filter: { type: 'lowpass', freq: 1500, Q: 4.0 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '087: Lead 7 (Fiff)', wave: 'triangle', A: 0.001, D: 0.05, S: 0.0, R: 0.2, filter: { type: 'highpass', freq: 4000, Q: 1.0 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '088: Lead 8 (Bass+Lead)', wave: 'sawtooth', A: 0.05, D: 0.2, S: 0.7, R: 0.4, filter: { type: 'lowpass', freq: 800, Q: 5.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+
+            // ----------------------------------------------------------------------
+            // 089-096: SYNTH PAD
+            // ----------------------------------------------------------------------
+            { name: '089: Pad 1 (New Age)', wave: 'sine', A: 0.5, D: 1.0, S: 0.7, R: 1.5, filter: { type: 'lowpass', freq: 2000, Q: 0.5 }, math: 'exponential', lfoRate: 0.5, modDepth: 0.02 },
+            { name: '090: Pad 2 (Warm)', wave: 'triangle', A: 0.8, D: 1.5, S: 0.8, R: 2.0, filter: { type: 'lowpass', freq: 1500, Q: 1.0 }, math: 'exponential', lfoRate: 0.2, modDepth: 0.01 },
+            { name: '091: Pad 3 (Polysynth)', wave: 'sawtooth', A: 0.2, D: 0.5, S: 0.9, R: 1.0, filter: { type: 'lowpass', freq: 3000, Q: 1.5 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '092: Pad 4 (Choir)', wave: 'square', A: 0.4, D: 0.8, S: 0.8, R: 1.2, filter: { type: 'lowpass', freq: 1000, Q: 2.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '093: Pad 5 (Bowed)', wave: 'triangle', A: 1.0, D: 1.0, S: 0.7, R: 2.0, filter: { type: 'lowpass', freq: 2500, Q: 0.7 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '094: Pad 6 (Metallic)', wave: 'sawtooth', A: 0.1, D: 0.5, S: 0.6, R: 1.0, filter: { type: 'bandpass', freq: 4000, Q: 5.0 }, math: 'linear', lfoRate: 1.0, modDepth: 0.1 },
+            { name: '095: Pad 7 (Halo)', wave: 'sine', A: 0.8, D: 1.5, S: 0.9, R: 2.5, filter: { type: 'lowpass', freq: 4000, Q: 0.5 }, math: 'exponential', lfoRate: 0.1, modDepth: 0.05 },
+            { name: '096: Pad 8 (Sweep)', wave: 'square', A: 0.5, D: 1.0, S: 0.5, R: 1.5, filter: { type: 'lowpass', freq: 500, Q: 3.0, freqSweep: true }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 }, // Special for sweep
+
+            // ----------------------------------------------------------------------
+            // 097-104: SYNTH FX
+            // ----------------------------------------------------------------------
+            { name: '097: FX 1 (Rain)', wave: 'square', A: 0.01, D: 0.1, S: 0.0, R: 0.2, filter: { type: 'lowpass', freq: 1000, Q: 5.0 }, math: 'linear', lfoRate: 20.0, modDepth: 10.0 },
+            { name: '098: FX 2 (Soundtrack)', wave: 'sawtooth', A: 0.05, D: 0.8, S: 0.7, R: 1.0, filter: { type: 'lowpass', freq: 3000, Q: 1.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '099: FX 3 (Crystal)', wave: 'triangle', A: 0.005, D: 0.3, S: 0.1, R: 0.5, filter: { type: 'bandpass', freq: 6000, Q: 10.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '100: FX 4 (Atmosphere)', wave: 'sine', A: 1.0, D: 2.0, S: 0.8, R: 3.0, filter: { type: 'lowpass', freq: 1000, Q: 0.5 }, math: 'exponential', lfoRate: 0.1, modDepth: 0.01 },
+            { name: '101: FX 5 (Brightness)', wave: 'sawtooth', A: 0.01, D: 0.1, S: 0.9, R: 0.2, filter: { type: 'highpass', freq: 5000, Q: 2.0 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '102: FX 6 (Goblins)', wave: 'square', A: 0.05, D: 0.4, S: 0.5, R: 0.6, filter: { type: 'lowpass', freq: 500, Q: 4.0 }, math: 'linear', lfoRate: 1.0, modDepth: 10.0 },
+            { name: '103: FX 7 (Echoes)', wave: 'triangle', A: 0.01, D: 0.5, S: 0.0, R: 0.8, filter: { type: 'lowpass', freq: 2000, Q: 0.5 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '104: FX 8 (Sci-Fi)', wave: 'sawtooth', A: 0.05, D: 0.5, S: 0.6, R: 0.8, filter: { type: 'bandpass', freq: 1500, Q: 8.0 }, math: 'linear', lfoRate: 10.0, modDepth: 0.1 },
+
+            // ----------------------------------------------------------------------
+            // 105-112: ETHNIC
+            // ----------------------------------------------------------------------
+            { name: '105: Sitar', wave: 'triangle', A: 0.005, D: 0.4, S: 0.1, R: 0.5, filter: { type: 'bandpass', freq: 800, Q: 10.0 }, math: 'exponential', lfoRate: 8.0, modDepth: 0.05 },
+            { name: '106: Banjo', wave: 'sawtooth', A: 0.001, D: 0.1, S: 0.0, R: 0.3, filter: { type: 'highpass', freq: 4000, Q: 0.5 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '107: Shamisen', wave: 'square', A: 0.001, D: 0.2, S: 0.0, R: 0.4, filter: { type: 'lowpass', freq: 3000, Q: 1.0 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '108: Koto', wave: 'sine', A: 0.05, D: 0.5, S: 0.0, R: 0.7, filter: { type: 'lowpass', freq: 2000, Q: 0.5 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '109: Kalimba', wave: 'triangle', A: 0.005, D: 0.2, S: 0.0, R: 0.4, filter: { type: 'bandpass', freq: 5000, Q: 5.0 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '110: Bagpipe', wave: 'sawtooth', A: 0.1, D: 0.5, S: 1.0, R: 0.2, filter: { type: 'lowpass', freq: 1000, Q: 2.0 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '111: Fiddle', wave: 'sine', A: 0.05, D: 0.3, S: 0.7, R: 0.4, filter: { type: 'lowpass', freq: 3500, Q: 1.0 }, math: 'exponential', lfoRate: 6.0, modDepth: 0.03 },
+            { name: '112: Shanai', wave: 'square', A: 0.1, D: 0.4, S: 0.8, R: 0.5, filter: { type: 'bandpass', freq: 1500, Q: 3.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+
+            // ----------------------------------------------------------------------
+            // 113-120: PERCUSSIVE
+            // ----------------------------------------------------------------------
+            { name: '113: Tinkle Bell', wave: 'triangle', A: 0.001, D: 0.2, S: 0.0, R: 0.5, filter: { type: 'highpass', freq: 8000, Q: 0.5 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '114: Agogô', wave: 'square', A: 0.001, D: 0.1, S: 0.0, R: 0.2, filter: { type: 'bandpass', freq: 2000, Q: 10.0 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '115: Steel Drums', wave: 'sine', A: 0.01, D: 0.3, S: 0.1, R: 0.4, filter: { type: 'lowpass', freq: 4000, Q: 1.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '116: Woodblock', wave: 'sawtooth', A: 0.001, D: 0.05, S: 0.0, R: 0.1, filter: { type: 'lowpass', freq: 1000, Q: 5.0 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '117: Taiko Drum', wave: 'square', A: 0.05, D: 0.5, S: 0.0, R: 0.8, filter: { type: 'lowpass', freq: 300, Q: 1.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '118: Melodic Tom', wave: 'triangle', A: 0.01, D: 0.2, S: 0.0, R: 0.3, filter: { type: 'lowpass', freq: 500, Q: 2.0 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '119: Synth Drum', wave: 'sawtooth', A: 0.01, D: 0.1, S: 0.5, R: 0.2, filter: { type: 'lowpass', freq: 2000, Q: 3.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '120: Reverse Cymbal', wave: 'sine', A: 0.5, D: 1.0, S: 0.0, R: 0.5, filter: { type: 'highpass', freq: 1000, Q: 0.1 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+
+            // ----------------------------------------------------------------------
+            // 121-127: SOUND EFFECTS
+            // ----------------------------------------------------------------------
+            { name: '121: Guitar Fret Noise', wave: 'sawtooth', A: 0.001, D: 0.05, S: 0.0, R: 0.1, filter: { type: 'highpass', freq: 6000, Q: 0.5 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '122: Breath Noise', wave: 'sine', A: 0.05, D: 0.3, S: 0.0, R: 0.5, filter: { type: 'bandpass', freq: 500, Q: 5.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '123: Seashore', wave: 'square', A: 0.1, D: 1.0, S: 0.0, R: 2.0, filter: { type: 'lowpass', freq: 200, Q: 0.5 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 },
+            { name: '124: Bird Tweet', wave: 'triangle', A: 0.005, D: 0.1, S: 0.0, R: 0.2, filter: { type: 'highpass', freq: 8000, Q: 0.1 }, math: 'exponential', lfoRate: 20.0, modDepth: 5.0 },
+            { name: '125: Telephone Ring', wave: 'square', A: 0.05, D: 0.2, S: 0.8, R: 0.3, filter: { type: 'bandpass', freq: 1000, Q: 10.0 }, math: 'linear', lfoRate: 10.0, modDepth: 5.0 },
+            { name: '126: Helicopter', wave: 'sawtooth', A: 0.5, D: 1.0, S: 0.5, R: 1.0, filter: { type: 'lowpass', freq: 100, Q: 0.5 }, math: 'linear', lfoRate: 2.0, modDepth: 10.0 },
+            { name: '127: Gunshot', wave: 'square', A: 0.001, D: 0.05, S: 0.0, R: 0.05, filter: { type: 'bandpass', freq: 4000, Q: 20.0 }, math: 'linear', lfoRate: 0.0, modDepth: 0.0 }, // TOTAL: 127 Patches (001-127)
+        ];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const SYNTH_DRUM_PATCHES = [    { name: '35 Acoustic Bass Drum', wave: 'triangle', A: 0.001, D: 0.3, S: 0.0, R: 0.1, filter: { type: 'lowpass', freq: 80, Q: 0.5 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+    { name: '36 Electric Bass Drum', wave: 'sine', A: 0.001, D: 0.25, S: 0.0, R: 0.05, filter: { type: 'lowpass', freq: 60, Q: 1.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+    // 37-40: SNARES/STICKS (Sharp Transient, Higher Frequency)
+    { name: '37 Side Stick', wave: 'square', A: 0.001, D: 0.05, S: 0.0, R: 0.01, filter: { type: 'lowpass', freq: 2000, Q: 5.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+    { name: '38 Acoustic Snare', wave: 'triangle', A: 0.001, D: 0.1, S: 0.0, R: 0.1, filter: { type: 'lowpass', freq: 3000, Q: 1.0 }, math: 'exponential', lfoRate: 5.0, modDepth: 0.05 },
+    { name: '39 Hand Clap', wave: 'square', A: 0.005, D: 0.05, S: 0.0, R: 0.05, filter: { type: 'lowpass', freq: 5000, Q: 0.5 }, math: 'exponential', lfoRate: 30.0, modDepth: 0.1 },
+    { name: '40 Electric Snare / Rimshot', wave: 'square', A: 0.001, D: 0.1, S: 0.0, R: 0.05, filter: { type: 'lowpass', freq: 4000, Q: 2.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+    // 41, 43, 45, 47, 48, 50: TOMS (Pitched, Short Ring)
+    { name: '41 Low Floor Tom', wave: 'triangle', A: 0.001, D: 0.2, S: 0.0, R: 0.1, filter: { type: 'lowpass', freq: 150, Q: 1.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+    { name: '42 Closed Hi-hat', wave: 'sawtooth', A: 0.001, D: 0.05, S: 0.0, R: 0.01, filter: { type: 'highpass', freq: 7000, Q: 0.1 }, math: 'exponential', lfoRate: 50.0, modDepth: 0.2 },
+    { name: '43 High Floor Tom', wave: 'triangle', A: 0.001, D: 0.2, S: 0.0, R: 0.1, filter: { type: 'lowpass', freq: 250, Q: 1.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+    { name: '44 Pedal Hi-hat', wave: 'sawtooth', A: 0.001, D: 0.08, S: 0.0, R: 0.01, filter: { type: 'highpass', freq: 6000, Q: 0.1 }, math: 'exponential', lfoRate: 40.0, modDepth: 0.2 },
+    { name: '45 Low Tom', wave: 'triangle', A: 0.001, D: 0.15, S: 0.0, R: 0.08, filter: { type: 'lowpass', freq: 300, Q: 1.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+    { name: '46 Open Hi-hat', wave: 'sawtooth', A: 0.001, D: 0.3, S: 0.0, R: 0.5, filter: { type: 'highpass', freq: 8000, Q: 0.1 }, math: 'exponential', lfoRate: 30.0, modDepth: 0.3 },
+    { name: '47 Low-Mid Tom', wave: 'triangle', A: 0.001, D: 0.15, S: 0.0, R: 0.08, filter: { type: 'lowpass', freq: 400, Q: 1.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+    { name: '48 High-Mid Tom', wave: 'triangle', A: 0.001, D: 0.15, S: 0.0, R: 0.08, filter: { type: 'lowpass', freq: 550, Q: 1.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+    { name: '49 Crash Cymbal 1', wave: 'square', A: 0.01, D: 1.5, S: 0.0, R: 2.0, filter: { type: 'highpass', freq: 9000, Q: 0.1 }, math: 'exponential', lfoRate: 10.0, modDepth: 0.4 },
+    { name: '50 High Tom', wave: 'triangle', A: 0.001, D: 0.15, S: 0.0, R: 0.08, filter: { type: 'lowpass', freq: 700, Q: 1.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+    { name: '51 Ride Cymbal 1', wave: 'square', A: 0.01, D: 1.0, S: 0.0, R: 1.5, filter: { type: 'highpass', freq: 6000, Q: 0.1 }, math: 'exponential', lfoRate: 8.0, modDepth: 0.3 },
+    // 52-59: AUXILIARY CYMBALS/METALLIC
+    { name: '52 Chinese Cymbal', wave: 'square', A: 0.01, D: 1.2, S: 0.0, R: 1.8, filter: { type: 'bandpass', freq: 4000, Q: 0.1 }, math: 'exponential', lfoRate: 15.0, modDepth: 0.3 },
+    { name: '53 Ride Bell', wave: 'triangle', A: 0.001, D: 0.2, S: 0.0, R: 0.3, filter: { type: 'highpass', freq: 5000, Q: 5.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+    { name: '54 Tambourine', wave: 'sawtooth', A: 0.005, D: 0.1, S: 0.0, R: 0.05, filter: { type: 'highpass', freq: 7000, Q: 0.1 }, math: 'exponential', lfoRate: 20.0, modDepth: 0.2 },
+    { name: '55 Splash Cymbal', wave: 'square', A: 0.01, D: 0.8, S: 0.0, R: 1.0, filter: { type: 'highpass', freq: 8000, Q: 0.1 }, math: 'exponential', lfoRate: 12.0, modDepth: 0.4 },
+    { name: '56 Cowbell', wave: 'square', A: 0.001, D: 0.2, S: 0.0, R: 0.1, filter: { type: 'bandpass', freq: 3000, Q: 3.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+    { name: '57 Crash Cymbal 2', wave: 'square', A: 0.01, D: 1.5, S: 0.0, R: 2.0, filter: { type: 'highpass', freq: 9000, Q: 0.1 }, math: 'exponential', lfoRate: 10.0, modDepth: 0.4 },
+    { name: '58 Vibraslap', wave: 'sawtooth', A: 0.005, D: 0.2, S: 0.0, R: 0.5, filter: { type: 'bandpass', freq: 2000, Q: 0.5 }, math: 'exponential', lfoRate: 10.0, modDepth: 0.2 },
+    { name: '59 Ride Cymbal 2', wave: 'square', A: 0.01, D: 1.0, S: 0.0, R: 1.5, filter: { type: 'highpass', freq: 6000, Q: 0.1 }, math: 'exponential', lfoRate: 8.0, modDepth: 0.3 },
+    // 60-66: LATIN HAND DRUMS (Pitched, Medium Decay)
+    { name: '60 High Bongo', wave: 'sine', A: 0.001, D: 0.1, S: 0.0, R: 0.05, filter: { type: 'lowpass', freq: 800, Q: 1.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+    { name: '61 Low Bongo', wave: 'sine', A: 0.001, D: 0.1, S: 0.0, R: 0.05, filter: { type: 'lowpass', freq: 400, Q: 1.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+    { name: '62 Mute High Conga', wave: 'sine', A: 0.001, D: 0.05, S: 0.0, R: 0.02, filter: { type: 'lowpass', freq: 1000, Q: 1.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+    { name: '63 Open High Conga', wave: 'sine', A: 0.001, D: 0.2, S: 0.0, R: 0.1, filter: { type: 'lowpass', freq: 900, Q: 1.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+    { name: '64 Low Conga', wave: 'sine', A: 0.001, D: 0.2, S: 0.0, R: 0.1, filter: { type: 'lowpass', freq: 450, Q: 1.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+    { name: '65 High Timbale', wave: 'square', A: 0.001, D: 0.15, S: 0.0, R: 0.1, filter: { type: 'bandpass', freq: 2000, Q: 2.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+    { name: '66 Low Timbale', wave: 'square', A: 0.001, D: 0.15, S: 0.0, R: 0.1, filter: { type: 'bandpass', freq: 1000, Q: 2.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+    // 67-70: LATIN SHAKERS/BELLS
+    { name: '67 High Agogô', wave: 'square', A: 0.001, D: 0.1, S: 0.0, R: 0.05, filter: { type: 'highpass', freq: 5000, Q: 3.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+    { name: '68 Low Agogô', wave: 'square', A: 0.001, D: 0.1, S: 0.0, R: 0.05, filter: { type: 'highpass', freq: 2500, Q: 3.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+    { name: '69 Cabasa', wave: 'sawtooth', A: 0.005, D: 0.05, S: 0.0, R: 0.05, filter: { type: 'highpass', freq: 8000, Q: 0.1 }, math: 'exponential', lfoRate: 50.0, modDepth: 0.3 },
+    { name: '70 Maracas', wave: 'sawtooth', A: 0.005, D: 0.1, S: 0.0, R: 0.05, filter: { type: 'highpass', freq: 8000, Q: 0.1 }, math: 'exponential', lfoRate: 40.0, modDepth: 0.3 },
+    // 71-74: WHISTLES/GUIRO
+    { name: '71 Short Whistle', wave: 'sine', A: 0.001, D: 0.1, S: 0.0, R: 0.05, filter: { type: 'lowpass', freq: 6000, Q: 0.5 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+    { name: '72 Long Whistle', wave: 'sine', A: 0.001, D: 0.4, S: 0.0, R: 0.1, filter: { type: 'lowpass', freq: 6000, Q: 0.5 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+    { name: '73 Short Güiro', wave: 'sawtooth', A: 0.001, D: 0.1, S: 0.0, R: 0.01, filter: { type: 'highpass', freq: 4000, Q: 0.5 }, math: 'exponential', lfoRate: 20.0, modDepth: 0.1 },
+    { name: '74 Long Güiro', wave: 'sawtooth', A: 0.001, D: 0.2, S: 0.0, R: 0.05, filter: { type: 'highpass', freq: 4000, Q: 0.5 }, math: 'exponential', lfoRate: 10.0, modDepth: 0.1 },
+    // 75-77: CLAVES/WOODBLOCKS
+    { name: '75 Claves', wave: 'square', A: 0.001, D: 0.02, S: 0.0, R: 0.01, filter: { type: 'highpass', freq: 8000, Q: 5.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+    { name: '76 High Woodblock', wave: 'square', A: 0.001, D: 0.1, S: 0.0, R: 0.05, filter: { type: 'bandpass', freq: 3000, Q: 5.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+    { name: '77 Low Woodblock', wave: 'square', A: 0.001, D: 0.1, S: 0.0, R: 0.05, filter: { type: 'bandpass', freq: 1500, Q: 5.0 }, math: 'exponential', lfoRate: 0.0, modDepth: 0.0 },
+    // 78-81: CUIACA/TRIANGLES
+    { name: '78 Mute Cuíca', wave: 'sawtooth', A: 0.01, D: 0.1, S: 0.0, R: 0.05, filter: { type: 'bandpass', freq: 2000, Q: 1.0 }, math: 'exponential', lfoRate: 10.0, modDepth: 0.1 },
+    { name: '79 Open Cuíca', wave: 'sawtooth', A: 0.01, D: 0.3, S: 0.0, R: 0.1, filter: { type: 'bandpass', freq: 3000, Q: 1.0 }, math: 'exponential', lfoRate: 15.0, modDepth: 0.2 },
+    { name: '80 Mute Triangle', wave: 'square', A: 0.005, D: 0.2, S: 0.0, R: 0.2, filter: { type: 'highpass', freq: 7000, Q: 0.1 }, math: 'exponential', lfoRate: 15.0, modDepth: 0.3 },
+    { name: '81 Open Triangle', wave: 'square', A: 0.005, D: 1.5, S: 0.0, R: 1.0, filter: { type: 'highpass', freq: 8000, Q: 0.1 }, math: 'exponential', lfoRate: 15.0, modDepth: 0.3 }
+];
+
+
+
+
+
+
+
+
+
+
+        // --- WEB AUDIO CONTEXT AND GLOBALS ---
+        let audioContext;
+        let masterGain;
+        let isPlaying = false;
+        let nextNoteTime = 0.0;
+var currentPatchIndex =0;
+        const lookahead = 25.0; // How far ahead to look in milliseconds
+        const scheduleAheadTime = 0.1; // How far ahead to schedule audio (seconds)
+        let timerID;
+
+// --- Musical Constants ---
+        var tempoBPM = 120; // 120 BPM
+        // C Major Scale: MIDI offsets from C. 
+        // 0=C, 2=D, 4=E, 5=F, 7=G, 9=A, 11=B
+        const C_MAJOR_SCALE = [0, 2, 4, 5, 7, 9, 11]; 
+        let lastNoteIndex = 0; // The index in C_MAJOR_SCALE
+
+        // --- Structured Composition Globals ---
+        // Indices of the chosen 3 instruments/patches
+        var PATCH_A_INDEX = Math.floor(126*Math.random()); // Lead 1 (Square)
+        var PATCH_B_INDEX = Math.floor(126*Math.random());;  // Acoustic Grand Piano
+        var PATCH_C_INDEX = Math.floor(126*Math.random());; // Synth Bass 1 (Acid)
+
+        var SELECTED_PATCHES = [
+            SYNTH_PATCHES[PATCH_A_INDEX],
+            SYNTH_PATCHES[PATCH_B_INDEX],
+            SYNTH_PATCHES[PATCH_C_INDEX]
+        ];
+
+        // Base 6-step pattern (A B A B C A)
+        var BASE_PHRASE_PATTERN = [
+            { patchIndex: 0, octave: Math.round(2+(5*Math.random())), direction: Math.pow(-1, Math.round(Math.random())), notes: Math.round(5+(5*Math.random())), duration: (.1+(Math.random()/2)) }, // A-Block: Synth Lead, Up, 4 notes (1 beat duration)
+            { patchIndex: 1, octave: Math.round(2+(5*Math.random())), direction: Math.pow(-1, Math.round(Math.random())), notes: Math.round(5+(5*Math.random())), duration: (.1+(Math.random()/2)) }, // B-Block: Piano, Down, 4 notes
+            { patchIndex: 1, octave: Math.round(2+(5*Math.random())), direction: Math.pow(-1, Math.round(Math.random())), notes: Math.round(5+(5*Math.random())), duration: (.1+(Math.random()/2)) }, // A-Block: Synth Lead, Up, 4 notes
+            { patchIndex: 2, octave: Math.round(2+(5*Math.random())), direction: Math.pow(-1, Math.round(Math.random())), notes: Math.round(5+(5*Math.random())), duration: (.1+(Math.random()/2)) }, // B-Block: Piano, Down, 4 notes
+            { patchIndex: 1, octave: Math.round(2+(5*Math.random())), direction: Math.pow(-1, Math.round(Math.random())), notes: Math.round(5+(5*Math.random())), duration: (.1+(Math.random()/2)) }, // C-Block: Bass, Static, 8 notes (2 beat duration)
+            { patchIndex: 0, octave: Math.round(2+(5*Math.random())), direction: Math.pow(-1, Math.round(Math.random())), notes: Math.round(5+(5*Math.random())), duration: (.1+(Math.random()/2)) }, // A-Block: Synth Lead, Up, 4 notes
+        ];
+
+var acht=80;
+function setbb(){
+acht=Math.round(20+(150*Math.random()))
+         PATCH_A_INDEX = Math.floor(126*Math.random()); // Lead 1 (Square)
+         PATCH_B_INDEX = Math.floor(126*Math.random());;  // Acoustic Grand Piano
+         PATCH_C_INDEX = Math.floor(126*Math.random());; // Synth Bass 1 (Acid)
+
+         SELECTED_PATCHES = [
+            SYNTH_PATCHES[PATCH_A_INDEX],
+            SYNTH_PATCHES[PATCH_B_INDEX],
+            SYNTH_PATCHES[PATCH_C_INDEX]
+        ];
+
+
+
+BASE_PHRASE_PATTERN = [
+            { patchIndex: 0, octave: Math.round(2+(5*Math.random())), direction: Math.pow(-1, Math.round(Math.random())), notes: Math.round(5+(5*Math.random())), duration: (.1+(Math.random()/2)) }, // A-Block: Synth Lead, Up, 4 notes (1 beat duration)
+            { patchIndex: 1, octave: Math.round(2+(5*Math.random())), direction: Math.pow(-1, Math.round(Math.random())), notes: Math.round(5+(5*Math.random())), duration: (.1+(Math.random()/2)) }, // B-Block: Piano, Down, 4 notes
+            { patchIndex: 1, octave: Math.round(2+(5*Math.random())), direction: Math.pow(-1, Math.round(Math.random())), notes: Math.round(5+(5*Math.random())), duration: (.1+(Math.random()/2)) }, // A-Block: Synth Lead, Up, 4 notes
+            { patchIndex: 2, octave: Math.round(2+(5*Math.random())), direction: Math.pow(-1, Math.round(Math.random())), notes: Math.round(5+(5*Math.random())), duration: (.1+(Math.random()/2)) }, // B-Block: Piano, Down, 4 notes
+            { patchIndex: 1, octave: Math.round(2+(5*Math.random())), direction: Math.pow(-1, Math.round(Math.random())), notes: Math.round(5+(5*Math.random())), duration: (.1+(Math.random()/2)) }, // C-Block: Bass, Static, 8 notes (2 beat duration)
+            { patchIndex: 0, octave: Math.round(2+(5*Math.random())), direction: Math.pow(-1, Math.round(Math.random())), notes: Math.round(5+(5*Math.random())), duration: (.1+(Math.random()/2)) }, // A-Block: Synth Lead, Up, 4 notes
+        ];
+
+}
+
+        // EXTEND THE LOOP LENGTH 5X (6 steps * 5 = 30 steps)
+        const PHRASE_STRUCTURE = [];
+        for (let i = 0; i < 5; i++) {
+            PHRASE_STRUCTURE.push(...BASE_PHRASE_PATTERN);
+        }
+
+        let currentPhraseStep = 0; // Current step in the PHRASE_STRUCTURE array
+
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        // MIDI to Frequency Conversion
+        function midiToFreq(midiNote) {
+            return 440 * Math.pow(2, (midiNote - 69) / 12);
+        }
+
+        // ----------------------------------------------------------------------
+        // --- CORE AUDIO FUNCTION ---
+        // ----------------------------------------------------------------------
+
+        function playNote(midiNote, duration, patch, time) {
+            if (!audioContext) return;
+            
+            const frequency = midiToFreq(midiNote);
+            
+            // 1. Create Oscillator (Voice)
+            const oscillator = audioContext.createOscillator();
+            oscillator.type = patch.wave;
+            oscillator.frequency.setValueAtTime(frequency, time);
+
+            // 2. Create Gain Node (Amplifier/ADSR)
+            const gainNode = audioContext.createGain();
+            const gain = gainNode.gain;
+            gain.setValueAtTime(0, time);
+
+            // ADSR Envelope
+            gain.linearRampToValueAtTime(1.0, time + patch.A);
+            gain.linearRampToValueAtTime(patch.S, time + patch.A + patch.D);
+            
+            // 3. Create Filter Node (Tone Color)
+            const filterNode = audioContext.createBiquadFilter();
+            filterNode.type = patch.filter.type;
+            filterNode.frequency.setValueAtTime(patch.filter.freq, time);
+            filterNode.Q.setValueAtTime(patch.filter.Q, time);
+
+            // 4. Connect Nodes: Oscillator -> Filter -> Gain -> Destination
+            oscillator.connect(filterNode);
+            filterNode.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            // 5. Start and Stop
+            oscillator.start(time);
+            
+            // Schedule the release phase
+            const releaseStartTime = time + duration; 
+            gain.cancelAndHoldAtTime(releaseStartTime);
+            gain.linearRampToValueAtTime(0, releaseStartTime + patch.R);
+
+            // Schedule the final oscillator stop after the release is complete
+            oscillator.stop(releaseStartTime + patch.R + 0.1); 
+        }
+
+        // ----------------------------------------------------------------------
+        // --- STRUCTURED SCHEDULER ---
+        // ----------------------------------------------------------------------
+
+        /**
+         * The main music generator (Scheduler) logic.
+         */
+var ta=0;
+        function scheduler() {
+
+ta++;
+if((ta%acht)==0){
+
+setbb();
+
+
+if(Math.random()>.5){
+	if(Math.random()>.5){
+tempoBPM=80;
+	}
+else{
+tempoBPM=60;
+
+}
+}
+
+}
+
+            while (nextNoteTime < audioContext.currentTime + scheduleAheadTime) {
+                const step = PHRASE_STRUCTURE[currentPhraseStep];
+                const patch = SELECTED_PATCHES[step.patchIndex];
+                const secondsPerBeat = 60.0 / tempoBPM;
+                
+                // Duration is fixed to the beat unit specified in the step (e.g., 0.25 = quarter note)
+                const noteDuration = secondsPerBeat * step.duration * 0.95; // 95% of the duration for separation (gate time)
+                
+                // --- Music Generator (Structured Variation) ---
+                
+                // 1. Calculate the next note index based on the phrase step's direction
+                let nextIndex = lastNoteIndex + step.direction; 
+
+                // If direction is 0 (static), randomly move up/down 1 step for variation
+                if (step.direction === 0) {
+                    nextIndex = lastNoteIndex + (Math.random() > 0.5 ? 1 : -1);
+                }
+
+                // Ensure the index stays within the C_MAJOR_SCALE array bounds
+                // This creates the rising/falling movement (like the arpeggiator's pitch change)
+                if (nextIndex >= C_MAJOR_SCALE.length || nextIndex < 0) {
+                    // Reverse direction or wrap around if out of bounds
+                    nextIndex = Math.min(C_MAJOR_SCALE.length - 1, Math.max(0, nextIndex));
+                }
+
+                lastNoteIndex = nextIndex;
+                let midiOffset = C_MAJOR_SCALE[lastNoteIndex];
+
+                // 2. Apply Octave/Frequency Variation based on the phrase step
+                // C4 is MIDI 60. C0 is MIDI 12.
+                let currentMidiNote = (step.octave * 12) + midiOffset; 
+
+                // 3. Play the note
+                playNote(currentMidiNote, noteDuration, patch, nextNoteTime);
+
+                // --- Phrase Cycling Logic ---
+                
+                // 4. Advance the phrase structure pointer
+                currentPhraseStep = (currentPhraseStep + 1) % PHRASE_STRUCTURE.length;
+                
+                // 5. Update display (must be synchronized to the time step)
+                setTimeout(() => {
+                    const patchLabel = ['A', 'B', 'C'][step.patchIndex];
+                   // document.getElementById('currentPatchName').textContent = `${patch.name} (Patch ${patchLabel})`;
+                    const currentStepNumber = (currentPhraseStep === 0 ? PHRASE_STRUCTURE.length : currentPhraseStep);
+                  //  document.getElementById('phraseStatus').textContent = `Phrase Step: ${currentStepNumber} of ${PHRASE_STRUCTURE.length} | Patch ${patchLabel} active`;
+                }, (nextNoteTime - audioContext.currentTime) * 1000);
+
+
+                // 6. Schedule the next note time
+                nextNoteTime += secondsPerBeat * step.duration;
+            }
+
+            if (isPlaying) {
+                timerID = setTimeout(scheduler, lookahead);
+            }
+        }
+
+
+
+        /**
+         * Updates the UI to show the name of the currently playing patch.
+         */
+        function updatePatchDisplay() {
+            const patch = SYNTH_PATCHES[currentPatchIndex];
+            const patchNameElement = document.getElementById('currentPatchName');
+            if (patchNameElement) {
+                patchNameElement.textContent = patch.name;
+            }
+            const statusElement = document.getElementById('status');
+             if (statusElement) {
+                statusElement.textContent = `Playing... | Patch ${currentPatchIndex + 1} of ${SYNTH_PATCHES.length}`;
+            }
+        }
+
+        function initAudio() {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            masterGain = audioContext.createGain();
+            masterGain.gain.setValueAtTime(0.5, audioContext.currentTime); // Master volume
+            masterGain.connect(audioContext.destination);
+        }
+
+        function startArpeggiator() {
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            } else if (audioContext.state === 'closed') {
+                initAudio();
+            }
+
+            isPlaying = true;
+            nextNoteTime = audioContext.currentTime;
+            scheduler();
+
+            document.getElementById('playButton').disabled = true;
+            document.getElementById('playButton').classList.remove('play-button');
+            document.getElementById('playButton').classList.add('stop-button');
+            document.getElementById('playButton').textContent = 'Stop';
+
+            document.getElementById('stopButton').disabled = false;
+
+            updatePatchDisplay();
+        }
+
+        function stopAudio() {
+            isPlaying = false;
+            clearTimeout(timerID);
+
+            // Ramp down master volume smoothly
+            masterGain.gain.linearRampToValueAtTime(0.0001, audioContext.currentTime + 0.5);
+
+            // Stop all active oscillators immediately on the next frame
+            activeOscillators.forEach(voice => {
+                try {
+                    voice.osc.stop();
+                    // Clean up immediately for safety, though they should stop after the ramp down
+                    cleanupAudioNode(voice.osc);
+                    cleanupAudioNode(voice.filter);
+                    cleanupAudioNode(voice.stopNode);
+                    if (voice.lfo) cleanupAudioNode(voice.lfo);
+                } catch (e) {
+                    // Ignore errors if the node was already stopped
+                }
+            });
+            activeOscillators = [];
+
+            // Suspend context and update UI
+            audioContext.suspend().then(() => {
+                document.getElementById('playButton').disabled = false;
+                document.getElementById('playButton').classList.remove('stop-button');
+                document.getElementById('playButton').classList.add('play-button');
+                document.getElementById('playButton').textContent = 'Play';
+
+                document.getElementById('stopButton').disabled = true;
+
+                document.getElementById('status').textContent = 'Stopped. Click Play to restart.';
+                document.getElementById('currentPatchName').textContent = '---';
+
+                // Reset patch counter on stop
+                currentPatchIndex = 0;
+                notesSincePatchChange = 0;
+            });
+
+        }
+
+        // --- Event Listeners ---
+        document.getElementById('playButton').addEventListener('click', () => {
+            // Reusing the same button for play/stop
+            if (isPlaying) {
+                stopAudio();
+            } else {
+                if (!audioContext) {
+                    initAudio();
+                }
+                startArpeggiator();
+            }
+        });
+
+        document.getElementById('stopButton').addEventListener('click', stopAudio);
+
+
+    </script>
+</body>
+</html>
