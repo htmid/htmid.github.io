@@ -1,0 +1,1293 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4D Cellular Automata with Layered Rules</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            #background-color: #111;
+            color: #eee;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            padding: 15px;
+            #background-color: rgba(0, 0, 0, 0.7);
+            border-bottom: 1px solid #333;
+            z-index: 10;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 5px;
+            color: #7fffd4;
+            text-shadow: 0 0 8px rgba(127, 255, 212, 0.5);
+        }
+        
+        .subtitle {
+            text-align: center;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 10px;
+        }
+        
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        #canvas-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        canvas {
+            display: block;
+            #background-color: #000;
+        }
+        
+        #info-panel {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            #background-color: rgba(0, 0, 0, 0.7);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            max-width: 300px;
+            border: 1px solid #333;
+        }
+        
+        .controls {
+            padding: 15px;
+            #background-color: rgba(0, 0, 0, 0.8);
+            width: 300px;
+            overflow-y: auto;
+            border-left: 1px solid #333;
+        }
+        
+        .control-group {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .control-group h3 {
+            margin-bottom: 10px;
+            color: #7fffd4;
+            font-size: 1.1rem;
+        }
+        
+        .slider-container {
+            margin-bottom: 15px;
+        }
+        
+        .slider-container label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .slider-value {
+            float: right;
+            font-weight: bold;
+            color: #7fffd4;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            -webkit-appearance: none;
+            background: #333;
+            border-radius: 3px;
+            outline: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #7fffd4;
+            cursor: pointer;
+        }
+        
+        .button-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        button {
+            padding: 8px 12px;
+            #background-color: #1a3a3a;
+            color: #7fffd4;
+            border: 1px solid #2a5a5a;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            flex: 1;
+            transition: all 0.2s;
+        }
+        
+        button:hover {
+            #background-color: #2a5a5a;
+            transform: translateY(-2px);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        #generate-btn {
+            #background-color: #0a2a2a;
+        }
+        
+        .rule-display {
+            #background-color: rgba(0, 20, 20, 0.5);
+            padding: 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin-top: 10px;
+            font-size: 0.8rem;
+            word-break: break-all;
+        }
+        
+        .color-legend {
+            display: flex;
+            margin-top: 10px;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        
+        .color-sample {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+        }
+        
+        .color-label {
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            margin-right: 10px;
+        }
+        
+        .layer-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 10px;
+        }
+        
+        .layer-rule {
+            font-size: 0.7rem;
+            #background-color: rgba(0, 40, 40, 0.5);
+            padding: 3px 6px;
+            border-radius: 3px;
+            border: 1px solid #2a5a5a;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 10px;
+            font-size: 0.8rem;
+            opacity: 0.7;
+            #background-color: rgba(0, 0, 0, 0.7);
+            border-top: 1px solid #333;
+        }
+        
+        @media (max-width: 900px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .controls {
+                width: 100%;
+                max-height: 300px;
+                border-left: none;
+                border-top: 1px solid #333;
+            }
+        }
+        
+        /* Fullscreen mode styles - FIXED */
+        body.fullscreen-mode header,
+        body.fullscreen-mode .controls,
+        body.fullscreen-mode footer,
+        body.fullscreen-mode #info-panel {
+            display: none !important;
+        }
+        
+        body.fullscreen-mode .container {
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body.fullscreen-mode .main-content {
+            height: 100vh;
+            width: 100vw;
+        }
+        
+        body.fullscreen-mode #canvas-container {
+            height: 100vh;
+            width: 100vw;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body.fullscreen-mode canvas {
+            width: 100vw !important;
+            height: 100vh !important;
+        }
+        
+        /* Hidden textarea - should always be hidden */
+        #state-storage {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>4D Cellular Automata with Layered Rules</h1>
+        <div class="subtitle">Each %2 W-layer uses a different rule type, creating complex interactions</div>
+    </header>
+    
+    <div class="container">
+        <div class="main-content">
+            <div id="canvas-container">
+                <canvas id="mainCanvas" width="1620" height="861"></canvas>
+                <div id="info-panel">
+                    <div><strong>Slice Position:</strong> <span id="slice-pos">16</span>/32</div>
+                    <div><strong>Active Cells:</strong> <span id="active-cells">0</span></div>
+                    <div><strong>Generation:</strong> <span id="generation">462</span></div>
+                    <div><strong>Rule Pattern:</strong> <span id="rule-pattern">Random</span></div>
+                    <div><strong>Current Layer Rule:</strong> <span id="current-rule">2</span></div>
+                    <div><strong>Seed:</strong> <span id="seed-display">3373195008</span></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <h3>4D Grid Settings</h3>
+                
+                <div class="slider-container">
+                    <label>Grid Size: <span class="slider-value" id="grid-size-value">32</span></label>
+                    <input type="range" id="grid-size" min="0" max="40" value="32" step="1">
+                </div>
+                
+                <div class="slider-container">
+                    <label>Initial Density: <span class="slider-value" id="density-value">4%</span></label>
+                    <input type="range" id="density" min="0" max="30" value="4">
+                </div>
+                
+                <div class="slider-container">
+                    <label>Slice W Position: <span class="slider-value" id="slice-value">7</span></label>
+                    <input type="range" id="slice" min="0" max="31" value="16">
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <h3>Rule Settings</h3>
+                
+                <div class="slider-container">
+                    <label>Rule Complexity: <span class="slider-value" id="complexity-value">3</span></label>
+                    <input type="range" id="complexity" min="0" max="8" value="4">
+                </div>
+                
+                <div class="slider-container">
+                    <label>Rule Set Size: <span class="slider-value" id="rule-count-value">8</span></label>
+                    <input type="range" id="rule-count" min="0" max="16" value="8">
+                </div>
+                
+                <div class="button-row">
+                    <button id="alternating-rules">Alternating Rules</button>
+                    <button id="random-rules">Random Rules</button>
+                </div>
+                
+                <div class="layer-info" id="layer-info"><div class="layer-rule" style="border-left-color: rgb(0, 255, 255); border-left-width: 4px;"><strong>W%14=0:</strong> 01011101...</div><div class="layer-rule" style="border-left-color: rgb(255, 0, 255); border-left-width: 4px;"><strong>W%14=1:</strong> 10111111...</div><div class="layer-rule" style="border-left-color: rgb(255, 255, 0); border-left-width: 4px;"><strong>W%14=2:</strong> 01111010...</div><div class="layer-rule" style="border-left-color: rgb(0, 255, 0); border-left-width: 4px;"><strong>W%14=3:</strong> 00011000...</div><div class="layer-rule" style="border-left-color: rgb(255, 136, 0); border-left-width: 4px;"><strong>W%14=4:</strong> 10010011...</div><div class="layer-rule" style="border-left-color: rgb(136, 0, 255); border-left-width: 4px;"><strong>W%14=5:</strong> 00011010...</div><div class="layer-rule" style="border-left-color: rgb(0, 170, 255); border-left-width: 4px;"><strong>W%14=6:</strong> 01101010...</div><div class="layer-rule" style="border-left-color: rgb(255, 0, 136); border-left-width: 4px;"><strong>W%14=7:</strong> 00111001...</div><div class="layer-rule">+6 more...</div></div>
+            </div>
+            
+            <div class="control-group">
+                <h3>Visualization</h3>
+                
+                <div class="slider-container">
+                    <label>Animation Speed: <span class="slider-value" id="speed-value">5</span></label>
+                    <input type="range" id="speed" min="0" max="20" value="5">
+                </div>
+                
+                <div class="slider-container">
+                    <label>Cell Size: <span class="slider-value" id="cell-size-value">12</span></label>
+                    <input type="range" id="cell-size" min="0" max="20" value="12">
+                </div>
+                
+                <div class="color-legend">
+                    <div class="color-label">
+                        <div class="color-sample" style="#background-color: #00ffff;"></div>
+                        <span>Rule Set A</span>
+                    </div>
+                    <div class="color-label">
+                        <div class="color-sample" style="#background-color: #ff00ff;"></div>
+                        <span>Rule Set B</span>
+                    </div>
+                    <div class="color-label">
+                        <div class="color-sample" style="#background-color: #ffff00;"></div>
+                        <span>Mixed Rules</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <h3>Actions</h3>
+                <div class="button-row">
+                    <button id="generate-btn">Generate New</button>
+                    <button id="pause-btn">Pause</button>
+                    <button id="reset-btn">Reset</button>
+                    <button id="step-btn">Step</button>
+                </div>
+                <div class="button-row" style="margin-top: 10px;">
+                    <button id="save-state-btn">Save State</button>
+                    <button id="save-html-btn">Save HTML</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>4D Cellular Automata with Layered Rules | Each W-layer uses different rules creating complex emergent patterns</p>
+    </footer>
+
+    <!-- Hidden textarea for state storage -->
+    <textarea id="state-storage" style="display: none;"></textarea>
+
+    <script>
+        // WIELSIEDER PSEUDO-RANDOM NUMBER GENERATOR
+        var modulus113 = Math.pow(2, 32);
+        var modulus101 = Math.pow(2, 32);
+        var a113 = 1664525;
+        var c11333 = 1013904223;
+        var a11xx33 = 1664525;
+        
+        // Parse URL parameters for initial seed
+        const urlParams = new URLSearchParams(window.location.search);
+        const initialSeedParam = urlParams.get('seed');
+        var sseed11 = initialSeedParam ? parseInt(initialSeedParam) : Math.round(400000000 * Math.random());
+        
+        // Global variable to store last seed
+        var lastseed = sseed11;
+        
+        function wielsieder() {
+            sseed11 = (a11xx33 * sseed11 + c11333) % modulus113;
+            return (sseed11 / modulus101);
+        }
+        
+        // Helper function to replace Math.random() with wielsieder()
+        function random() {
+            return wielsieder();
+        }
+
+        // Main canvas and context
+        const canvas = document.getElementById('mainCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // UI elements
+        const gridSizeSlider = document.getElementById('grid-size');
+        const densitySlider = document.getElementById('density');
+        const sliceSlider = document.getElementById('slice');
+        const complexitySlider = document.getElementById('complexity');
+        const ruleCountSlider = document.getElementById('rule-count');
+        const speedSlider = document.getElementById('speed');
+        const cellSizeSlider = document.getElementById('cell-size');
+        const alternatingRulesBtn = document.getElementById('alternating-rules');
+        const randomRulesBtn = document.getElementById('random-rules');
+        const generateBtn = document.getElementById('generate-btn');
+        const pauseBtn = document.getElementById('pause-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const stepBtn = document.getElementById('step-btn');
+        const saveStateBtn = document.getElementById('save-state-btn');
+        const saveHtmlBtn = document.getElementById('save-html-btn');
+        const stateStorage = document.getElementById('state-storage');
+        
+        // Display elements
+        const gridSizeValue = document.getElementById('grid-size-value');
+        const densityValue = document.getElementById('density-value');
+        const sliceValue = document.getElementById('slice-value');
+        const complexityValue = document.getElementById('complexity-value');
+        const ruleCountValue = document.getElementById('rule-count-value');
+        const speedValue = document.getElementById('speed-value');
+        const cellSizeValue = document.getElementById('cell-size-value');
+        const slicePosElement = document.getElementById('slice-pos');
+        const activeCellsElement = document.getElementById('active-cells');
+        const generationElement = document.getElementById('generation');
+        const rulePatternElement = document.getElementById('rule-pattern');
+        const currentRuleElement = document.getElementById('current-rule');
+        const layerInfoElement = document.getElementById('layer-info');
+        const seedDisplay = document.getElementById('seed-display');
+        
+        // Grid parameters
+        let gridSize = 32;
+        let density = 0.15;
+        let sliceW = 16;
+        let complexity = 5;
+        let ruleCount = 8;
+        let animationSpeed = 5;
+        let cellSize = 12;
+        
+        // Animation control
+        let isPlaying = true;
+        let generation = 0;
+        let lastUpdateTime = 0;
+        
+        // 4D grid
+        let grid = null;
+        let nextGrid = null;
+        let cellRules = null; // Store which rule set each cell follows
+        let cellAges = null;
+        
+        // Rule definitions - multiple rule sets for different layers
+        let ruleSets = [];
+        let rulePattern = "Alternating"; // "Alternating" or "Random"
+        
+        // Fullscreen mode variables
+        let isFullscreenMode = false;
+        let fullscreenResetInterval = null;
+        let fullscreenSliceInterval = null;
+        let storedSliceValue = sliceW;
+        
+        // Color gradients for visualization - different colors for different rule sets
+        const ruleColors = [
+            '#00ffff', // Cyan for rule set 0
+            '#ff00ff', // Magenta for rule set 1
+            '#ffff00', // Yellow for mixed/other
+            '#00ff00', // Green
+            '#ff8800', // Orange
+            '#8800ff', // Purple
+            '#00aaff', // Light Blue
+            '#ff0088'  // Pink
+        ];
+        
+        // Initialize canvas size
+        function initCanvas() {
+            const container = document.getElementById('canvas-container');
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+        }
+        
+        // Initialize 4D grid
+        function initGrid() {
+            const totalCells = gridSize * gridSize * gridSize * gridSize;
+            console.log(`Initializing 4D grid with ${gridSize}^4 = ${totalCells} cells`);
+            
+            // Allocate memory for grids
+            grid = new Uint8Array(totalCells);
+            nextGrid = new Uint8Array(totalCells);
+            cellRules = new Uint8Array(totalCells);
+            cellAges = new Uint8Array(totalCells);
+            
+            // Random initialization based on density using wielsieder()
+            for (let i = 0; i < totalCells; i++) {
+                if (random() < density) {
+                    grid[i] = 1;
+                    cellAges[i] = 1;
+                }
+            }
+            
+            // Assign rule sets based on W position (layer)
+            const size3 = gridSize * gridSize * gridSize;
+            for (let w = 0; w < gridSize; w++) {
+                const ruleSetIndex = w % ruleCount;
+                for (let z = 0; z < gridSize; z++) {
+                    for (let y = 0; y < gridSize; y++) {
+                        for (let x = 0; x < gridSize; x++) {
+                            const idx = w * size3 + z * gridSize * gridSize + y * gridSize + x;
+                            cellRules[idx] = ruleSetIndex;
+                        }
+                    }
+                }
+            }
+            
+            updateInfoPanel();
+            updateLayerInfo();
+        }
+        
+        // Generate multiple rule sets using wielsieder()
+        function generateRuleSets() {
+            ruleSets = [];
+            const ruleLength = Math.pow(2, complexity);
+            
+            for (let i = 0; i < ruleCount; i++) {
+                const rule = [];
+                
+                if (rulePattern === "Alternating") {
+                    // Alternating patterns create interesting interactions
+                    for (let j = 0; j < ruleLength; j++) {
+                        // Each rule set has a different but deterministic pattern
+                        const value = (i + j) % 3 === 0 ? 1 : 
+                                     (i * j) % 5 === 0 ? 1 : 
+                                     (i + j * 2) % 7 === 0 ? 1 : 0;
+                        rule.push(value);
+                    }
+                } else {
+                    // Random pattern using wielsieder()
+                    for (let j = 0; j < ruleLength; j++) {
+                        rule.push(random() > 0.5 ? 1 : 0);
+                    }
+                }
+                
+                ruleSets.push(rule);
+            }
+            
+            updateLayerInfo();
+        }
+        
+        // Update layer info display
+        function updateLayerInfo() {
+            layerInfoElement.innerHTML = '';
+            
+            for (let i = 0; i < Math.min(ruleCount, 8); i++) {
+                const ruleElement = document.createElement('div');
+                ruleElement.className = 'layer-rule';
+                ruleElement.innerHTML = `<strong>W%${ruleCount}=${i}:</strong> ${ruleSets[i] ? ruleSets[i].slice(0, 8).join('') + '...' : 'Not set'}`;
+                ruleElement.style.borderLeftColor = ruleColors[i % ruleColors.length];
+                ruleElement.style.borderLeftWidth = '4px';
+                layerInfoElement.appendChild(ruleElement);
+            }
+            
+            if (ruleCount > 8) {
+                const moreElement = document.createElement('div');
+                moreElement.className = 'layer-rule';
+                moreElement.textContent = `+${ruleCount - 8} more...`;
+                layerInfoElement.appendChild(moreElement);
+            }
+        }
+        
+        // Calculate next generation
+        function nextGeneration() {
+            // Define a neighborhood for 4D cellular automata
+            const neighborOffsets = [];
+            
+            // Create a 4D neighborhood (small for performance)
+            for (let dw = -1; dw <= 1; dw++) {
+                for (let dz = -1; dz <= 1; dz++) {
+                    for (let dy = -1; dy <= 1; dy++) {
+                        for (let dx = -1; dx <= 1; dx++) {
+                            // Limit neighborhood size for performance
+                            const dist = Math.abs(dw) + Math.abs(dz) + Math.abs(dy) + Math.abs(dx);
+                            if (dist <= 2) {
+                                neighborOffsets.push([dw, dz, dy, dx]);
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Apply appropriate rule to each cell based on its layer
+            const size = gridSize;
+            const size2 = size * size;
+            const size3 = size * size * size;
+            
+            for (let w = 0; w < size; w++) {
+                // Get the rule set for this W layer
+                const ruleSetIndex = w % ruleCount;
+                const rule = ruleSets[ruleSetIndex];
+                
+                for (let z = 0; z < size; z++) {
+                    for (let y = 0; y < size; y++) {
+                        for (let x = 0; x < size; x++) {
+                            const idx = w * size3 + z * size2 + y * size + x;
+                            
+                            // Calculate neighborhood state index
+                            let neighborhoodIndex = 0;
+                            let bitPosition = 0;
+                            
+                            // Sample neighbors to determine the rule to apply
+                            for (const offset of neighborOffsets) {
+                                if (bitPosition >= complexity) break;
+                                
+                                const nw = (w + offset[0] + size) % size;
+                                const nz = (z + offset[1] + size) % size;
+                                const ny = (y + offset[2] + size) % size;
+                                const nx = (x + offset[3] + size) % size;
+                                
+                                const nIdx = nw * size3 + nz * size2 + ny * size + nx;
+                                
+                                if (grid[nIdx] === 1) {
+                                    neighborhoodIndex |= (1 << bitPosition);
+                                }
+                                
+                                bitPosition++;
+                            }
+                            
+                            // Apply the appropriate rule for this layer
+                            const ruleIndex = neighborhoodIndex % rule.length;
+                            nextGrid[idx] = rule[ruleIndex];
+                            
+                            // Update cell age
+                            if (nextGrid[idx] === 1) {
+                                cellAges[idx] = grid[idx] === 1 ? Math.min(cellAges[idx] + 1, 255) : 1;
+                            } else {
+                                cellAges[idx] = 0;
+                            }
+                            
+                            // Keep the rule assignment for this cell
+                            cellRules[idx] = ruleSetIndex;
+                        }
+                    }
+                }
+            }
+            
+            // Swap grids
+            [grid, nextGrid] = [nextGrid, grid];
+            generation++;
+            
+            updateInfoPanel();
+        }
+        
+        // Render the 3D slice
+        function renderSlice() {
+            // Clear canvas
+            ctx.fillStyle = 'transparent';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            const size = gridSize;
+            const size2 = size * size;
+            const size3 = size * size * size;
+            
+            // Calculate center offset to center the grid
+            const totalWidth = size * cellSize;
+            const totalHeight = size * cellSize;
+            const offsetX = (canvas.width - totalWidth) / 2;
+            const offsetY = (canvas.height - totalHeight) / 2;
+            
+			
+			            ctx.fillStyle = '#000';
+            ctx.fillRect(offsetX, offsetY, totalWidth, totalHeight);
+			
+            // Draw cells at the current W slice
+            let activeCells = 0;
+            
+            // Get the rule set for the current slice for display
+            const currentRuleSetIndex = sliceW % ruleCount;
+            currentRuleElement.textContent = currentRuleSetIndex;
+            
+            for (let z = 0; z < size; z++) {
+                for (let y = 0; y < size; y++) {
+                    for (let x = 0; x < size; x++) {
+                        const idx = sliceW * size3 + z * size2 + y * size + x;
+                        
+                        if (grid[idx] === 1) {
+                            activeCells++;
+                            
+                            // Determine color based on rule set and age
+                            const ruleSetIndex = cellRules[idx];
+                            let baseColor = ruleColors[ruleSetIndex % ruleColors.length];
+                            
+                            // Darken older cells for depth
+                            const ageFactor = Math.min(cellAges[idx] / 15, 1);
+                            const color = ageFactor > 0.5 ? 
+                                darkenColor(baseColor, (ageFactor - 0.5) * 0.5) : 
+                                lightenColor(baseColor, ageFactor * 0.3);
+                            
+                            // Draw cell with perspective based on Z position
+                            const scale = 0.5 + (z / size) * 0.5;
+                            const cellX = offsetX + x * cellSize;
+                            const cellY = offsetY + y * cellSize;
+                            const scaledSize = cellSize * scale;
+                            
+                            // Draw cell
+                            ctx.fillStyle = color;
+                            ctx.fillRect(
+                                cellX - (scaledSize - cellSize) / 2,
+                                cellY - (scaledSize - cellSize) / 2,
+                                scaledSize,
+                                scaledSize
+                            );
+                            
+                            // Add a subtle glow for cells following different rules than the current layer
+                            if (ruleSetIndex !== currentRuleSetIndex) {
+                                ctx.shadowColor = color;
+                                ctx.shadowBlur = 4;
+                                ctx.fillRect(
+                                    cellX - (scaledSize - cellSize) / 2,
+                                    cellY - (scaledSize - cellSize) / 2,
+                                    scaledSize,
+                                    scaledSize
+                                );
+                                ctx.shadowBlur = 0;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Update active cells count
+            activeCellsElement.textContent = activeCells.toLocaleString();
+            
+            // Draw grid lines if cells are large enough
+            if (cellSize > 10) {
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+                ctx.lineWidth = 0.5;
+                
+                // Vertical lines
+                for (let x = 0; x <= size; x++) {
+                    ctx.beginPath();
+                    ctx.moveTo(offsetX + x * cellSize, offsetY);
+                    ctx.lineTo(offsetX + x * cellSize, offsetY + totalHeight);
+                    ctx.stroke();
+                }
+                
+                // Horizontal lines
+                for (let y = 0; y <= size; y++) {
+                    ctx.beginPath();
+                    ctx.moveTo(offsetX, offsetY + y * cellSize);
+                    ctx.lineTo(offsetX + totalWidth, offsetY + y * cellSize);
+                    ctx.stroke();
+                }
+            }
+        }
+        
+        // Helper function to darken a color
+        function darkenColor(color, factor) {
+            const hex = color => {
+                const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(color);
+                return result ? {
+                    r: parseInt(result[1], 16),
+                    g: parseInt(result[2], 16),
+                    b: parseInt(result[3], 16)
+                } : null;
+            };
+            
+            const rgb = hex(color);
+            const r = Math.round(rgb.r * (1 - factor));
+            const g = Math.round(rgb.g * (1 - factor));
+            const b = Math.round(rgb.b * (1 - factor));
+            
+            return `rgb(${r}, ${g}, ${b})`;
+        }
+        
+        // Helper function to lighten a color
+        function lightenColor(color, factor) {
+            const hex = color => {
+                const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(color);
+                return result ? {
+                    r: parseInt(result[1], 16),
+                    g: parseInt(result[2], 16),
+                    b: parseInt(result[3], 16)
+                } : null;
+            };
+            
+            const rgb = hex(color);
+            const r = Math.round(rgb.r + (255 - rgb.r) * factor);
+            const g = Math.round(rgb.g + (255 - rgb.g) * factor);
+            const b = Math.round(rgb.b + (255 - rgb.b) * factor);
+            
+            return `rgb(${r}, ${g}, ${b})`;
+        }
+        
+        // Update information panel
+        function updateInfoPanel() {
+            slicePosElement.textContent = sliceW;
+            generationElement.textContent = generation;
+            rulePatternElement.textContent = rulePattern;
+            seedDisplay.textContent = sseed11;
+        }
+        
+
+        
+        
+        
+        // Save state as file
+
+        
+   
+   
+   
+   // In the saveStateToFile function:
+function saveStateToFile() {
+    // First, save current state and get it
+    const state = saveCurrentState();
+    const stateJSON = JSON.stringify(state, null, 2);
+    
+    // Set the textarea content to the JSON data
+    stateStorage.innerHTML = stateJSON;  // Or stateStorage.value = stateJSON;
+    
+    // Create and download JSON file
+    const blob = new Blob([stateJSON], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `cellular_automata_state_${Date.now()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+   
+   
+   
+   
+   
+   
+   function saveHtmlToFile() {
+    // First, save current state and get it
+    const state = saveCurrentState();
+    const stateJSON = JSON.stringify(state, null, 2);
+    
+    // CRITICAL: Set textarea content to the JSON data
+    stateStorage.innerHTML = stateJSON;  // Or stateStorage.value = stateJSON;
+    
+	
+	    const state0 = saveCurrentState();
+    const stateJSON0 = JSON.stringify(state0, null, 2);
+    
+    // Set textarea content
+    stateStorage.value = stateJSON0;
+    
+    // Force DOM update
+    setTimeout(() => {
+        // Now get HTML with updated textarea
+        const htmlContent0 = document.documentElement.outerHTML;
+        
+        // Rest of download code...
+		
+		
+    
+    // 1. Download HTML file
+    const blob1 = new Blob([htmlContent0], { type: 'text/html' });
+    const url1 = URL.createObjectURL(blob1);
+    const a1 = document.createElement('a');
+    a1.href = url1;
+    a1.download = `4d_cellular_automata_${Date.now()}.html`;
+    document.body.appendChild(a1);
+    a1.click();
+
+    
+    // 2. Download Base64 version as .txt file
+    const base64Content = btoa(htmlContent0);
+    const blob2 = new Blob([base64Content], { type: 'text/plain' });
+    const url2 = URL.createObjectURL(blob2);
+    const a2 = document.createElement('a');
+    a2.href = url2;
+    a2.download = `4d_cellular_automata_base64_${Date.now()}.txt`;
+    document.body.appendChild(a2);
+    a2.click();
+    document.body.removeChild(a2);
+    
+    // 3. Download JSON state as separate file
+    const blob3 = new Blob([stateJSON], { type: 'application/json' });
+    const url3 = URL.createObjectURL(blob3);
+    const a3 = document.createElement('a');
+    a3.href = url3;
+    a3.download = `cellular_automata_config_${Date.now()}.json`;
+    document.body.appendChild(a3);
+    a3.click();
+    document.body.removeChild(a3);
+    
+    // Clean up
+    URL.revokeObjectURL(url1);
+    URL.revokeObjectURL(url2);
+    URL.revokeObjectURL(url3);
+    }, 50);
+	
+	
+
+}
+// Also need to enhance the saveCurrentState function to include ALL rule data:
+function saveCurrentState() {
+    const state = {
+        sseed11: sseed11,
+        lastseed: lastseed,
+        gridSize: gridSize,
+        density: density,
+        sliceW: sliceW,
+        complexity: complexity,
+        ruleCount: ruleCount,
+        animationSpeed: animationSpeed,
+        cellSize: cellSize,
+        rulePattern: rulePattern,
+        generation: generation,
+        isPlaying: isPlaying,
+        // Save the actual rule sets data
+        ruleSets: ruleSets.map(rule => rule.join('')),
+        // Save grid state if we want to preserve exact simulation state
+        gridState: Array.from(grid).join(''),
+        cellRulesState: Array.from(cellRules).join(''),
+        cellAgesState: Array.from(cellAges).join('')
+    };
+    
+    stateStorage.value = JSON.stringify(state, null, 2);
+    return state;
+}
+
+// And enhance loadState to restore all this data:
+function loadState() {
+    try {
+        const stateText = stateStorage.value;
+        if (!stateText) return false;
+        
+        const state = JSON.parse(stateText);
+        
+        // Restore seed values
+        if (state.sseed11 !== undefined) sseed11 = state.sseed11;
+        if (state.lastseed !== undefined) lastseed = state.lastseed;
+        
+        // Restore UI values
+        if (state.gridSize !== undefined) {
+            gridSize = state.gridSize;
+            gridSizeSlider.value = gridSize;
+            gridSizeValue.textContent = gridSize;
+            sliceSlider.max = gridSize - 1;
+        }
+        
+        if (state.density !== undefined) {
+            density = state.density;
+            densitySlider.value = Math.round(density * 100);
+            densityValue.textContent = `${Math.round(density * 100)}%`;
+        }
+        
+        if (state.sliceW !== undefined) {
+            sliceW = state.sliceW;
+            sliceSlider.value = sliceW;
+            sliceValue.textContent = sliceW;
+            storedSliceValue = sliceW;
+        }
+        
+        if (state.complexity !== undefined) {
+            complexity = state.complexity;
+            complexitySlider.value = complexity;
+            complexityValue.textContent = complexity;
+        }
+        
+        if (state.ruleCount !== undefined) {
+            ruleCount = state.ruleCount;
+            ruleCountSlider.value = ruleCount;
+            ruleCountValue.textContent = ruleCount;
+        }
+        
+        if (state.animationSpeed !== undefined) {
+            animationSpeed = state.animationSpeed;
+            speedSlider.value = animationSpeed;
+            speedValue.textContent = animationSpeed;
+        }
+        
+        if (state.cellSize !== undefined) {
+            cellSize = state.cellSize;
+            cellSizeSlider.value = cellSize;
+            cellSizeValue.textContent = cellSize;
+        }
+        
+        if (state.rulePattern !== undefined) {
+            rulePattern = state.rulePattern;
+            rulePatternElement.textContent = rulePattern;
+        }
+        
+        if (state.generation !== undefined) {
+            generation = state.generation;
+        }
+        
+        if (state.isPlaying !== undefined) {
+            isPlaying = state.isPlaying;
+            pauseBtn.textContent = isPlaying ? 'Pause' : 'Resume';
+        }
+        
+        // Restore rule sets if available
+        if (state.ruleSets && state.ruleSets.length > 0) {
+            ruleSets = state.ruleSets.map(ruleString => 
+                ruleString.split('').map(char => parseInt(char))
+            );
+        } else {
+            // Regenerate rule sets if not in state
+            generateRuleSets();
+        }
+        
+        // Try to restore grid state if available
+        if (state.gridState && state.cellRulesState && state.cellAgesState) {
+            try {
+                const totalCells = gridSize * gridSize * gridSize * gridSize;
+                grid = new Uint8Array(totalCells);
+                nextGrid = new Uint8Array(totalCells);
+                cellRules = new Uint8Array(totalCells);
+                cellAges = new Uint8Array(totalCells);
+                
+                // Restore grid data
+                const gridArray = state.gridState.split('').map(Number);
+                const rulesArray = state.cellRulesState.split('').map(Number);
+                const agesArray = state.cellAgesState.split('').map(Number);
+                
+                for (let i = 0; i < Math.min(totalCells, gridArray.length); i++) {
+                    grid[i] = gridArray[i];
+                    cellRules[i] = rulesArray[i];
+                    cellAges[i] = agesArray[i];
+                }
+            } catch (e) {
+                console.error('Failed to restore grid state, reinitializing:', e);
+                initGrid();
+            }
+        } else {
+            // Initialize grid if no saved state
+            initGrid();
+        }
+        
+        updateInfoPanel();
+        updateLayerInfo();
+        return true;
+    } catch (e) {
+        console.error('Failed to load state:', e);
+        return false;
+    }
+}
+   
+   
+   
+   
+   
+        
+        // Check for fullscreen mode from URL
+        function checkFullscreenMode() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const fullscreenParam = urlParams.get('fullscreen');
+            
+            if (fullscreenParam === '1') {
+                isFullscreenMode = true;
+                document.body.classList.add('fullscreen-mode');
+                
+                // Start fullscreen behaviors
+                startFullscreenBehaviors();
+                
+                return true;
+            }
+            return false;
+        }
+        
+        // Start fullscreen mode behaviors
+        function startFullscreenBehaviors() {
+            // Auto-reset every 5 seconds
+            fullscreenResetInterval = setInterval(() => {
+                if (isFullscreenMode) {
+                    // Store current state before reset
+                    saveCurrentState();
+                    
+                    // Click reset button
+                    resetBtn.click();
+                }
+            }, 5000);
+            
+            // Random slice adjustment every 10 seconds
+            fullscreenSliceInterval = setInterval(() => {
+                if (isFullscreenMode) {
+                    // Random adjustment between -4 and +4
+                    const adjustment = Math.floor(random() * 9) - 4; // -4 to +4
+                    const newSlice = Math.max(0, Math.min(gridSize - 1, storedSliceValue + adjustment));
+                    
+                    // Update slice slider
+                    sliceW = newSlice;
+                    sliceSlider.value = newSlice;
+                    sliceValue.textContent = newSlice;
+                    
+                    // Trigger change event
+                    sliceSlider.dispatchEvent(new Event('input'));
+                }
+            }, 10000);
+        }
+        
+        // Stop fullscreen behaviors
+        function stopFullscreenBehaviors() {
+            if (fullscreenResetInterval) {
+                clearInterval(fullscreenResetInterval);
+                fullscreenResetInterval = null;
+            }
+            if (fullscreenSliceInterval) {
+                clearInterval(fullscreenSliceInterval);
+                fullscreenSliceInterval = null;
+            }
+        }
+        
+        // Animation loop
+        function animate(timestamp) {
+            // Calculate time since last update
+            const deltaTime = timestamp - lastUpdateTime;
+            const updateInterval = 1000 / (animationSpeed * 2);
+            
+            if (deltaTime > updateInterval && isPlaying) {
+                nextGeneration();
+                lastUpdateTime = timestamp;
+            }
+            
+            renderSlice();
+            requestAnimationFrame(animate);
+        }
+        
+        // Initialize everything
+        function init() {
+            initCanvas();
+            
+            // Check for fullscreen mode
+            checkFullscreenMode();
+            
+            // Try to load state from URL or textarea
+            const urlParams = new URLSearchParams(window.location.search);
+            const stateParam = urlParams.get('state');
+            
+            if (stateParam) {
+                // Try to decode base64 state from URL
+                try {
+                    const decodedState = atob(stateParam);
+                    stateStorage.value = decodedState;
+                    loadState();
+                } catch (e) {
+                    console.error('Failed to load state from URL:', e);
+                    generateRuleSets();
+                    initGrid();
+                }
+            } else {
+                // Check if there's state in the textarea
+                if (stateStorage.value) {
+                    loadState();
+                } else {
+                    generateRuleSets();
+                    initGrid();
+                }
+            }
+            
+            // Set up event listeners
+            window.addEventListener('resize', initCanvas);
+            
+            gridSizeSlider.addEventListener('input', function() {
+                gridSize = parseInt(this.value);
+                gridSizeValue.textContent = gridSize;
+                sliceSlider.max = gridSize - 1;
+                storedSliceValue = Math.min(storedSliceValue, gridSize - 1);
+                initGrid();
+            });
+            
+            densitySlider.addEventListener('input', function() {
+                density = parseInt(this.value) / 100;
+                densityValue.textContent = `${this.value}%`;
+            });
+            
+            sliceSlider.addEventListener('input', function() {
+                sliceW = parseInt(this.value);
+                sliceValue.textContent = sliceW;
+                storedSliceValue = sliceW;
+                updateInfoPanel();
+            });
+            
+            complexitySlider.addEventListener('input', function() {
+                complexity = parseInt(this.value);
+                complexityValue.textContent = complexity;
+                generateRuleSets();
+            });
+            
+            ruleCountSlider.addEventListener('input', function() {
+                ruleCount = parseInt(this.value);
+                ruleCountValue.textContent = ruleCount;
+                generateRuleSets();
+                initGrid();
+            });
+            
+            speedSlider.addEventListener('input', function() {
+                animationSpeed = parseInt(this.value);
+                speedValue.textContent = animationSpeed;
+            });
+            
+            cellSizeSlider.addEventListener('input', function() {
+                cellSize = parseInt(this.value);
+                cellSizeValue.textContent = cellSize;
+            });
+            
+            alternatingRulesBtn.addEventListener('click', function() {
+                rulePattern = "Alternating";
+                generateRuleSets();
+                updateInfoPanel();
+            });
+            
+            randomRulesBtn.addEventListener('click', function() {
+                rulePattern = "Random";
+                generateRuleSets();
+                updateInfoPanel();
+            });
+            
+            generateBtn.addEventListener('click', function() {
+                // Save current seed to lastseed
+                lastseed = sseed11;
+                
+                // Generate new seed using wielsieder()
+                sseed11 = Math.round(400000000 * random());
+                
+                initGrid();
+                generation = 0;
+                updateInfoPanel();
+            });
+            
+            pauseBtn.addEventListener('click', function() {
+                isPlaying = !isPlaying;
+                pauseBtn.textContent = isPlaying ? 'Pause' : 'Resume';
+            });
+            
+            resetBtn.addEventListener('click', function() {
+                // Save current seed to lastseed before reset
+                lastseed = sseed11;
+                
+                // Save current state
+                saveCurrentState();
+                
+                generation = 0;
+                initGrid();
+                if (!isPlaying) {
+                    isPlaying = true;
+                    pauseBtn.textContent = 'Pause';
+                }
+            });
+            
+            stepBtn.addEventListener('click', function() {
+                isPlaying = false;
+                pauseBtn.textContent = 'Resume';
+                nextGeneration();
+            });
+            
+            saveStateBtn.addEventListener('click', function() {
+                saveStateToFile();
+            });
+            
+            saveHtmlBtn.addEventListener('click', function() {
+                saveHtmlToFile();
+            });
+            
+            // Start animation
+            requestAnimationFrame(animate);
+            
+            // Auto-save initial state on page load
+            setTimeout(() => {
+                saveCurrentState();
+            }, 1000);
+        }
+        
+        // Initialize when page loads
+        window.addEventListener('load', init);
+        
+        // Clean up intervals on page unload
+        window.addEventListener('beforeunload', () => {
+            stopFullscreenBehaviors();
+        });
+    </script>
+
+</body></html>
