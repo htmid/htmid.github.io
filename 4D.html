@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4D Cellular Automata with Layered Rules</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: #111;
+            color: #eee;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            padding: 15px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-bottom: 1px solid #333;
+            z-index: 10;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 5px;
+            color: #7fffd4;
+            text-shadow: 0 0 8px rgba(127, 255, 212, 0.5);
+        }
+        
+        .subtitle {
+            text-align: center;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 10px;
+        }
+        
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        #canvas-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        canvas {
+            display: block;
+            background-color: #000;
+        }
+        
+        #info-panel {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            max-width: 300px;
+            border: 1px solid #333;
+        }
+        
+        .controls {
+            padding: 15px;
+            background-color: rgba(0, 0, 0, 0.8);
+            width: 300px;
+            overflow-y: auto;
+            border-left: 1px solid #333;
+        }
+        
+        .control-group {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .control-group h3 {
+            margin-bottom: 10px;
+            color: #7fffd4;
+            font-size: 1.1rem;
+        }
+        
+        .slider-container {
+            margin-bottom: 15px;
+        }
+        
+        .slider-container label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .slider-value {
+            float: right;
+            font-weight: bold;
+            color: #7fffd4;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            -webkit-appearance: none;
+            background: #333;
+            border-radius: 3px;
+            outline: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #7fffd4;
+            cursor: pointer;
+        }
+        
+        .button-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        button {
+            padding: 8px 12px;
+            background-color: #1a3a3a;
+            color: #7fffd4;
+            border: 1px solid #2a5a5a;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            flex: 1;
+            transition: all 0.2s;
+        }
+        
+        button:hover {
+            background-color: #2a5a5a;
+            transform: translateY(-2px);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        #generate-btn {
+            background-color: #0a2a2a;
+        }
+        
+        .rule-display {
+            background-color: rgba(0, 20, 20, 0.5);
+            padding: 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin-top: 10px;
+            font-size: 0.8rem;
+            word-break: break-all;
+        }
+        
+        .color-legend {
+            display: flex;
+            margin-top: 10px;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        
+        .color-sample {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+        }
+        
+        .color-label {
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            margin-right: 10px;
+        }
+        
+        .layer-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 10px;
+        }
+        
+        .layer-rule {
+            font-size: 0.7rem;
+            background-color: rgba(0, 40, 40, 0.5);
+            padding: 3px 6px;
+            border-radius: 3px;
+            border: 1px solid #2a5a5a;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 10px;
+            font-size: 0.8rem;
+            opacity: 0.7;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-top: 1px solid #333;
+        }
+        
+        @media (max-width: 900px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .controls {
+                width: 100%;
+                max-height: 300px;
+                border-left: none;
+                border-top: 1px solid #333;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>4D Cellular Automata with Layered Rules</h1>
+        <div class="subtitle">Each %2 W-layer uses a different rule type, creating complex interactions</div>
+    </header>
+    
+    <div class="container">
+        <div class="main-content">
+            <div id="canvas-container">
+                <canvas id="mainCanvas"></canvas>
+                <div id="info-panel">
+                    <div><strong>Slice Position:</strong> <span id="slice-pos">16</span>/32</div>
+                    <div><strong>Active Cells:</strong> <span id="active-cells">0</span></div>
+                    <div><strong>Generation:</strong> <span id="generation">0</span></div>
+                    <div><strong>Rule Pattern:</strong> <span id="rule-pattern">Alternating</span></div>
+                    <div><strong>Current Layer Rule:</strong> <span id="current-rule">30</span></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <h3>4D Grid Settings</h3>
+                
+                <div class="slider-container">
+                    <label>Grid Size: <span class="slider-value" id="grid-size-value">32</span></label>
+                    <input type="range" id="grid-size" min="16" max="40" value="32" step="8">
+                </div>
+                
+                <div class="slider-container">
+                    <label>Initial Density: <span class="slider-value" id="density-value">15%</span></label>
+                    <input type="range" id="density" min="1" max="30" value="15">
+                </div>
+                
+                <div class="slider-container">
+                    <label>Slice W Position: <span class="slider-value" id="slice-value">16</span></label>
+                    <input type="range" id="slice" min="0" max="31" value="16">
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <h3>Rule Settings</h3>
+                
+                <div class="slider-container">
+                    <label>Rule Complexity: <span class="slider-value" id="complexity-value">5</span></label>
+                    <input type="range" id="complexity" min="3" max="8" value="5">
+                </div>
+                
+                <div class="slider-container">
+                    <label>Rule Set Size: <span class="slider-value" id="rule-count-value">8</span></label>
+                    <input type="range" id="rule-count" min="2" max="16" value="8">
+                </div>
+                
+                <div class="button-row">
+                    <button id="alternating-rules">Alternating Rules</button>
+                    <button id="random-rules">Random Rules</button>
+                </div>
+                
+                <div class="layer-info" id="layer-info">
+                    <!-- Layer rules will be displayed here -->
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <h3>Visualization</h3>
+                
+                <div class="slider-container">
+                    <label>Animation Speed: <span class="slider-value" id="speed-value">5</span></label>
+                    <input type="range" id="speed" min="1" max="20" value="5">
+                </div>
+                
+                <div class="slider-container">
+                    <label>Cell Size: <span class="slider-value" id="cell-size-value">12</span></label>
+                    <input type="range" id="cell-size" min="5" max="20" value="12">
+                </div>
+                
+                <div class="color-legend">
+                    <div class="color-label">
+                        <div class="color-sample" style="background-color: #00ffff;"></div>
+                        <span>Rule Set A</span>
+                    </div>
+                    <div class="color-label">
+                        <div class="color-sample" style="background-color: #ff00ff;"></div>
+                        <span>Rule Set B</span>
+                    </div>
+                    <div class="color-label">
+                        <div class="color-sample" style="background-color: #ffff00;"></div>
+                        <span>Mixed Rules</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <h3>Actions</h3>
+                <div class="button-row">
+                    <button id="generate-btn">Generate New</button>
+                    <button id="pause-btn">Pause</button>
+                    <button id="reset-btn">Reset</button>
+                    <button id="step-btn">Step</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>4D Cellular Automata with Layered Rules | Each W-layer uses different rules creating complex emergent patterns</p>
+    </footer>
+
+    <script>
+        // Main canvas and context
+        const canvas = document.getElementById('mainCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // UI elements
+        const gridSizeSlider = document.getElementById('grid-size');
+        const densitySlider = document.getElementById('density');
+        const sliceSlider = document.getElementById('slice');
+        const complexitySlider = document.getElementById('complexity');
+        const ruleCountSlider = document.getElementById('rule-count');
+        const speedSlider = document.getElementById('speed');
+        const cellSizeSlider = document.getElementById('cell-size');
+        const alternatingRulesBtn = document.getElementById('alternating-rules');
+        const randomRulesBtn = document.getElementById('random-rules');
+        const generateBtn = document.getElementById('generate-btn');
+        const pauseBtn = document.getElementById('pause-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const stepBtn = document.getElementById('step-btn');
+        
+        // Display elements
+        const gridSizeValue = document.getElementById('grid-size-value');
+        const densityValue = document.getElementById('density-value');
+        const sliceValue = document.getElementById('slice-value');
+        const complexityValue = document.getElementById('complexity-value');
+        const ruleCountValue = document.getElementById('rule-count-value');
+        const speedValue = document.getElementById('speed-value');
+        const cellSizeValue = document.getElementById('cell-size-value');
+        const slicePosElement = document.getElementById('slice-pos');
+        const activeCellsElement = document.getElementById('active-cells');
+        const generationElement = document.getElementById('generation');
+        const rulePatternElement = document.getElementById('rule-pattern');
+        const currentRuleElement = document.getElementById('current-rule');
+        const layerInfoElement = document.getElementById('layer-info');
+        
+        // Grid parameters
+        let gridSize = 32;
+        let density = 0.15;
+        let sliceW = 16;
+        let complexity = 5;
+        let ruleCount = 8;
+        let animationSpeed = 5;
+        let cellSize = 12;
+        
+        // Animation control
+        let isPlaying = true;
+        let generation = 0;
+        let lastUpdateTime = 0;
+        
+        // 4D grid
+        let grid = null;
+        let nextGrid = null;
+        let cellRules = null; // Store which rule set each cell follows
+        let cellAges = null;
+        
+        // Rule definitions - multiple rule sets for different layers
+        let ruleSets = [];
+        let rulePattern = "Alternating"; // "Alternating" or "Random"
+        
+        // Color gradients for visualization - different colors for different rule sets
+        const ruleColors = [
+            '#00ffff', // Cyan for rule set 0
+            '#ff00ff', // Magenta for rule set 1
+            '#ffff00', // Yellow for mixed/other
+            '#00ff00', // Green
+            '#ff8800', // Orange
+            '#8800ff', // Purple
+            '#00aaff', // Light Blue
+            '#ff0088'  // Pink
+        ];
+        
+        // Initialize canvas size
+        function initCanvas() {
+            const container = document.getElementById('canvas-container');
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+        }
+        
+        // Initialize 4D grid
+        function initGrid() {
+            const totalCells = gridSize * gridSize * gridSize * gridSize;
+            console.log(`Initializing 4D grid with ${gridSize}^4 = ${totalCells} cells`);
+            
+            // Allocate memory for grids
+            grid = new Uint8Array(totalCells);
+            nextGrid = new Uint8Array(totalCells);
+            cellRules = new Uint8Array(totalCells);
+            cellAges = new Uint8Array(totalCells);
+            
+            // Random initialization based on density
+            for (let i = 0; i < totalCells; i++) {
+                if (Math.random() < density) {
+                    grid[i] = 1;
+                    cellAges[i] = 1;
+                }
+            }
+            
+            // Assign rule sets based on W position (layer)
+            const size3 = gridSize * gridSize * gridSize;
+            for (let w = 0; w < gridSize; w++) {
+                const ruleSetIndex = w % ruleCount;
+                for (let z = 0; z < gridSize; z++) {
+                    for (let y = 0; y < gridSize; y++) {
+                        for (let x = 0; x < gridSize; x++) {
+                            const idx = w * size3 + z * gridSize * gridSize + y * gridSize + x;
+                            cellRules[idx] = ruleSetIndex;
+                        }
+                    }
+                }
+            }
+            
+            updateInfoPanel();
+            updateLayerInfo();
+        }
+        
+        // Generate multiple rule sets
+        function generateRuleSets() {
+            ruleSets = [];
+            const ruleLength = Math.pow(2, complexity);
+            
+            for (let i = 0; i < ruleCount; i++) {
+                const rule = [];
+                
+                if (rulePattern === "Alternating") {
+                    // Alternating patterns create interesting interactions
+                    for (let j = 0; j < ruleLength; j++) {
+                        // Each rule set has a different but deterministic pattern
+                        const value = (i + j) % 3 === 0 ? 1 : 
+                                     (i * j) % 5 === 0 ? 1 : 
+                                     (i + j * 2) % 7 === 0 ? 1 : 0;
+                        rule.push(value);
+                    }
+                } else {
+                    // Random pattern
+                    for (let j = 0; j < ruleLength; j++) {
+                        rule.push(Math.random() > 0.5 ? 1 : 0);
+                    }
+                }
+                
+                ruleSets.push(rule);
+            }
+            
+            updateLayerInfo();
+        }
+        
+        // Update layer info display
+        function updateLayerInfo() {
+            layerInfoElement.innerHTML = '';
+            
+            for (let i = 0; i < Math.min(ruleCount, 8); i++) {
+                const ruleElement = document.createElement('div');
+                ruleElement.className = 'layer-rule';
+                ruleElement.innerHTML = `<strong>W%${ruleCount}=${i}:</strong> ${ruleSets[i] ? ruleSets[i].slice(0, 8).join('') + '...' : 'Not set'}`;
+                ruleElement.style.borderLeftColor = ruleColors[i % ruleColors.length];
+                ruleElement.style.borderLeftWidth = '4px';
+                layerInfoElement.appendChild(ruleElement);
+            }
+            
+            if (ruleCount > 8) {
+                const moreElement = document.createElement('div');
+                moreElement.className = 'layer-rule';
+                moreElement.textContent = `+${ruleCount - 8} more...`;
+                layerInfoElement.appendChild(moreElement);
+            }
+        }
+        
+        // Calculate next generation
+        function nextGeneration() {
+            // Define a neighborhood for 4D cellular automata
+            const neighborOffsets = [];
+            
+            // Create a 4D neighborhood (small for performance)
+            for (let dw = -1; dw <= 1; dw++) {
+                for (let dz = -1; dz <= 1; dz++) {
+                    for (let dy = -1; dy <= 1; dy++) {
+                        for (let dx = -1; dx <= 1; dx++) {
+                            // Limit neighborhood size for performance
+                            const dist = Math.abs(dw) + Math.abs(dz) + Math.abs(dy) + Math.abs(dx);
+                            if (dist <= 2) {
+                                neighborOffsets.push([dw, dz, dy, dx]);
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Apply appropriate rule to each cell based on its layer
+            const size = gridSize;
+            const size2 = size * size;
+            const size3 = size * size * size;
+            
+            for (let w = 0; w < size; w++) {
+                // Get the rule set for this W layer
+                const ruleSetIndex = w % ruleCount;
+                const rule = ruleSets[ruleSetIndex];
+                
+                for (let z = 0; z < size; z++) {
+                    for (let y = 0; y < size; y++) {
+                        for (let x = 0; x < size; x++) {
+                            const idx = w * size3 + z * size2 + y * size + x;
+                            
+                            // Calculate neighborhood state index
+                            let neighborhoodIndex = 0;
+                            let bitPosition = 0;
+                            
+                            // Sample neighbors to determine the rule to apply
+                            for (const offset of neighborOffsets) {
+                                if (bitPosition >= complexity) break;
+                                
+                                const nw = (w + offset[0] + size) % size;
+                                const nz = (z + offset[1] + size) % size;
+                                const ny = (y + offset[2] + size) % size;
+                                const nx = (x + offset[3] + size) % size;
+                                
+                                const nIdx = nw * size3 + nz * size2 + ny * size + nx;
+                                
+                                if (grid[nIdx] === 1) {
+                                    neighborhoodIndex |= (1 << bitPosition);
+                                }
+                                
+                                bitPosition++;
+                            }
+                            
+                            // Apply the appropriate rule for this layer
+                            const ruleIndex = neighborhoodIndex % rule.length;
+                            nextGrid[idx] = rule[ruleIndex];
+                            
+                            // Update cell age
+                            if (nextGrid[idx] === 1) {
+                                cellAges[idx] = grid[idx] === 1 ? Math.min(cellAges[idx] + 1, 255) : 1;
+                            } else {
+                                cellAges[idx] = 0;
+                            }
+                            
+                            // Keep the rule assignment for this cell
+                            cellRules[idx] = ruleSetIndex;
+                        }
+                    }
+                }
+            }
+            
+            // Swap grids
+            [grid, nextGrid] = [nextGrid, grid];
+            generation++;
+            
+            updateInfoPanel();
+        }
+        
+        // Render the 3D slice
+        function renderSlice() {
+            // Clear canvas
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            const size = gridSize;
+            const size2 = size * size;
+            const size3 = size * size * size;
+            
+            // Calculate center offset to center the grid
+            const totalWidth = size * cellSize;
+            const totalHeight = size * cellSize;
+            const offsetX = (canvas.width - totalWidth) / 2;
+            const offsetY = (canvas.height - totalHeight) / 2;
+            
+            // Draw cells at the current W slice
+            let activeCells = 0;
+            
+            // Get the rule set for the current slice for display
+            const currentRuleSetIndex = sliceW % ruleCount;
+            currentRuleElement.textContent = currentRuleSetIndex;
+            
+            for (let z = 0; z < size; z++) {
+                for (let y = 0; y < size; y++) {
+                    for (let x = 0; x < size; x++) {
+                        const idx = sliceW * size3 + z * size2 + y * size + x;
+                        
+                        if (grid[idx] === 1) {
+                            activeCells++;
+                            
+                            // Determine color based on rule set and age
+                            const ruleSetIndex = cellRules[idx];
+                            let baseColor = ruleColors[ruleSetIndex % ruleColors.length];
+                            
+                            // Darken older cells for depth
+                            const ageFactor = Math.min(cellAges[idx] / 15, 1);
+                            const color = ageFactor > 0.5 ? 
+                                darkenColor(baseColor, (ageFactor - 0.5) * 0.5) : 
+                                lightenColor(baseColor, ageFactor * 0.3);
+                            
+                            // Draw cell with perspective based on Z position
+                            const scale = 0.5 + (z / size) * 0.5;
+                            const cellX = offsetX + x * cellSize;
+                            const cellY = offsetY + y * cellSize;
+                            const scaledSize = cellSize * scale;
+                            
+                            // Draw cell
+                            ctx.fillStyle = color;
+                            ctx.fillRect(
+                                cellX - (scaledSize - cellSize) / 2,
+                                cellY - (scaledSize - cellSize) / 2,
+                                scaledSize,
+                                scaledSize
+                            );
+                            
+                            // Add a subtle glow for cells following different rules than the current layer
+                            if (ruleSetIndex !== currentRuleSetIndex) {
+                                ctx.shadowColor = color;
+                                ctx.shadowBlur = 4;
+                                ctx.fillRect(
+                                    cellX - (scaledSize - cellSize) / 2,
+                                    cellY - (scaledSize - cellSize) / 2,
+                                    scaledSize,
+                                    scaledSize
+                                );
+                                ctx.shadowBlur = 0;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Update active cells count
+            activeCellsElement.textContent = activeCells.toLocaleString();
+            
+            // Draw grid lines if cells are large enough
+            if (cellSize > 10) {
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+                ctx.lineWidth = 0.5;
+                
+                // Vertical lines
+                for (let x = 0; x <= size; x++) {
+                    ctx.beginPath();
+                    ctx.moveTo(offsetX + x * cellSize, offsetY);
+                    ctx.lineTo(offsetX + x * cellSize, offsetY + totalHeight);
+                    ctx.stroke();
+                }
+                
+                // Horizontal lines
+                for (let y = 0; y <= size; y++) {
+                    ctx.beginPath();
+                    ctx.moveTo(offsetX, offsetY + y * cellSize);
+                    ctx.lineTo(offsetX + totalWidth, offsetY + y * cellSize);
+                    ctx.stroke();
+                }
+            }
+        }
+        
+        // Helper function to darken a color
+        function darkenColor(color, factor) {
+            const hex = color => {
+                const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(color);
+                return result ? {
+                    r: parseInt(result[1], 16),
+                    g: parseInt(result[2], 16),
+                    b: parseInt(result[3], 16)
+                } : null;
+            };
+            
+            const rgb = hex(color);
+            const r = Math.round(rgb.r * (1 - factor));
+            const g = Math.round(rgb.g * (1 - factor));
+            const b = Math.round(rgb.b * (1 - factor));
+            
+            return `rgb(${r}, ${g}, ${b})`;
+        }
+        
+        // Helper function to lighten a color
+        function lightenColor(color, factor) {
+            const hex = color => {
+                const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(color);
+                return result ? {
+                    r: parseInt(result[1], 16),
+                    g: parseInt(result[2], 16),
+                    b: parseInt(result[3], 16)
+                } : null;
+            };
+            
+            const rgb = hex(color);
+            const r = Math.round(rgb.r + (255 - rgb.r) * factor);
+            const g = Math.round(rgb.g + (255 - rgb.g) * factor);
+            const b = Math.round(rgb.b + (255 - rgb.b) * factor);
+            
+            return `rgb(${r}, ${g}, ${b})`;
+        }
+        
+        // Update information panel
+        function updateInfoPanel() {
+            slicePosElement.textContent = sliceW;
+            generationElement.textContent = generation;
+            rulePatternElement.textContent = rulePattern;
+        }
+        
+        // Animation loop
+        function animate(timestamp) {
+            // Calculate time since last update
+            const deltaTime = timestamp - lastUpdateTime;
+            const updateInterval = 1000 / (animationSpeed * 2);
+            
+            if (deltaTime > updateInterval && isPlaying) {
+                nextGeneration();
+                lastUpdateTime = timestamp;
+            }
+            
+            renderSlice();
+            requestAnimationFrame(animate);
+        }
+        
+        // Initialize everything
+        function init() {
+            initCanvas();
+            generateRuleSets();
+            initGrid();
+            
+            // Set up event listeners
+            window.addEventListener('resize', initCanvas);
+            
+            gridSizeSlider.addEventListener('input', function() {
+                gridSize = parseInt(this.value);
+                gridSizeValue.textContent = gridSize;
+                sliceSlider.max = gridSize - 1;
+                initGrid();
+            });
+            
+            densitySlider.addEventListener('input', function() {
+                density = parseInt(this.value) / 100;
+                densityValue.textContent = `${this.value}%`;
+            });
+            
+            sliceSlider.addEventListener('input', function() {
+                sliceW = parseInt(this.value);
+                sliceValue.textContent = sliceW;
+                updateInfoPanel();
+            });
+            
+            complexitySlider.addEventListener('input', function() {
+                complexity = parseInt(this.value);
+                complexityValue.textContent = complexity;
+                generateRuleSets();
+            });
+            
+            ruleCountSlider.addEventListener('input', function() {
+                ruleCount = parseInt(this.value);
+                ruleCountValue.textContent = ruleCount;
+                generateRuleSets();
+                initGrid();
+            });
+            
+            speedSlider.addEventListener('input', function() {
+                animationSpeed = parseInt(this.value);
+                speedValue.textContent = animationSpeed;
+            });
+            
+            cellSizeSlider.addEventListener('input', function() {
+                cellSize = parseInt(this.value);
+                cellSizeValue.textContent = cellSize;
+            });
+            
+            alternatingRulesBtn.addEventListener('click', function() {
+                rulePattern = "Alternating";
+                generateRuleSets();
+                updateInfoPanel();
+            });
+            
+            randomRulesBtn.addEventListener('click', function() {
+                rulePattern = "Random";
+                generateRuleSets();
+                updateInfoPanel();
+            });
+            
+            generateBtn.addEventListener('click', function() {
+                initGrid();
+                generation = 0;
+            });
+            
+            pauseBtn.addEventListener('click', function() {
+                isPlaying = !isPlaying;
+                pauseBtn.textContent = isPlaying ? 'Pause' : 'Resume';
+            });
+            
+            resetBtn.addEventListener('click', function() {
+                generation = 0;
+                initGrid();
+                if (!isPlaying) {
+                    isPlaying = true;
+                    pauseBtn.textContent = 'Pause';
+                }
+            });
+            
+            stepBtn.addEventListener('click', function() {
+                isPlaying = false;
+                pauseBtn.textContent = 'Resume';
+                nextGeneration();
+            });
+            
+            // Start animation
+            requestAnimationFrame(animate);
+        }
+        
+        // Initialize when page loads
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
