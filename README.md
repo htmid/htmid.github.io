@@ -16,3 +16,6 @@ Cross-Platform Compatibility: Runs seamlessly in any modern web browser.
 Demo
 Experience HTMID in action! Visit our live demo at: [https://htmid.github.io/](https://htmid.github.io/default.html)
 
+![Boundaries banner](./boundary-banner.svg)
+
+
