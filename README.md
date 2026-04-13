@@ -14,5 +14,5 @@ Export Options: Save your compositions in various formats for easy sharing.
 Cross-Platform Compatibility: Runs seamlessly in any modern web browser.
 
 Demo
-Experience HTMID in action! Visit our live demo at: [https://htmid.github.io/index.html](https://htmid.github.io/default.html)
+Experience HTMID in action! Visit our live demo at: [https://htmid.github.io/](https://htmid.github.io/default.html)
 
