@@ -1,0 +1,74 @@
+<svg width="900" height="260" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Background gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#050510"/>
+      <stop offset="50%" stop-color="#141428"/>
+      <stop offset="100%" stop-color="#1b2b3f"/>
+    </linearGradient>
+
+    <!-- Gate glow -->
+    <radialGradient id="gateGlow" cx="50%" cy="55%" r="40%">
+      <stop offset="0%" stop-color="#33ffcc" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#33ffcc" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Rising light -->
+    <radialGradient id="horizonGlow" cx="50%" cy="100%" r="60%">
+      <stop offset="0%" stop-color="#ffcc66" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#ffcc66" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Stroke gradient for gate -->
+    <linearGradient id="gateStroke" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ff0066"/>
+      <stop offset="50%" stop-color="#ffcc00"/>
+      <stop offset="100%" stop-color="#33ffcc"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="260" fill="url(#bgGrad)" />
+
+  <!-- Horizon light (future, not yet reachable) -->
+  <ellipse cx="450" cy="250" rx="260" ry="80" fill="url(#horizonGlow)" />
+
+  <!-- Path leading to the gate -->
+  <path d="M380 260 C410 210, 490 210, 520 260 Z"
+        fill="#101820" stroke="#222a33" stroke-width="2" />
+
+  <!-- Gate glow -->
+  <circle cx="450" cy="150" r="140" fill="url(#gateGlow)" />
+
+  <!-- Gate frame -->
+  <rect x="320" y="70" width="260" height="160" rx="10" ry="10"
+        fill="none" stroke="url(#gateStroke)" stroke-width="4" />
+
+  <!-- Gate bars -->
+  <line x1="350" y1="80" x2="350" y2="220" stroke="#99ffee" stroke-width="3" />
+  <line x1="390" y1="80" x2="390" y2="220" stroke="#99ffee" stroke-width="2" />
+  <line x1="430" y1="80" x2="430" y2="220" stroke="#99ffee" stroke-width="2" />
+  <line x1="470" y1="80" x2="470" y2="220" stroke="#99ffee" stroke-width="2" />
+  <line x1="510" y1="80" x2="510" y2="220" stroke="#99ffee" stroke-width="2" />
+  <line x1="550" y1="80" x2="550" y2="220" stroke="#99ffee" stroke-width="3" />
+
+  <!-- Lock symbol -->
+  <rect x="430" y="130" width="40" height="40" rx="6" ry="6"
+        fill="#050510" stroke="#ffcc66" stroke-width="2" />
+  <path d="M438 130 Q450 110 462 130"
+        fill="none" stroke="#ffcc66" stroke-width="2" />
+
+  <!-- Main text -->
+  <text x="50%" y="40%" text-anchor="middle"
+        font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+        font-size="26" fill="#f5f5f5">
+    I will never forget.
+  </text>
+
+  <!-- Sub text -->
+  <text x="50%" y="60%" text-anchor="middle"
+        font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+        font-size="18" fill="#cccccc">
+    My gate stays closed to those who harm me. Respect is the only key.
+  </text>
+</svg>
