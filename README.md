@@ -1,4 +1,4 @@
-<center><img src="assets/boundry-banner.svg" alt="Boundaries banner" width="356"></center>center>
+<center><img src="boundry-banner.svg" alt="Boundaries banner" width="356"></center>center>
 
 HTMID: A Generative Music App
 
