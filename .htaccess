@@ -2,3 +2,5 @@
   Header set Access-Control-Allow-Origin "*"
 </IfModule>
 
+# Make default.html the index file
+DirectoryIndex default.html index.html 
