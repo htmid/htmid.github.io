@@ -13,7 +13,7 @@ Customizable Sound Profiles: Choose from a variety of instruments and sounds to 
 Export Options: Save your compositions in various formats for easy sharing.
 Cross-Platform Compatibility: Runs seamlessly in any modern web browser.
 
-![Boundaries banner](https://htmid.github.io/boundary-banner.svg)
+![Boundaries banner](boundary-banner.svg)
 
 Demo
 Experience HTMID in action! Visit our live demo at: [https://htmid.github.io/](https://htmid.github.io/default.html)
