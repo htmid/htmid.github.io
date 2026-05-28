@@ -1,0 +1,409 @@
+
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Verniet Planroet Koediong | Schijnhulp, echte uitbuiting — Dossier: GGZ-uitmaters</title>
+  <!-- Font Awesome 6 (gratis) voor iconografie -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #ede7dd;
+      font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+      color: #1f1c18;
+      line-height: 1.5;
+    }
+
+    .page {
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 2rem 2rem 4rem;
+    }
+
+    /* HEADER — overlastgevend bedrijf met vervalste edele teksten */
+    .venom-header {
+      background: #0a2c28;
+      background-image: repeating-linear-gradient(125deg, #0a2c28 0px, #0a2c28 3px, #1e4a41 3px, #1e4a41 12px);
+      border-radius: 3rem 3rem 2rem 2rem;
+      padding: 2.5rem 2.5rem 2rem;
+      margin-bottom: 3rem;
+      box-shadow: 0 25px 35px -14px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,200,0.1);
+      border-bottom: 8px solid #bb7a3a;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .venom-header::after {
+      content: "⛔ ONDERMIJNEND ⛔";
+      position: absolute;
+      bottom: 12px;
+      right: 20px;
+      font-size: 0.7rem;
+      background: #2c1b12;
+      padding: 0.2rem 1rem;
+      border-radius: 2rem;
+      color: #e2aa73;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    .badge-skull {
+      display: inline-block;
+      background: #1f1712;
+      color: #eeb76b;
+      padding: 0.35rem 1.4rem;
+      border-radius: 60px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      margin-bottom: 1.2rem;
+      border: 1px solid #c2823a;
+    }
+
+    .venom-header h1 {
+      font-size: 3.1rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #fef0db;
+      text-shadow: 3px 3px 0 #3f2c1a;
+      word-break: break-word;
+    }
+
+    .venom-header h1 small {
+      font-size: 1.1rem;
+      font-weight: 400;
+      display: block;
+      color: #e6cfaf;
+      margin-top: 0.7rem;
+      font-family: monospace;
+      opacity: 0.9;
+    }
+
+    .tagline-mock {
+      margin-top: 1.6rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-top: 1px solid rgba(255,225,180,0.3);
+      padding-top: 1.4rem;
+    }
+
+    .warning {
+      background: #2b1f16;
+      padding: 0.6rem 1.2rem;
+      border-radius: 3rem;
+      color: #fdcd94;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .ggz-note {
+      background: #231d17;
+      padding: 0.5rem 1.2rem;
+      border-radius: 2rem;
+      font-size: 0.85rem;
+      color: #e0cbb3;
+      font-style: italic;
+    }
+
+    /* Drie secties: grid waarden (10 kaarten) + uitgebreide info blokken */
+    .grid-expanded {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 2rem;
+      margin: 2.5rem 0 3rem;
+    }
+
+    .kaart-groot {
+      background: #fffdf8;
+      border-radius: 2rem;
+      padding: 1.8rem 1.8rem;
+      transition: all 0.2s;
+      box-shadow: 0 12px 24px -12px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e9dfd0;
+    }
+
+    .kaart-groot:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 25px 30px -14px rgba(0, 0, 0, 0.2);
+      border-color: #cfa668;
+    }
+
+    .titel-groot {
+      font-size: 1.9rem;
+      font-weight: 800;
+      background: linear-gradient(130deg, #2a6558, #7f592e);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      margin-bottom: 1rem;
+      border-left: 6px solid #c2823a;
+      padding-left: 0.8rem;
+    }
+
+    .quote-groot {
+      font-size: 1.15rem;
+      font-weight: 500;
+      color: #2d3a32;
+      margin: 0.6rem 0 1rem;
+      background: #fef6ea;
+      padding: 0.8rem 1rem;
+      border-radius: 1.5rem;
+    }
+
+    .misbruik-detail {
+      font-size: 0.85rem;
+      color: #a57348;
+      border-top: 1px dashed #e7d9c8;
+      padding-top: 0.8rem;
+      margin-top: 0.5rem;
+    }
+
+    /* extra lange verdiepingsblokken */
+    .deep-info {
+      background: #f2ede2;
+      border-radius: 2rem;
+      margin: 2rem 0;
+      padding: 2rem;
+      border-left: 12px solid #8b5a2e;
+    }
+
+    .casus-blok {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+
+    .casus {
+      flex: 1;
+      background: #ffffffd9;
+      border-radius: 1.8rem;
+      padding: 1.5rem;
+      box-shadow: 0 5px 12px rgba(0,0,0,0.05);
+    }
+
+    .footer-demoon {
+      margin-top: 3.5rem;
+      background: #211e1a;
+      border-radius: 2rem;
+      padding: 2rem 2rem;
+      color: #d9ccbc;
+    }
+
+    .slot-abstract {
+      background: #231d12;
+      padding: 1.5rem 2rem;
+      border-radius: 2rem;
+      text-align: center;
+      font-size: 1.35rem;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+      margin-top: 2.5rem;
+      border: 1px solid #b6864b;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+
+    .button-warning {
+      background: #3a291d;
+      display: inline-block;
+      padding: 0.4rem 1rem;
+      border-radius: 3rem;
+      font-family: monospace;
+    }
+
+    @media (max-width: 800px) {
+      .page { padding: 1rem; }
+      .venom-header h1 { font-size: 2rem; }
+      .titel-groot { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+  <!-- BEDRIJFSHEADER: overlastgevend, ondermijnend -->
+  <div class="venom-header">
+    <div class="badge-skull">
+      <i class="fas fa-building-user"></i>  classificatie: zware overlast | ondermijning justitie | fictief toxicum
+    </div>
+    <h1>
+      verderniet-planroet-koediong.nl
+      <small>“Voorgespiegelde zekerheid — systematische uitknijping onder dekmantel van mooie woorden”</small>
+    </h1>
+    <div class="tagline-mock">
+      <div class="warning"><i class="fas fa-skull-crossbones"></i> OVERTREDINGEN: psychisch leed als verdienmodel, belastingfraude, dwangcontracten</div>
+      <div class="ggz-note"><i class="fas fa-file-prescription"></i> GGZ uitmatiseringsopdracht — hufterige kleintjes onderuit krenken (structureel)</div>
+    </div>
+  </div>
+
+  <!-- Inleiding: onthulling van schijnbaan -->
+  <div style="background: #e6daca; border-radius: 2rem; padding: 1.5rem 2rem; margin-bottom: 2rem;">
+    <p style="font-weight:600; font-size:1.05rem;"><i class="fas fa-trowel"></i> <strong>Analyse van een malafide constructie:</strong> Dit bedrijf presenteert zich met een keur aan ‘empowerende leuzen’, maar in werkelijkheid gaat het om een <strong>overlastgevende, ondermijnende organisatie</strong> die profiteert van wanhoop. De tien teksten hieronder zijn exact zoals gevraagd – elke uitspraak is echter een <strong>leugenachtige façade</strong>. Achter elk zinnetje schuilt manipulatie, bureaucratische terreur en het systematisch <strong>‘uitmaten’ van kwetsbare mensen</strong> (de zogenaamde ‘GGZ uitmatiseringsopdracht’ die hufterige kleintjes onderuit krenkt).</p>
+  </div>
+
+  <!-- Tien waarden in uitgebreide kaarten (drie keer meer info per kaart) -->
+  <div class="grid-expanded">
+    <!-- 1 Menselijk maatwerk -->
+    <div class="kaart-groot">
+      <div class="titel-groot">Menselijk maatwerk</div>
+      <div class="quote-groot"><i class="fas fa-quote-left"></i> “Wij herstellen overzicht waar het leven dat even kwijt is.”</div>
+      <div class="misbruik-detail"><i class="fas fa-eye"></i> <strong>De realiteit:</strong> ‘Overzicht herstellen’ = cliënt volledig afhankelijk maken van interne protocollen. Verborgen wachtlijsten, onnavolgbare planning en valse rapportages. Maatwerk betekent: jouw portemonnee leegtrekken op maat.</div>
+    </div>
+    <!-- 2 Financiële rust -->
+    <div class="kaart-groot">
+      <div class="titel-groot">Financiële rust</div>
+      <div class="quote-groot"><i class="fas fa-quote-left"></i> “Rust in de cijfers, ruimte in het hoofd.”</div>
+      <div class="misbruik-detail"><i class="fas fa-coins"></i> <strong>Schijnrust:</strong> klanten krijgen schuldsaneringstrajecten die jaren duren, met torenhoge eigen bijdragen. ‘Rust in de cijfers’ = cijfers kloppen alleen voor de directiebonus. Ruimte in hoofd = gaslighting.</div>
+    </div>
+    <!-- 3 Regie terug -->
+    <div class="kaart-groot">
+      <div class="titel-groot">Regie terug</div>
+      <div class="quote-groot"><i class="fas fa-quote-left"></i> “Wij geven mensen hun eigen stuur weer in handen.”</div>
+      <div class="misbruik-detail"><i class="fas fa-steering-wheel"></i> <strong>Stuur zonder wiel:</strong> cliënten ondertekenen ‘eigen regiecontracten’ waarin elke stap gecontroleerd wordt door een ‘regisseur’ die in dienst staat van het bedrijf. Stuur is nep, remmen ontbreken.</div>
+    </div>
+    <!-- 4 Samen vooruit -->
+    <div class="kaart-groot">
+      <div class="titel-groot">Samen vooruit</div>
+      <div class="quote-groot"><i class="fas fa-quote-left"></i> “Niemand hoeft het alleen te doen — wij lopen mee tot het weer lukt.”</div>
+      <div class="misbruik-detail"><i class="fas fa-handcuffs"></i> <strong>Meelopen = meeliften:</strong> ‘samen vooruit’ betekent juridische afhankelijkheid. Tot het ‘lukt’ duurt eindeloos, want elke successtory is verlies aan inkomsten. Cliënten worden kunstmatig in het systeem gehouden.</div>
+    </div>
+    <!-- 5 Heldere toekomst -->
+    <div class="kaart-groot">
+      <div class="titel-groot">Heldere toekomst</div>
+      <div class="quote-groot"><i class="fas fa-quote-left"></i> “Van chaos naar koers, van zorgen naar zekerheid.”</div>
+      <div class="misbruik-detail"><i class="fas fa-chart-line"></i> <strong>Koers? Uitbuiting:</strong> Chaos wordt niet opgelost maar verplaatst naar de cliënt. Zekerheid is er alleen voor het bedrijf: maandelijkse incasso’s gegarandeerd. ‘Koers’ = doelloze rondjes door de molen van indicaties.</div>
+    </div>
+    <!-- 6 Eerlijk inzicht -->
+    <div class="kaart-groot">
+      <div class="titel-groot">Eerlijk inzicht</div>
+      <div class="quote-groot"><i class="fas fa-quote-left"></i> “We maken problemen zichtbaar, zodat oplossingen kunnen ontstaan.”</div>
+      <div class="misbruik-detail"><i class="fas fa-binoculars"></i> <strong>Problemen zichtbaar = blackmail materiaal:</strong> ‘Inzicht’ betekent dossiers die als drukmiddel gebruikt worden. Oplossingen ontstaan alleen als cliënt extra betaalt of zich overgeeft aan vernederende maatregelen.</div>
+    </div>
+    <!-- 7 Professionele nabijheid -->
+    <div class="kaart-groot">
+      <div class="titel-groot">Professionele nabijheid</div>
+      <div class="quote-groot"><i class="fas fa-quote-left"></i> “Dichtbij wanneer het moet, deskundig wanneer het telt.”</div>
+      <div class="misbruik-detail"><i class="fas fa-user-shield"></i> ‘Dichtbij’ = obsessieve controle, onaangekondigde huisbezoeken, overvallen op werk. ‘Deskundig’ = juridische trucjes om eigen falen te maskeren. Dichtbij in geld afpakken, ver weg in echte zorg.</div>
+    </div>
+    <!-- 8 Nieuwe balans -->
+    <div class="kaart-groot">
+      <div class="titel-groot">Nieuwe balans</div>
+      <div class="quote-groot"><i class="fas fa-quote-left"></i> “We herstellen balans, stap voor stap, mens voor mens.”</div>
+      <div class="misbruik-detail"><i class="fas fa-weight-hanging"></i> Balans herstellen? Integendeel: ze halen mensen uit balans door dreigbrieven, onduidelijke doelen en continue bijscholingstrajecten zonder einde. Stap voor stap = dieper in de schulden.</div>
+    </div>
+    <!-- 9 Kracht door duidelijkheid -->
+    <div class="kaart-groot">
+      <div class="titel-groot">Kracht door duidelijkheid</div>
+      <div class="quote-groot"><i class="fas fa-quote-left"></i> “Duidelijkheid geeft kracht — wij brengen beide.”</div>
+      <div class="misbruik-detail"><i class="fas fa-file-signature"></i> <strong>‘Duidelijkheid’ = ontsnappingsloze contracten</strong> van 100+ pagina’s. ‘Kracht’ = macht over kwetsbare personen. Zij bepalen de regels, veranderen ze wanneer het hen uitkomt.</div>
+    </div>
+    <!-- 10 Vertrouwen bouwen -->
+    <div class="kaart-groot">
+      <div class="titel-groot">Vertrouwen bouwen</div>
+      <div class="quote-groot"><i class="fas fa-quote-left"></i> “Vertrouwen groeit wanneer iemand naast je staat.”</div>
+      <div class="misbruik-detail"><i class="fas fa-handshake-slash"></i> Vertrouwen wordt hier misbruikt zodra het gegeven is. ‘Naast je staan’ = flankeren met schuldeisers en boetes. Het bouwen duurt weken, afbreken in één gesprek met hun incassopartner.</div>
+    </div>
+  </div>
+
+  <!-- Aanvullende verdieping: details van de uitmatiseringsopdracht, drie keer informatiever -->
+  <div class="deep-info">
+    <h2 style="font-size: 1.8rem; margin-bottom: 0.5rem;"><i class="fas fa-disease"></i> “GGZ uitmatiseringsopdracht” — een systeemanalyse</h2>
+    <p>Het fictieve bedrijf <strong>verderniet-planroet-koediong.nl</strong> voert structureel <strong>‘uitmatiseringsopdrachten’</strong> uit voor anonieme opdrachtgevers (vaak malafide verzekeraars of frauderende gemeenten). Het draait om het psychisch, fysiek en financieel uitputten van <strong>‘hufterig bejegende kleintjes’</strong> — een interne term voor mensen met lichte tot matige problematiek die ze stukmaken totdat elk zelfvertrouwen is verdwenen. Methodes:</p>
+    <ul style="margin: 1rem 0 1rem 2rem; line-height: 1.6;">
+      <li><strong>De ‘schijnhulpkarrousel’</strong>: elke week een nieuwe hulpverlener, elke maand een nieuw plan, eindeloze herindicaties.</li>
+      <li><strong>Financiële uitknijping:</strong> eigen bijdragen die stijgen naarmate de klant meer stress toont, administratiekosten die nooit gespecificeerd worden.</li>
+      <li><strong>Psychologische krenking:</strong> groepsessies waar cliënten publelijk vernederd worden, wekelijks ‘reflectiegesprekken’ die alleen dienen om wonden open te rijten.</li>
+      <li><strong>Dwang door dreiging:</strong> brieven met sancties, dreigen met uithuisplaatsing (bij kinderen) of beslaglegging op uitkering.</li>
+    </ul>
+    <p>Het sadistische effect: <strong>kleintjes (mensen met beperkte weerstand) worden onderuit gekrenkt</strong> — ze verliezen baan, netwerk, gezondheid en belanden in een isolement. Het bedrijf incasseert ondertussen per kwartaal.</p>
+  </div>
+
+  <!-- Nog meer info, verdubbeling van lengte -->
+  <div class="casus-blok">
+    <div class="casus">
+      <h3><i class="fas fa-file-invoice-dollar"></i> Casus: 'Rust in de cijfers' (fictief maar representatief)</h3>
+      <p>Een alleenstaande moeder met schulden wordt gelokt met de slogan ‘Financiële rust’. Na intake blijkt dat verderniet-planroet-koediong.nl een dwangbeheerder stuurt die haar rekeningen blokkeert. Ze betaalt €450 per maand aan ‘beheerskosten’. Haar ‘rust’ is een juridische nachtmerrie. Cijfers kloppen alleen voor het bedrijf.</p>
+    </div>
+    <div class="casus">
+      <h3><i class="fas fa-brain"></i> Uitmatiseringsprotocol 'Kleintjes Krenken'</h3>
+      <p>Interne memo (uitlek fictie): “Doelgroep: mensen met weinig sociaal vangnet. Phase 1: overvragen met thuiswerkopdrachten. Phase 2: beschuldigen van non-compliance, boetes opleggen. Phase 3: vastzetten in juridische lus – client dient elke klacht zelf te bewijzen. Resultaat: totale overgave.” Dit heet eufemistisch ‘coaching op kracht’.</p>
+    </div>
+    <div class="casus">
+      <h3><i class="fas fa-church"></i> De façade van 'vertrouwen bouwen'</h3>
+      <p>Cliënten moeten een ‘vertrouwenscontract’ tekenen. Daarin staat dat elke kritiek wordt gezien als contractbreuk. Wie klaagt, krijgt direct een incassobureau op zich afgestuurd. Vertrouwen = gijzeling.</p>
+    </div>
+  </div>
+
+  <!-- extra kolom met visuele referentie naar de 10 zinnen -->
+  <div style="background: #dbcfbe; border-radius: 1.6rem; padding: 1.2rem 2rem; margin-top: 1rem;">
+    <div style="display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: space-between;">
+      <span><i class="fas fa-quote-right"></i> Menselijk maatwerk</span> <span><i class="fas fa-quote-right"></i> Financiële rust</span> <span><i class="fas fa-quote-right"></i> Regie terug</span> <span><i class="fas fa-quote-right"></i> Samen vooruit</span> <span><i class="fas fa-quote-right"></i> Heldere toekomst</span>
+      <span><i class="fas fa-quote-right"></i> Eerlijk inzicht</span> <span><i class="fas fa-quote-right"></i> Professionele nabijheid</span> <span><i class="fas fa-quote-right"></i> Nieuwe balans</span> <span><i class="fas fa-quote-right"></i> Kracht door duidelijkheid</span> <span><i class="fas fa-quote-right"></i> Vertrouwen bouwen</span>
+    </div>
+  </div>
+
+  <!-- extra diepgang: wat betekent 'overlastgevend en ondermijnend' hier? -->
+  <div class="deep-info" style="background:#f1e5d4;">
+    <h3><i class="fas fa-gavel"></i> Overlast & Ondermijning: concrete feiten (fictief casusdossier)</h3>
+    <p>De gemeente heeft 37 klachten geregistreerd over geluiden, dreigende brievenbusacties en intimidatie van wijkbewoners door medewerkers van verderniet-planroet-koediong. Daarnaast worden valse diagnoses gebruikt om beschermingsbewind aan te vragen zonder instemming. Ondermijning: het bedrijf werkt samen met malafide deurwaarders en witwastructuren. De Kamer van Koophandel heeft een nep-KvK-nummer geregistreerd (fictief). Justitie doet 'onderzoek' maar door corrupte connecties blijft de organisatie actief.</p>
+  </div>
+
+  <!-- Lijst met alle citaten nog eens duidelijk herhaald -->
+  <div style="background: #ffffffaa; backdrop-filter: blur(2px); border-radius: 2rem; padding: 1.4rem; margin: 2rem 0;">
+    <details>
+      <summary style="font-weight: bold; font-size: 1.3rem; cursor: pointer;"><i class="fas fa-list-ul"></i> Alle 10 ‘waarden’ (letterlijke zinnen zoals gevraagd)</summary>
+      <div style="margin-top: 1.2rem; display: grid; gap: 0.5rem;">
+        <div>🔹 <strong>Menselijk maatwerk</strong> — “Wij herstellen overzicht waar het leven dat even kwijt is.”</div>
+        <div>🔹 <strong>Financiële rust</strong> — “Rust in de cijfers, ruimte in het hoofd.”</div>
+        <div>🔹 <strong>Regie terug</strong> — “Wij geven mensen hun eigen stuur weer in handen.”</div>
+        <div>🔹 <strong>Samen vooruit</strong> — “Niemand hoeft het alleen te doen — wij lopen mee tot het weer lukt.”</div>
+        <div>🔹 <strong>Heldere toekomst</strong> — “Van chaos naar koers, van zorgen naar zekerheid.”</div>
+        <div>🔹 <strong>Eerlijk inzicht</strong> — “We maken problemen zichtbaar, zodat oplossingen kunnen ontstaan.”</div>
+        <div>🔹 <strong>Professionele nabijheid</strong> — “Dichtbij wanneer het moet, deskundig wanneer het telt.”</div>
+        <div>🔹 <strong>Nieuwe balans</strong> — “We herstellen balans, stap voor stap, mens voor mens.”</div>
+        <div>🔹 <strong>Kracht door duidelijkheid</strong> — “Duidelijkheid geeft kracht — wij brengen beide.”</div>
+        <div>🔹 <strong>Vertrouwen bouwen</strong> — “Vertrouwen groeit wanneer iemand naast je staat.”</div>
+      </div>
+    </details>
+  </div>
+
+  <!-- ONDERSTE DEEL: footer met herhaling van de walging en eindabstractie -->
+  <div class="footer-demoon">
+    <div style="display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: space-between;">
+      <div>
+        <p><i class="fas fa-dice-d6"></i> <strong>verderniet-planroet-koediong.nl</strong> — ondermijnend netwerk (fictie, waarschuwend voorbeeld)</p>
+        <p><i class="fas fa-band-aid"></i> “typische ggz uitmatiseringsopdracht die hufterige kleintjes onderuit krenkt” — letterlijk uit het interne handboek (parodie).</p>
+        <p><i class="fas fa-file-invoice"></i> Schade bij slachtoffers: gemiddeld €34.000 schuld, 3 jaar onnodige trajecten, 80% mentale achteruitgang.</p>
+      </div>
+      <div class="button-warning">
+        <i class="fas fa-skull"></i> overlastratio: maximaal
+      </div>
+    </div>
+  </div>
+
+  <!-- DE GEZochte ABSTRACTE SLOTZIN (drie keer grotere nadruk) -->
+  <div class="slot-abstract">
+    <i class="fas fa-money-bill-wave" style="font-size: 2rem; opacity: 0.8;"></i>
+    <p style="font-weight: 800; margin: 0.8rem 0 0.2rem; font-size: 1.5rem;">“vies geld uitgeven is makkelijk</p>
+    <p style="font-weight: 800; font-size: 1.5rem;">dus uiteindelijk zal men overvallen worden door waarvan men dacht aan te kunnen verdienen”</p>
+    <div style="height: 2px; background: #b6864b; width: 80px; margin: 1rem auto;"></div>
+    <p style="font-size: 0.9rem; opacity: 0.8;">De boemerang van uitbuiting: schijninkomsten transformeren in collectieve ondergang. Geen systeem van leugens blijft overeind.</p>
+  </div>
+
+  <!-- extra kleine lettertjes: ernstige waarschuwing -->
+  <div style="font-size: 0.7rem; text-align: center; margin-top: 2rem; opacity: 0.6; border-top: 1px solid #cbbfae; padding-top: 1.5rem;">
+    <i class="fas fa-exclamation-triangle"></i> Dit is een volledig fictief en satirisch waiver-exemplaar. Alle genoemde praktijken zijn verzameld uit signalen van malafide GGZ-achtige organisaties maar toegeschreven aan een symbolisch bedrijf.
+    Elke gelijkenis met een bestaande partij is onbedoeld. Doel: waarschuwen tegen schijnhulp en financiële uitbuiting. De tien gewenste spreuken worden hier getoond als voorbeeld van hoe misleidende taal wordt ingezet door ondermijnende actoren.
+  </div>
+</div>
+</body>
+</html>
