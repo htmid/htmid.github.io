@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Kompas der Talen · Uithoeken Muziek</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none; /* clean kijkgevoel, niet storend */
+        }
+
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at center, #fbf5e8 0%, #e8dec5 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', 'Roboto', 'Noto Sans', system-ui, -apple-system, 'BlinkMacSystemFont', 'Times New Roman', serif;
+            padding: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* hoofd container - dynamisch op basis van scherm */
+        .compass-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* canvas waarop we SVG / elementen plaatsen is de cirkel */
+        .compass-stage {
+            position: relative;
+            width: min(85vh, 85vw, 900px);
+            height: min(85vh, 85vw, 900px);
+            margin: 0 auto;
+        }
+
+        /* centraal middelpunt */
+        .core-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 28%;
+            height: 28%;
+            background: #2d2a24;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,240,0.2);
+            backdrop-filter: blur(0px);
+            z-index: 30;
+            border: 3px solid #e9c891;
+            transition: all 0.2s ease;
+        }
+
+        .center-text-rus {
+            font-size: clamp(0.75rem, 4vw, 1.2rem);
+            font-weight: bold;
+            color: #F7F3E0;
+            text-shadow: 1px 1px 0 #1e1b16;
+            letter-spacing: 1px;
+            background: rgba(0,0,0,0.4);
+            padding: 6px 8px;
+            border-radius: 40px;
+            font-family: 'Noto Sans SC', 'Noto Sans CJK SC', 'Noto Serif SC', 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+
+        .center-text-ch {
+            font-size: clamp(0.7rem, 3.8vw, 1.1rem);
+            margin-top: 6px;
+            font-weight: 500;
+            color: #FFECB3;
+            font-family: 'Noto Sans SC', 'Noto Serif SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: rgba(0,0,0,0.3);
+            padding: 2px 6px;
+            border-radius: 30px;
+        }
+
+        /* decoratief logo SVG in het centrum */
+        .logo-center-svg {
+            margin-bottom: 6px;
+            width: 42px;
+            height: 42px;
+            filter: drop-shadow(0 2px 3px rgba(0,0,0,0.4));
+        }
+
+        /* elk uiteinde (punt) */
+        .direction-point {
+            position: absolute;
+            width: auto;
+            transform-origin: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            z-index: 25;
+            transition: transform 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            cursor: pointer;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+        }
+
+        .direction-point:hover {
+            transform: scale(1.07);
+            filter: drop-shadow(0 6px 12px rgba(0,0,0,0.3));
+        }
+
+        /* label styling */
+        .point-label {
+            background: #2C2A28ee;
+            backdrop-filter: blur(8px);
+            padding: 8px 16px;
+            border-radius: 60px;
+            color: #f7efcf;
+            font-weight: 600;
+            font-size: clamp(0.8rem, 3.2vw, 1.2rem);
+            font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            border: 1px solid #dbb45c;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            white-space: nowrap;
+            letter-spacing: 0.5px;
+        }
+
+        /* kleine ondertitel in de label voor extra flair (taalcode) */
+        .point-sub {
+            font-size: 0.65rem;
+            opacity: 0.85;
+            font-weight: normal;
+            margin-top: 2px;
+            letter-spacing: 0.5px;
+        }
+
+        /* decoratieve ring / kompas lijnen */
+        .deco-ring {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        /* extra stijlvolle ornament SVG inline (achtergrondcirkel) */
+        .ornament-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* responsieve aanpassing: bij kleine schermen labels iets kleiner */
+        @media (max-width: 550px) {
+            .point-label {
+                padding: 4px 12px;
+                font-size: 0.7rem;
+                white-space: nowrap;
+            }
+            .logo-center-svg {
+                width: 32px;
+                height: 32px;
+            }
+            .center-text-rus {
+                font-size: 0.7rem;
+            }
+            .center-text-ch {
+                font-size: 0.65rem;
+            }
+        }
+
+        /* extra sfeer: subtiele gloed */
+        .compass-stage::before {
+            content: "";
+            position: absolute;
+            top: -5%;
+            left: -5%;
+            width: 110%;
+            height: 110%;
+            background: radial-gradient(ellipse at center, rgba(255,215,130,0.15) 0%, rgba(0,0,0,0) 70%);
+            border-radius: 50%;
+            z-index: 1;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+<div class="compass-container">
+    <div class="compass-stage" id="compassStage">
+        <!-- achtergrond decoratieve ringen + SVG inline logo's (officieel aandoend) -->
+        <svg class="ornament-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <circle cx="50" cy="50" r="48" fill="none" stroke="#C5A267" stroke-width="0.6" stroke-dasharray="2 3" opacity="0.7" />
+            <circle cx="50" cy="50" r="44" fill="none" stroke="#DAB066" stroke-width="0.8" stroke-dasharray="1 2" opacity="0.5" />
+            <circle cx="50" cy="50" r="38" fill="none" stroke="#F3CF7A" stroke-width="0.5" opacity="0.6" />
+            <path d="M50 6 L52 22 L48 22 Z M50 94 L52 78 L48 78 Z M6 50 L22 48 L22 52 Z M94 50 L78 52 L78 48 Z" fill="#CDA759" opacity="0.45" />
+            <!-- kompasrozen decor -->
+            <g fill="#B88B44" opacity="0.4">
+                <polygon points="50,12 53,20 47,20" />
+                <polygon points="50,88 53,80 47,80" />
+                <polygon points="12,50 20,47 20,53" />
+                <polygon points="88,50 80,53 80,47" />
+            </g>
+        </svg>
+
+        <!-- dynamische punten worden via JS geplaatst (straal = 0.5 * min(schermhoogte, schermbreedte) relatief tov stage grootte) -->
+        <!-- maar we maken gebruik van absolute positioning t.o.v. compass-stage breedte/hoogte, straal is 0.5 van stage grootte -->
+    </div>
+</div>
+
+<script>
+    // Definieer de vijf talen / richtingen met bijbehorende doelpagina's en labels
+    // volgens opdracht: Midden (centrum) in talen Nederlands, Engels, Duits, Frans, Arabisch
+    // Volgorde: verspreid over 360° met 5 punten → elk 72° verschil.
+    // Start hoek: voor mooie symmetrie beginnen we met boven ( -90° ) of Nederlands boven? 
+    // Laten we voor elegantie beginnen met Nederlands op 0° (rechts) is niet gebruikelijk, maar mooier:  noord = Nederlands? 
+    // Omdat het kompas geen absolute noord vereist, verdelen we simpel: 0°, 72°, 144°, 216°, 288°.
+    // Laten we voor leesbaarheid: Nederlands (0° / oost?), maar maakt niet uit; duidelijk label.
+    // ik kies: 0° = rechts (Nederlands), 72° = Engels, 144° = Duits, 216° = Frans, 288° = Arabisch.
+    // Middencentrum heeft zelf index.html als doel. elk uiteinde linkt naar respectievelijke .html
+    
+    const directions = [
+        { label: "Nederlands", sub: "NL", page: "nl.html", angle: 0, color: "#A67B42" },
+        { label: "English", sub: "EN", page: "en.html", angle: 72, color: "#8B6946" },
+        { label: "Deutsch", sub: "DE", page: "de.html", angle: 144, color: "#9F7B4C" },
+        { label: "Français", sub: "FR", page: "fr.html", angle: 216, color: "#B8865B" },
+        { label: "العربية", sub: "AR", page: "ar.html", angle: 288, color: "#A57246" }
+    ];
+    
+    // Extra officiële logo waarde: een klein symbool voor verrijking (waardevol object: "Kompasbloem der Talen")
+    // We voegen aan elk punt een klein SVG icoontje toe (optioneel maar esthetisch), of voeg in het centrum een 'waarde object' 
+    // dat meer waarde vertegenwoordigt dan een gewoon object: "het gouden kompas van verbinding". Uitvoering met inline svg in elk punt?
+    // Voor het centrale thema: “Uithoeken: Muziek uit de Hoeken Gehouden” wordt weergegeven in Russisch en Chinees.
+    // Het centrum heeft al de twee vertalingen. We voegen ook een klein icoon met waarde-symbool in het centrum.
+    
+    // Het toevoegen van punten op basis van relatieve straal = 0.5 * MIN(stage width, stage height)
+    // stage width/height dynamic = de grootte van compass-stage (vierkant). We gebruiken clientWidth/Height.
+    // We maken een functie om de punten te positioneren en te regenereren bij resize.
+    
+    let stageEl = document.getElementById('compassStage');
+    let pointsArray = [];
+    
+    // functie om een direction point te creëren (DOM elementen)
+    function createDirectionPoint(data, radiusFraction = 0.5) {
+        const div = document.createElement('div');
+        div.className = 'direction-point';
+        
+        // maak een inner container met label en evt decoratief icoon (kleine waarde-symbool)
+        // Officieel logo ontwerp decoratie: voor elk punt een mini symbool: een kleine diamant of klanksymbool (muzieknoot)
+        // Omdat opdracht waarde-object aanmoedigt: voegen we een miniature "klankschijf" of 'gouden stip' die 'Waarde van Dialoog' voorstelt
+        const miniIcon = `
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block; margin:0 auto 4px auto; filter:drop-shadow(0 1px 1px gold);">
+                <circle cx="12" cy="12" r="9" stroke="#F5CF87" stroke-width="1.2" fill="#B47C44" />
+                <path d="M12 6 L12 18 M6 12 L18 12" stroke="#FFE5A3" stroke-width="1" stroke-linecap="round"/>
+                <circle cx="12" cy="12" r="2.5" fill="#EFC27D" stroke="#C9812E" stroke-width="0.8"/>
+                <path d="M9 9 L15 15 M15 9 L9 15" stroke="#fff3cf" stroke-width="0.7" opacity="0.8"/>
+                <text x="12" y="16" font-size="6" text-anchor="middle" fill="#2E241A" font-weight="bold">✦</text>
+            </svg>
+        `;
+        
+        // label met tekst + code
+        const labelSpan = document.createElement('div');
+        labelSpan.className = 'point-label';
+        labelSpan.style.background = `linear-gradient(135deg, #3c352c, ${data.color}cc)`;
+        labelSpan.style.borderColor = "#FADB85";
+        
+        const mainText = document.createElement('div');
+        mainText.innerText = data.label;
+        mainText.style.fontWeight = "bold";
+        const subText = document.createElement('div');
+        subText.className = 'point-sub';
+        subText.innerText = data.sub;
+        
+        labelSpan.appendChild(mainText);
+        labelSpan.appendChild(subText);
+        
+        // voeg event toe voor navigatie
+        div.addEventListener('click', (e) => {
+            e.stopPropagation();
+            window.location.href = data.page;
+        });
+        
+        // decoratief icoon boven label (waarde-object: kruispunt van culturen)
+        const iconWrapper = document.createElement('div');
+        iconWrapper.innerHTML = miniIcon;
+        iconWrapper.style.display = 'flex';
+        iconWrapper.style.justifyContent = 'center';
+        
+        div.appendChild(iconWrapper);
+        div.appendChild(labelSpan);
+        
+        div.style.cursor = 'pointer';
+        return div;
+    }
+    
+    // functie om alle punten te verwijderen / te regenereren bij resize
+    function renderPoints() {
+        // bestaande punten verwijderen (behalve het centrum, en de ornament svg's)
+        const existingPoints = document.querySelectorAll('.direction-point');
+        existingPoints.forEach(p => p.remove());
+        
+        const stageRect = stageEl.getBoundingClientRect();
+        const size = Math.min(stageRect.width, stageRect.height);
+        const radius = (size * 0.5); // straal = 0.5 van min(schermbreedte, schermhoogte) -> MAAR! de stage is exact min(85vh,85vw)
+        // Omdat stage al gekoppeld is aan viewport, zorgt .compass-stage breedte/hoogte dynamisch, radius = size/2.
+        // Middenpunt = (stageRect.width/2, stageRect.height/2)
+        const centerX = stageRect.width / 2;
+        const centerY = stageRect.height / 2;
+        
+        directions.forEach(dir => {
+            const radian = (dir.angle - 90) * Math.PI / 180;  // -90 zodat 0° naar boven wijst? maar eerdere keuze was voor leesbaarheid, 
+            // Echter: traditioneel gezien beginnende hoek? maakt niet uit. maar ik pas aan zodat Nederlands mooi rechtsboven of bovenaan? 
+            // Oorspronkelijk: hoek 0° = rechts (oost). Om symmetrisch mooi te houden en geen overlap met midden, maakt niet uit. 
+            // Gebruik gewoon de gegeven hoek + offset voor prettig zicht: draai de hele set een beetje zodat de talen mooi spreiden.
+            // Ik pas een offset toe: 18° extra zodat de labels niet exact op assen vallen voor betere leesbaarheid? nee, 72° spreiding is elegant.
+            // We gebruiken precies de opgegeven hoeken, maar om het mooier te laten lijken: 0° = rechts (Nederlands) is prima.
+            const angleRad = (dir.angle) * Math.PI / 180;
+            const x = centerX + radius * Math.cos(angleRad);
+            const y = centerY + radius * Math.sin(angleRad);
+            
+            const pointDiv = createDirectionPoint(dir, 0.5);
+            pointDiv.style.position = 'absolute';
+            pointDiv.style.left = `${x}px`;
+            pointDiv.style.top = `${y}px`;
+            pointDiv.style.transform = 'translate(-50%, -50%)';
+            // kleine individuele animatie delay?
+            pointDiv.style.transition = 'transform 0.2s, filter 0.2s';
+            stageEl.appendChild(pointDiv);
+        });
+    }
+    
+    // Centrum bouwen (indien nog niet aanwezig) - verwijder eventueel oude core
+    function buildCenter() {
+        const existingCenter = document.querySelector('.core-center');
+        if(existingCenter) existingCenter.remove();
+        
+        const centerDiv = document.createElement('div');
+        centerDiv.className = 'core-center';
+        
+        // "Officieel Logo Ontwerp Decoratie" dat meer waarde vertegenwoordigt => een geanimeerde edelsteen / kompas zonnebloem
+        // SVG inline logo met kruisende culturen en gouden klanksymbolen
+        const logoValueSvg = `
+            <svg class="logo-center-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="44" fill="#2F2A24" stroke="#EBC07C" stroke-width="2.5" stroke-dasharray="3 3"/>
+                <circle cx="50" cy="50" r="36" fill="#433D34" stroke="#F3D48F" stroke-width="1.5"/>
+                <path d="M50 10 L55 30 L70 32 L58 44 L64 60 L50 52 L36 60 L42 44 L30 32 L45 30 L50 10Z" fill="#F0C674" stroke="#DDA15E" stroke-width="1.2"/>
+                <path d="M50 90 L45 70 L30 68 L42 56 L36 40 L50 48 L64 40 L58 56 L70 68 L55 70 L50 90Z" fill="#EABB6E" stroke="#C5853A" stroke-width="1"/>
+                <text x="50" y="54" font-size="12" text-anchor="middle" fill="#2F2418" font-weight="bold" font-family="sans-serif">⚝</text>
+                <path d="M70 34 L82 26 L76 40 M30 34 L18 26 L24 40 M70 66 L82 74 L76 60 M30 66 L18 74 L24 60" stroke="#FAD27A" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+        `;
+        
+        const rusText = document.createElement('div');
+        rusText.className = 'center-text-rus';
+        rusText.innerText = 'Уголки: Музыка, удерживаемая из углов'; // vertaling "Uithoeken: Muziek uit de Hoeken Gehouden"
+        // Controle: letterlijke vertaling: "Uithoeken: Muziek uit de hoeken gehouden" -> het thema klopt.
+        
+        const chText = document.createElement('div');
+        chText.className = 'center-text-ch';
+        chText.innerText = '边角：来自角落留存的音乐'; // Chinese variant: "Uithoeken: Muziek uit de hoeken bewaard"
+        
+        // toevoegen logo
+        centerDiv.innerHTML = '';
+        centerDiv.appendChild( (() => { let tmp = document.createElement('div'); tmp.innerHTML = logoValueSvg; return tmp.firstChild; })() );
+        centerDiv.appendChild(rusText);
+        centerDiv.appendChild(chText);
+        
+        // interaktiviteit: klik naar index.html (zelf) – hoewel je al op index bent, maar voor consistentie: refreshen? beter gewoon geen actie of herladen
+        centerDiv.style.cursor = 'pointer';
+        centerDiv.addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+        
+        // tooltip waarde object: 'Waardevol symbool van culturele resonantie'
+        centerDiv.title = "Kompas van Waarde — verbindende muziek der talen";
+        
+        stageEl.appendChild(centerDiv);
+    }
+    
+    // observer voor resize en initialisatie
+    let resizeObserver = null;
+    function initFull() {
+        buildCenter();
+        renderPoints();
+        // bij venster verandering herberekenen
+        if (resizeObserver) resizeObserver.disconnect();
+        resizeObserver = new ResizeObserver(() => {
+            renderPoints();
+            // centrum hoeft niet opnieuw gebouwd, maar zorg dat positie klopt (centrum is al absoluut 50% 50%, prima)
+        });
+        resizeObserver.observe(stageEl);
+        window.addEventListener('resize', () => {
+            renderPoints();
+        });
+    }
+    
+    // klaarzetten: wacht tot DOM volledig en stage afmetingen berekend zijn
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            initFull();
+        });
+    } else {
+        initFull();
+    }
+    
+    // eventueel extra touch voor dynamic: na load nog kleine correctie
+    window.addEventListener('load', () => {
+        renderPoints();
+        // check of de horizontale/verticale schaal correct is
+    });
+    
+    // extra sier: de labels hebben een subtiele zweving (beetje sfeer)
+    const styleTag = document.createElement('style');
+    styleTag.textContent = `
+        .direction-point {
+            transition: transform 0.25s ease, filter 0.2s;
+        }
+        .direction-point:hover .point-label {
+            background: #544c40ee !important;
+            border-color: #FFDFA5;
+            box-shadow: 0 0 8px rgba(255,215,0,0.5);
+        }
+        .core-center:hover {
+            transform: translate(-50%, -50%) scale(1.02);
+            background: #3f3a32;
+            border-color: #f5cf87;
+            box-shadow: 0 0 18px rgba(235,190,100,0.6);
+        }
+        .point-label {
+            transition: all 0.2s;
+        }
+    `;
+    document.head.appendChild(styleTag);
+</script>
+</body>
+</html>
