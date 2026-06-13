@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Ben Massud, Riduan">
+    <meta name="copright" content="Tout Les Droit Reserve"> 
+    <meta name="description" content="Modular Anime System">
+    <meta name="domain" content="computer graphics">
+    <meta name="dependencie[s]" content="NONE - MINIMAL=possible inline">                
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="language" content="html 5, emc js">    
+    <title>Oneindige Transitie Machine | Willekeurige Beelden × Random Operator Kettingen</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+        body {
+            background: radial-gradient(circle at 20% 30%, #0a0a1a, #000000);
+            font-family: 'Fira Code', 'Courier New', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background: rgba(10, 10, 25, 0.9);
+            backdrop-filter: blur(12px);
+            border-radius: 32px;
+            padding: 20px;
+            border: 1px solid #ff6b35;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.7);
+            max-width: 800px;
+        }
+        canvas {
+            border-radius: 20px;
+            box-shadow: 0 0 0 2px #ff6b35, 0 15px 35px black;
+            display: block;
+            margin: 0 auto;
+            cursor: pointer;
+        }
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0 12px;
+        }
+        button {
+            background: #ff6b35;
+            border: none;
+            color: white;
+            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        button:hover {
+            background: #ff9040;
+            transform: scale(0.96);
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .sentence {
+            background: #000000aa;
+            padding: 12px 20px;
+            border-radius: 28px;
+            text-align: center;
+            color: #ffb347;
+            font-size: 0.7rem;
+            margin-top: 15px;
+            word-break: break-word;
+            max-height: 90px;
+            overflow-y: auto;
+            font-family: monospace;
+        }
+        .info-panel {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            margin-bottom: 10px;
+            color: #ffaa66;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .badge {
+            background: #2d2d5e;
+            padding: 2px 10px;
+            border-radius: 20px;
+        }
+        .loading {
+            color: #ffaa66;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+<canvas id="mainCanvas" width="720" height="450" style="position:fixed;left:0;top:0;width:100%;height:100%"></canvas>
+<div class="container" style="display:none">
+    <div class="info-panel">
+        <span class="badge">🎲 28+ SELECTIES</span>
+        <span class="badge">⚡ 18+ SCHADES</span>
+        <span class="badge">🔗 2-6 OPERATOREN</span>
+        <span class="badge">🖼️ RANDOME BEELDEN (Picsum)</span>
+        <span class="badge">🔄 ONEINDIGE KETTING</span>
+    </div>
+    
+    
+    <div class="controls">
+        <button id="nextBtn">✨ VOLGENDE TRANSITIE ✨</button>
+        <button id="autoBtn">▶️ AUTO PLAY (3s)</button>
+        <button id="stopBtn">⏹️ STOP</button>
+    </div>
+    
+    <div class="sentence" id="sentenceBox">
+        💡 Klik op "Volgende Transitie" → laadt nieuw beeld → genereert random operator-ketting → vloeiende overgang
+    </div>
+    <div id="imageInfo" style="text-align: center; font-size: 10px; margin-top: 8px; color: #888;"></div>
+</div>
+
+<script>
+    (function() {
+        const canvas = document.getElementById('mainCanvas');
+        const ctx = canvas.getContext('2d');
+        const w = 720, h = 450;
+        
+        // ----- HUIDIGE EN VORIGE AFBEELDINGEN -----
+        let currentImage = null;      // Canvas met huidige afbeelding
+        let nextImage = null;         // Canvas met volgende afbeelding (wordt geladen)
+        let isLoading = false;
+        let autoPlayInterval = null;
+        let isAnimating = false;
+        
+        // Eerste afbeelding: een mooie startafbeelding
+        function createDefaultImage() {
+            const canvas = document.createElement('canvas');
+            canvas.width = w; canvas.height = h;
+            const cctx = canvas.getContext('2d');
+            cctx.fillStyle = '#1a2a3a';
+            cctx.fillRect(0, 0, w, h);
+            cctx.fillStyle = '#ffaa66';
+            cctx.font = 'bold 28px monospace';
+            cctx.fillText('START', w/2-50, h/2);
+            cctx.fillStyle = '#ff6b35';
+            cctx.fillRect(w/2-80, h/2+30, 160, 4);
+            return canvas;
+        }
+        
+        currentImage = createDefaultImage();
+        ctx.drawImage(currentImage, 0, 0);
+        
+        // ----- RANDOME BEELDEN SOURCES (Picsum - betrouwbaar, geen CORS) -----
+        // Grote lijst met unieke afbeelding ID's voor variatie
+        const imageIds = [
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+            21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
+            41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60,
+            61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80,
+            81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100,
+            101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120
+        ];
+        
+        let lastImageId = 104; // start ID
+        
+        function ogetRandomImageUrl() {
+            let newId;
+            do {
+                newId = imageIds[Math.floor(Math.random() * imageIds.length)];
+            } while(newId === lastImageId && imageIds.length > 1);
+            lastImageId = newId;
+            return `https://picsum.photos/id/${newId}/${w}/${h}`;
+        }
+        
+        
+           const positiveThings = [
+      "skyline", "parks", "murals", "fountains", "cafes", 
+      "architecture", "lights", "plazas", "bikelanes", "rooftops", 
+      "gardens", "bridges", "markets", "subways", "sculptures", 
+      "walkways", "libraries", "boutiques", "benches", "pavements", 
+      "arcades", "clocks", "alleys", "theaters", "balconies", 
+      "courtyards", "neon", "boulevards", "spires", "promenades", 
+      "waterfronts", "skyscrapers", "squares", 
+      "sunshine", "forests", "oceans", "mountains", "rivers", 
+      "waterfalls", "sunsets", "wildflowers", "beaches", "streams", 
+      "meadows", "trees", "stars", "clouds", "valleys", 
+      "breezes", "lakes", "wildlife", "petrichor", "cliffs", 
+      "canyons", "moss", "islands", "sunbeams", "springs", 
+      "rainbows", "glades", "hills", "reefs", "peaks", 
+      "coves", "deserts", "tundra", "canopies", 
+      "laughter", "smiles", "kindness", "friends", "family", 
+      "sharing", "helping", "hugs", "community", "music", 
+      "art", "waves", "diversity", "conversations", "cooperation", 
+      "festivals", "buskers", "crowds", "belonging", "generosity", 
+      "warmth", "dancing", "greetings", "harmony", "cheering", 
+      "learning", "playing", "creativity", "unity", "storytelling", 
+      "politeness", "compassion", "empathy"
+    ];
+
+    function getRandomImageUrl() {
+        const randomNum = Math.round(1000 * Math.random());
+        const gd = positiveThings[Math.floor(positiveThings.length * Math.random())];
+        const sseedd = Math.round(1000000 * Math.random());
+        return `http://127.0.0.1:9997/imagesl.php?width=640&height=360&seed=${sseedd}&model=sd-v1-5&steps=15&q=Europe%20Landscape%20${randomNum}%20` + gd;
+    }
+
+        
+        // Afbeelding laden naar canvas
+        function loadImageToCanvas(url) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = "Anonymous";
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = w;
+                    canvas.height = h;
+                    const cctx = canvas.getContext('2d');
+                    cctx.drawImage(img, 0, 0, w, h);
+                    resolve(canvas);
+                };
+                img.onerror = () => {
+                    // Fallback: gekleurd canvas
+                    const canvas = document.createElement('canvas');
+                    canvas.width = w;
+                    canvas.height = h;
+                    const cctx = canvas.getContext('2d');
+                    cctx.fillStyle = `hsl(${Math.random() * 360}, 60%, 40%)`;
+                    cctx.fillRect(0, 0, w, h);
+                    cctx.fillStyle = 'white';
+                    cctx.font = '20px monospace';
+                    cctx.fillText('Image load fallback', w/2-100, h/2);
+                    resolve(canvas);
+                };
+                img.src = url;
+            });
+        }
+        
+        // ========== SELECTIE FUNCTIES (28+) ==========
+        const selecties = {
+            // KLEUR (8)
+            '🎯 kleur_rood': (x,y,r,g,b,intensity,params) => (r/255) * intensity,
+            '🎯 kleur_groen': (x,y,r,g,b,intensity,params) => (g/255) * intensity,
+            '🎯 kleur_blauw': (x,y,r,g,b,intensity,params) => (b/255) * intensity,
+            '🎯 kleur_helderheid': (x,y,r,g,b,intensity,params) => ((r+g+b)/765) * intensity,
+            '🎯 kleur_verzadiging': (x,y,r,g,b,intensity,params) => (Math.max(r,g,b)-Math.min(r,g,b))/255 * intensity,
+            '🎯 kleur_cyan': (x,y,r,g,b,intensity,params) => (Math.min(r,g) - b + 255)/255 * intensity * 0.8,
+            '🎯 kleur_magenta': (x,y,r,g,b,intensity,params) => (Math.min(r,b) - g + 255)/255 * intensity * 0.8,
+            '🎯 kleur_geel': (x,y,r,g,b,intensity,params) => (Math.min(g,b) - r + 255)/255 * intensity * 0.8,
+            
+            // POSITIE (10)
+            '🎯 pos_cirkel_rand': (x,y,r,g,b,intensity,params) => Math.hypot(x-w/2, y-h/2) / Math.hypot(w/2,h/2) * intensity,
+            '🎯 pos_cirkel_midden': (x,y,r,g,b,intensity,params) => (1 - Math.hypot(x-w/2, y-h/2) / Math.hypot(w/2,h/2)) * intensity,
+            '🎯 pos_horizontaal': (x,y,r,g,b,intensity,params) => (x/w) * intensity,
+            '🎯 pos_verticaal': (x,y,r,g,b,intensity,params) => (y/h) * intensity,
+            '🎯 pos_diagonaal': (x,y,r,g,b,intensity,params) => ((x+y)/(w+h)) * intensity,
+            '🎯 pos_anti_diagonaal': (x,y,r,g,b,intensity,params) => ((w-x + y)/(w+h)) * intensity,
+            '🎯 pos_spiraal': (x,y,r,g,b,intensity,params) => {
+                const angle = Math.atan2(y-h/2, x-w/2);
+                const rad = Math.hypot(x-w/2, y-h/2);
+                const spiral = (angle + rad*0.02) % (Math.PI*2) / (Math.PI*2);
+                return spiral * intensity;
+            },
+            '🎯 pos_golf_h': (x,y,r,g,b,intensity,params) => ((Math.sin(x * 0.02) + 1)/2) * intensity,
+            '🎯 pos_golf_v': (x,y,r,g,b,intensity,params) => ((Math.sin(y * 0.02) + 1)/2) * intensity,
+            '🎯 pos_x_y_product': (x,y,r,g,b,intensity,params) => ((x * y) / (w * h)) * intensity,
+            
+            // GRID/STRUCTUUR (6)
+            '🎯 grid_blok': (x,y,r,g,b,intensity,params) => {
+                const size = params.size || 25 + Math.random() * 40;
+                const hash = (Math.floor(x/size) * 7919 + Math.floor(y/size) * 701) % 1000 / 1000;
+                return hash * intensity;
+            },
+            '🎯 grid_strepen_h': (x,y,r,g,b,intensity,params) => {
+                const breedte = params.breedte || 15 + Math.random() * 30;
+                return (Math.floor(y/breedte) % 2) * intensity;
+            },
+            '🎯 grid_strepen_v': (x,y,r,g,b,intensity,params) => {
+                const breedte = params.breedte || 15 + Math.random() * 30;
+                return (Math.floor(x/breedte) % 2) * intensity;
+            },
+            '🎯 grid_dambord': (x,y,r,g,b,intensity,params) => {
+                const size = params.size || 20 + Math.random() * 40;
+                return ((Math.floor(x/size) + Math.floor(y/size)) % 2) * intensity;
+            },
+            '🎯 grid_hex': (x,y,r,g,b,intensity,params) => {
+                const size = params.size || 28 + Math.random() * 30;
+                const hexX = x / size, hexY = y / size;
+                const hash = (Math.floor(hexX) * 1009 + Math.floor(hexY) * 1013) % 1000 / 1000;
+                return hash * intensity;
+            },
+            '🎯 grid_concentrisch': (x,y,r,g,b,intensity,params) => {
+                const rad = Math.hypot(x-w/2, y-h/2);
+                const ringen = Math.floor(rad / 25) % 2;
+                return ringen * intensity;
+            },
+            
+            // GOLVEN/PATRONEN (4)
+            '🎯 golf_sinus': (x,y,r,g,b,intensity,params) => {
+                const freq = params.freq || 0.015 + Math.random() * 0.04;
+                const phase = params.phase || Math.random() * Math.PI * 2;
+                return ((Math.sin(x * freq + phase) + 1) / 2) * intensity;
+            },
+            '🎯 golf_cosinus': (x,y,r,g,b,intensity,params) => {
+                const freq = params.freq || 0.015 + Math.random() * 0.04;
+                return ((Math.cos(y * freq) + 1) / 2) * intensity;
+            },
+            '🎯 golf_radiaal': (x,y,r,g,b,intensity,params) => {
+                const rad = Math.hypot(x-w/2, y-h/2);
+                const freq = params.freq || 0.02 + Math.random() * 0.05;
+                return ((Math.sin(rad * freq) + 1) / 2) * intensity;
+            },
+            '🎯 golf_noise': (x,y,r,g,b,intensity,params) => {
+                const noise = (Math.sin(x * 0.05) * Math.cos(y * 0.05) + 1) / 2;
+                return noise * intensity;
+            }
+        };
+        
+        // ========== SCHADE FUNCTIES (18+) ==========
+        const schades = {
+            // VERSCHUIVINGEN
+            '⚡ shift_sinus': (pixel, intensity, x, y, origData) => {
+                const dx = Math.sin(y * 0.05) * 45 * intensity;
+                const dy = Math.cos(x * 0.05) * 45 * intensity;
+                const sx = Math.min(w-1, Math.max(0, x + dx));
+                const sy = Math.min(h-1, Math.max(0, y + dy));
+                return getPixel(origData, sx, sy);
+            },
+            '⚡ shift_swirl': (pixel, intensity, x, y, origData) => {
+                const cx = w/2, cy = h/2;
+                const dx = x - cx, dy = y - cy;
+                const dist = Math.hypot(dx, dy);
+                const angle = Math.atan2(dy, dx);
+                const swirl = intensity * 3.5 * (1 - dist / Math.hypot(w/2, h/2));
+                const newX = cx + Math.cos(angle + swirl) * dist;
+                const newY = cy + Math.sin(angle + swirl) * dist;
+                if(newX >= 0 && newX < w && newY >= 0 && newY < h) {
+                    return getPixel(origData, newX, newY);
+                }
+                return pixel;
+            },
+            '⚡ shift_random': (pixel, intensity, x, y, origData) => {
+                const sx = Math.min(w-1, Math.max(0, x + (Math.random() - 0.5) * 60 * intensity));
+                const sy = Math.min(h-1, Math.max(0, y + (Math.random() - 0.5) * 60 * intensity));
+                return getPixel(origData, sx, sy);
+            },
+            '⚡ shift_zoom': (pixel, intensity, x, y, origData) => {
+                const cx = w/2, cy = h/2;
+                const zoom = 1 + intensity * 1.5;
+                const sx = cx + (x - cx) / zoom;
+                const sy = cy + (y - cy) / zoom;
+                if(sx >= 0 && sx < w && sy >= 0 && sy < h) {
+                    return getPixel(origData, sx, sy);
+                }
+                return pixel;
+            },
+            
+            // RUIS
+            '⚡ noise_uniform': (pixel, intensity, x, y, origData) => ({
+                r: Math.min(255, Math.max(0, pixel.r + (Math.random() - 0.5) * 140 * intensity)),
+                g: Math.min(255, Math.max(0, pixel.g + (Math.random() - 0.5) * 140 * intensity)),
+                b: Math.min(255, Math.max(0, pixel.b + (Math.random() - 0.5) * 140 * intensity))
+            }),
+            '⚡ noise_zoutpeper': (pixel, intensity, x, y, origData) => {
+                if(Math.random() < intensity * 0.35) {
+                    return Math.random() > 0.5 ? {r:255,g:255,b:255} : {r:0,g:0,b:0};
+                }
+                return pixel;
+            },
+            '⚡ noise_kleur': (pixel, intensity, x, y, origData) => ({
+                r: Math.min(255, Math.max(0, pixel.r + (Math.random() - 0.5) * 220 * intensity)),
+                g: Math.min(255, Math.max(0, pixel.g + (Math.random() - 0.5) * 220 * intensity)),
+                b: Math.min(255, Math.max(0, pixel.b + (Math.random() - 0.5) * 220 * intensity))
+            }),
+            
+            // FILTERS
+            '⚡ blur': (pixel, intensity, x, y, origData) => {
+                if(intensity < 0.05) return pixel;
+                const radius = Math.floor(1 + intensity * 12);
+                let r=0,g=0,b=0, count=0;
+                for(let dy=-radius; dy<=radius; dy++) {
+                    for(let dx=-radius; dx<=radius; dx++) {
+                        const sx = Math.min(w-1, Math.max(0, x+dx));
+                        const sy = Math.min(h-1, Math.max(0, y+dy));
+                        const p = getPixel(origData, sx, sy);
+                        r += p.r; g += p.g; b += p.b;
+                        count++;
+                    }
+                }
+                return {r: r/count, g: g/count, b: b/count};
+            },
+            '⚡ sharpen': (pixel, intensity, x, y, origData) => {
+                const mid = pixel;
+                const left = getPixel(origData, x-1, y);
+                const right = getPixel(origData, x+1, y);
+                const up = getPixel(origData, x, y-1);
+                const down = getPixel(origData, x, y+1);
+                const sharpen = intensity * 1.8;
+                return {
+                    r: Math.min(255, Math.max(0, mid.r * (1+sharpen) - (left.r+right.r+up.r+down.r) * sharpen/4)),
+                    g: Math.min(255, Math.max(0, mid.g * (1+sharpen) - (left.g+right.g+up.g+down.g) * sharpen/4)),
+                    b: Math.min(255, Math.max(0, mid.b * (1+sharpen) - (left.b+right.b+up.b+down.b) * sharpen/4))
+                };
+            },
+            '⚡ quantize': (pixel, intensity, x, y, origData) => {
+                const levels = Math.max(2, Math.floor(20 * (1 - intensity * 0.8) + 2));
+                const step = 256 / levels;
+                return {
+                    r: Math.floor(pixel.r / step) * step,
+                    g: Math.floor(pixel.g / step) * step,
+                    b: Math.floor(pixel.b / step) * step
+                };
+            },
+            '⚡ invert': (pixel, intensity, x, y, origData) => ({
+                r: pixel.r * (1 - intensity) + (255 - pixel.r) * intensity,
+                g: pixel.g * (1 - intensity) + (255 - pixel.g) * intensity,
+                b: pixel.b * (1 - intensity) + (255 - pixel.b) * intensity
+            }),
+            '⚡ threshold': (pixel, intensity, x, y, origData) => {
+                const brightness = (pixel.r + pixel.g + pixel.b) / 3;
+                const thresh = 80 + intensity * 140;
+                const val = brightness > thresh ? 255 : 0;
+                return {r: val, g: val, b: val};
+            },
+            '⚡ edge': (pixel, intensity, x, y, origData) => {
+                const left = getPixel(origData, x-1, y);
+                const right = getPixel(origData, x+1, y);
+                const up = getPixel(origData, x, y-1);
+                const down = getPixel(origData, x, y+1);
+                const edgeX = Math.abs(pixel.r - left.r) + Math.abs(pixel.g - right.g);
+                const edgeY = Math.abs(pixel.b - up.b) + Math.abs(pixel.r - down.r);
+                const edge = Math.min(255, (edgeX + edgeY) * 2) * intensity;
+                return {r: edge, g: edge, b: edge};
+            },
+            '⚡ posterize': (pixel, intensity, x, y, origData) => {
+                const levels = Math.max(3, Math.floor(12 * (1 - intensity) + 2));
+                const step = 256 / levels;
+                return {
+                    r: Math.floor(pixel.r / step) * step + step/2,
+                    g: Math.floor(pixel.g / step) * step + step/2,
+                    b: Math.floor(pixel.b / step) * step + step/2
+                };
+            },
+            
+            // VERVORMING
+            '⚡ mosaic': (pixel, intensity, x, y, origData) => {
+                const blockSize = Math.max(2, Math.floor(28 * intensity + 2));
+                const blockX = Math.floor(x / blockSize) * blockSize;
+                const blockY = Math.floor(y / blockSize) * blockSize;
+                return getPixel(origData, blockX + blockSize/2, blockY + blockSize/2);
+            },
+            '⚡ wave': (pixel, intensity, x, y, origData) => {
+                const amp = 40 * intensity;
+                const newX = x + Math.sin(y * 0.04) * amp;
+                const newY = y + Math.cos(x * 0.04) * amp;
+                if(newX >= 0 && newX < w && newY >= 0 && newY < h) {
+                    return getPixel(origData, newX, newY);
+                }
+                return pixel;
+            },
+            '⚡ kleuren_shift': (pixel, intensity, x, y, origData) => {
+                const rSrc = getPixel(origData, x + intensity*20, y);
+                const gSrc = getPixel(origData, x, y + intensity*20);
+                const bSrc = getPixel(origData, x - intensity*15, y - intensity*15);
+                return {r: rSrc.r, g: gSrc.g, b: bSrc.b};
+            },
+            '⚡ pixelate': (pixel, intensity, x, y, origData) => {
+                const size = Math.max(2, Math.floor(15 * intensity + 2));
+                const px = Math.floor(x / size) * size;
+                const py = Math.floor(y / size) * size;
+                return getPixel(origData, px + size/2, py + size/2);
+            },
+            '⚡ ripple': (pixel, intensity, x, y, origData) => {
+                const amp = 25 * intensity;
+                const freq = 0.06;
+                const newX = x + Math.sin(y * freq) * amp;
+                const newY = y + Math.sin(x * freq) * amp;
+                if(newX >= 0 && newX < w && newY >= 0 && newY < h) {
+                    return getPixel(origData, newX, newY);
+                }
+                return pixel;
+            }
+        };
+        
+        // Hulpfuncties
+        let currentOrigData = null;
+        function getPixel(origData, x, y) {
+            if(!origData) return {r:0,g:0,b:0};
+            const ix = Math.min(w-1, Math.max(0, Math.floor(x)));
+            const iy = Math.min(h-1, Math.max(0, Math.floor(y)));
+            const idx = (iy * w + ix) * 4;
+            return {r: origData[idx], g: origData[idx+1], b: origData[idx+2]};
+        }
+        
+        function getRandomParams(operatorNaam) {
+            const params = {};
+            if(operatorNaam.includes('grid') || operatorNaam.includes('dambord') || operatorNaam.includes('hex') || operatorNaam.includes('concentrisch')) {
+                params.size = 15 + Math.random() * 55;
+            }
+            if(operatorNaam.includes('strepen')) {
+                params.breedte = 10 + Math.random() * 45;
+            }
+            if(operatorNaam.includes('golf')) {
+                params.freq = 0.01 + Math.random() * 0.08;
+                params.phase = Math.random() * Math.PI * 2;
+            }
+            return params;
+        }
+        
+        // Operator ketting genereren (2 tot 6 operatoren)
+        function genereerOperatorKetting() {
+            const selectieNamen = Object.keys(selecties);
+            const schadeNamen = Object.keys(schades);
+            const lengte = 2 + Math.floor(Math.random() * 5); // 2 t/m 6
+            const ketting = [];
+            
+            for(let i = 0; i < lengte; i++) {
+                // Afwisselend selectie en schade voor interessantere ketting
+                const isSelectie = (i % 2 === 0) || (Math.random() > 0.6);
+                if(isSelectie && ketting.length < lengte - 1) {
+                    const naam = selectieNamen[Math.floor(Math.random() * selectieNamen.length)];
+                    ketting.push({
+                        type: 'selectie',
+                        naam: naam,
+                        displayNaam: naam,
+                        params: getRandomParams(naam)
+                    });
+                } else {
+                    const naam = schadeNamen[Math.floor(Math.random() * schadeNamen.length)];
+                    ketting.push({
+                        type: 'schade',
+                        naam: naam,
+                        displayNaam: naam,
+                        params: getRandomParams(naam)
+                    });
+                }
+            }
+            return ketting;
+        }
+        
+        // Pas ketting toe op pixel
+        function applyChain(ketting, x, y, r, g, b, intensity, origData) {
+            let currentPixel = {r,g,b};
+            let currentIntensity = intensity;
+            let currentSelectieWeight = 1.0;
+            
+            for(const op of ketting) {
+                if(op.type === 'selectie') {
+                    const selectieFn = selecties[op.naam];
+                    if(selectieFn) {
+                        currentSelectieWeight = selectieFn(x, y, currentPixel.r, currentPixel.g, currentPixel.b, currentIntensity, op.params);
+                        currentSelectieWeight = Math.min(1, currentSelectieWeight * (0.5 + Math.random() * 0.9));
+                    }
+                } else if(op.type === 'schade') {
+                    if(currentSelectieWeight > 0.03) {
+                        const schadeFn = schades[op.naam];
+                        if(schadeFn) {
+                            currentPixel = schadeFn(currentPixel, currentIntensity * currentSelectieWeight, x, y, origData);
+                        }
+                    }
+                }
+            }
+            return currentPixel;
+        }
+        
+        // Pas ketting toe op hele afbeelding
+        function applyDamageChain(sourceCanvas, ketting, intensity) {
+            const resultCanvas = document.createElement('canvas');
+            resultCanvas.width = w; resultCanvas.height = h;
+            const resCtx = resultCanvas.getContext('2d');
+            resCtx.drawImage(sourceCanvas, 0, 0);
+            const imgData = resCtx.getImageData(0, 0, w, h);
+            const data = imgData.data;
+            const originalData = new Uint8ClampedArray(data);
+            currentOrigData = originalData;
+            
+            for(let y = 0; y < h; y++) {
+                for(let x = 0; x < w; x++) {
+                    const idx = (y * w + x) * 4;
+                    const newPixel = applyChain(ketting, x, y, data[idx], data[idx+1], data[idx+2], intensity, originalData);
+                    data[idx] = newPixel.r;
+                    data[idx+1] = newPixel.g;
+                    data[idx+2] = newPixel.b;
+                }
+            }
+            
+            resCtx.putImageData(imgData, 0, 0);
+            currentOrigData = null;
+            return resultCanvas;
+        }
+        
+        // Animatiefunctie met vloeiende overgang (0% → 50% afbraak A, 50% → 100% opbouw B)
+        let currentAnimation = null;
+        async function runFluidTransition(fromCanvas, toCanvas, ketting, duration = 1500) {
+    if (currentAnimation) cancelAnimationFrame(currentAnimation);
+    
+    return new Promise((resolve) => {
+        const startTime = performance.now();
+        
+        function animate(now) {
+            // 1. Time-independent linear progress (0 to 1)
+            let progress = (now - startTime) / duration;
+            progress = Math.min(1, Math.max(0, progress));
+            
+            let intensity;
+            let sourceCanvas;
+            
+            if (progress <= 0.5) {
+                // Map progress (0 -> 0.5) to a clean internal progress (0 -> 1)
+                const halfProgress = progress * 2; 
+                
+                // Break phase: fromCanvas breaks down (intensity 0 → 1)
+                intensity = Math.pow(halfProgress, 1.2); 
+                sourceCanvas = fromCanvas;
+                
+                // Render the damaged base
+                const damagedCanvas = applyDamageChain(sourceCanvas, ketting, intensity);
+                ctx.clearRect(0, 0, w, h);
+                ctx.drawImage(damagedCanvas, 0, 0);
+                
+                // Subtle crossfade overlay
+                ctx.globalAlpha = 1 - (halfProgress * 0.1);
+                ctx.drawImage(fromCanvas, 0, 0);
+                ctx.globalAlpha = 1;
+                
+            } else {
+                // Map progress (0.5 -> 1) to a clean internal progress (0 -> 1)
+                const halfProgress = (progress - 0.5) * 2; 
+                
+                // Reverse phase: toCanvas builds up (intensity 1 → 0)
+                intensity = Math.pow(1 - halfProgress, 1.2);
+                sourceCanvas = toCanvas;
+                
+                // Render the damaged base
+                const damagedCanvas = applyDamageChain(sourceCanvas, ketting, intensity);
+                ctx.clearRect(0, 0, w, h);
+                ctx.drawImage(damagedCanvas, 0, 0);
+                
+                // Subtle crossfade overlay
+                ctx.globalAlpha = halfProgress * 0.3;
+                ctx.drawImage(toCanvas, 0, 0);
+                ctx.globalAlpha = 1;
+            }
+            
+            // 2. Frame Management
+            if (progress < 1) {
+                currentAnimation = requestAnimationFrame(animate);
+            } else {
+                // Ensure a perfect clean slate finish
+                ctx.clearRect(0, 0, w, h);
+                ctx.drawImage(toCanvas, 0, 0);
+                currentAnimation = null;
+                resolve();
+            }
+        }
+        
+        currentAnimation = requestAnimationFrame(animate);
+    });
+}
+        async function runFluidTransitionw(fromCanvas, toCanvas, ketting, duration = 1500) {
+            if(currentAnimation) cancelAnimationFrame(currentAnimation);
+            return new Promise((resolve) => {
+                const startTime = performance.now();
+                
+                function animate(now) {
+                    let progress = (now - startTime) / duration;
+                    progress = Math.min(1, Math.max(0, progress));
+                    
+                    let intensity;
+                    let sourceCanvas;
+                    
+                    if(progress <= 0.5) {
+                        // Break fase: fromCanvas wordt afgebroken (intensity 0→1)
+                        intensity = (progress * 1.1* 1.1);
+                        sourceCanvas = fromCanvas;
+                    } else {
+                        // Reverse fase: toCanvas wordt opgebouwd (intensity 1→0)
+                        intensity = Math.pow(2 - (progress * 1.1), 1.2);
+                        sourceCanvas = toCanvas;
+                    }
+                    
+                    const damagedCanvas = applyDamageChain(sourceCanvas, ketting, intensity);
+                    ctx.clearRect(0, 0, w, h);
+                    ctx.drawImage(damagedCanvas, 0, 0);
+                    
+                    // Subtiele crossfade
+                    if(progress <= 0.5) {
+                        ctx.globalAlpha = 1 - (progress * 1.1) * 0.2;
+                        ctx.drawImage(fromCanvas, 0, 0);
+                        ctx.globalAlpha = 1;
+                    } else {
+                        ctx.globalAlpha = (progress - 0.5) * 1.1 * 0.3;
+                        ctx.drawImage(toCanvas, 0, 0);
+                        ctx.globalAlpha = 1;
+                    }
+                    
+                    if(progress < 1) {
+                        currentAnimation = requestAnimationFrame(animate);
+                    } else {
+                        ctx.drawImage(toCanvas, 0, 0);
+                        currentAnimation = null;
+                        resolve();
+                    }
+                }
+                
+                currentAnimation = requestAnimationFrame(animate);
+            });
+        }
+        
+        // Ketting naar leesbare string
+        function kettingToString(ketting) {
+            return ketting.map(op => op.displayNaam).join(' → ');
+        }
+        
+        // ----- HOOFDFUNCTIE: VOLGENDE TRANSITIE -----
+        async function nextTransition() {
+            if(isAnimating || isLoading) {
+                document.getElementById('sentenceBox').innerHTML = '⏳ Bezig met laden of animatie... even geduld';
+                return;
+            }
+            
+            isAnimating = true;
+            const nextBtn = document.getElementById('nextBtn');
+            nextBtn.disabled = true;
+            
+            // 1. Genereer nieuwe operator ketting
+            const ketting = genereerOperatorKetting();
+            const kettingStr = kettingToString(ketting);
+            document.getElementById('sentenceBox').innerHTML = `🔗 OPERATOR KETTING (${ketting.length} stappen):<br>${kettingStr}`;
+            
+            // 2. Laad nieuwe afbeelding
+            isLoading = true;
+            document.getElementById('imageInfo').innerHTML = '<span class="loading">📡 Laden van nieuwe afbeelding...</span>';
+            
+            const newUrl = getRandomImageUrl();
+            const newImageCanvas = await loadImageToCanvas(newUrl);
+            const imageId = lastImageId;
+            document.getElementById('imageInfo').innerHTML = `🖼️ Huidig beeld ID: ${imageId} | Volgende: random`;
+            
+            isLoading = false;
+            
+            // 3. Voer transitie uit
+            const oldImage = currentImage;
+            await runFluidTransition(oldImage, newImageCanvas, ketting, 1500);
+            
+            // 4. Update current image
+            currentImage = newImageCanvas;
+            isAnimating = false;
+            nextBtn.disabled = false;
+        }
+        
+        // ----- AUTO PLAY -----
+        function startAutoPlay() {
+            if(autoPlayInterval) clearInterval(autoPlayInterval);
+            autoPlayInterval = setInterval(() => {
+                if(!isAnimating && !isLoading) {
+                    nextTransition();
+                }
+            }, 3200);
+            document.getElementById('sentenceBox').innerHTML += '<br>▶️ Auto Play actief (elke 3.2 seconden)';
+        }
+        
+        function stopAutoPlay() {
+            if(autoPlayInterval) {
+                clearInterval(autoPlayInterval);
+                autoPlayInterval = null;
+                document.getElementById('sentenceBox').innerHTML = document.getElementById('sentenceBox').innerHTML.replace('<br>▶️ Auto Play actief (elke 3.2 seconden)', '');
+            }
+        }
+        
+        // Knoppen
+        document.getElementById('nextBtn').onclick = nextTransition;
+        document.getElementById('autoBtn').onclick = startAutoPlay;
+        document.getElementById('stopBtn').onclick = stopAutoPlay;
+        
+        // Start met een eerste echte afbeelding
+        (async () => {
+            const startUrl = getRandomImageUrl();
+            const startCanvas = await loadImageToCanvas(startUrl);
+            currentImage = startCanvas;
+            ctx.drawImage(currentImage, 0, 0);
+            document.getElementById('imageInfo').innerHTML = `🖼️ Start beeld ID: ${lastImageId} | Klik op "Volgende Transitie"`;
+        })();
+    })();
+    
+    document.getElementById('autoBtn').click();
+    
+    
+    let count = 0;
+var mcanvas=document.getElementById('mainCanvas');
+function animateCanvas() {
+
+    // unified zoom factor (keeps aspect ratio)
+    const zoom = 110 + Math.cos(count / 30) * 5; // between 100% and 110%
+
+    // circular movement (but small so edges never show)
+    const moveX = Math.cos(count / 40) * 2; 
+    const moveY = Math.sin(count / 40) * 2;
+
+    // apply size (same % for width and height)
+    mcanvas.style.width  = zoom + "%";
+    mcanvas.style.height = zoom + "%";
+
+    // keep centered + apply movement
+    mcanvas.style.left = `calc(50% - ${zoom/2}% + ${moveX}%)`;
+    mcanvas.style.top  = `calc(50% - ${zoom/2}% + ${moveY}%)`;
+
+    count++;
+
+    setTimeout(animateCanvas, 80);
+}
+
+animateCanvas();
+</script>
+</body>
+</html>
