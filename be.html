@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Nederlandse & Belgische Tekst-naar-Spraak (alle stemmen)</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f0f7ff 0%, #e9eef5 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+            margin: 0;
+        }
+
+        .card {
+            max-width: 850px;
+            width: 100%;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(2px);
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.2), 0 1px 3px rgba(0,0,0,0.05);
+            overflow: hidden;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        .header {
+            background: #0b2b40;
+            color: white;
+            padding: 1.5rem 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+
+        .header p {
+            margin: 0.5rem 0 0;
+            opacity: 0.85;
+            font-size: 0.95rem;
+        }
+
+        .content {
+            padding: 1.8rem 2rem 2rem 2rem;
+        }
+
+        .textarea-group {
+            margin-bottom: 1.8rem;
+        }
+
+        label {
+            font-weight: 600;
+            color: #1e2f3a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+
+        label i {
+            font-style: normal;
+            font-size: 1.2rem;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            border: 2px solid #cbd5e1;
+            border-radius: 1.5rem;
+            background: white;
+            resize: vertical;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #2c7da0;
+            box-shadow: 0 0 0 3px rgba(44,125,160,0.2);
+        }
+
+        .voice-panel {
+            background: #f8fafc;
+            border-radius: 1.5rem;
+            padding: 1.2rem 1.5rem;
+            margin-bottom: 1.8rem;
+            border: 1px solid #e2edf2;
+        }
+
+        .voice-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+
+        .select-wrapper {
+            flex: 2;
+            min-width: 180px;
+        }
+
+        .select-wrapper label {
+            font-size: 0.8rem;
+            margin-bottom: 4px;
+            color: #2c5a6e;
+        }
+
+        select {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            border-radius: 2rem;
+            border: 1px solid #cbd5e1;
+            background: white;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        select:focus {
+            border-color: #2c7da0;
+            outline: none;
+        }
+
+        .voice-info {
+            flex: 1;
+            background: #eef2f6;
+            border-radius: 2rem;
+            padding: 0.5rem 1rem;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #1e4a62;
+            font-weight: 500;
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .btn {
+            border: none;
+            padding: 0.9rem 1.6rem;
+            border-radius: 3rem;
+            font-weight: 600;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            background: #eef2f6;
+            color: #1f3b45;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: #1f6e8c;
+            color: white;
+            box-shadow: 0 4px 8px rgba(31,110,140,0.3);
+        }
+
+        .btn-primary:hover {
+            background: #0e5a75;
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background: #e0e7ed;
+            border: 1px solid #cbdae2;
+        }
+
+        .btn-secondary:hover {
+            background: #d0dbe4;
+        }
+
+        .status {
+            margin-top: 1.5rem;
+            background: #eef3f7;
+            border-radius: 2rem;
+            padding: 0.75rem 1.2rem;
+            font-size: 0.85rem;
+            color: #145c74;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            border-left: 4px solid #2c7da0;
+        }
+
+        .badge {
+            background: #ffffffcc;
+            border-radius: 2rem;
+            padding: 0.2rem 0.7rem;
+            font-family: monospace;
+            font-size: 0.75rem;
+        }
+
+        footer {
+            font-size: 0.7rem;
+            text-align: center;
+            padding: 1rem;
+            border-top: 1px solid #e2edf2;
+            color: #6c8d9c;
+        }
+
+        @media (max-width: 550px) {
+            .content {
+                padding: 1.2rem;
+            }
+            .btn {
+                padding: 0.7rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="header">
+        <h1>🗣️ Nederlandse & Belgische Stemmen</h1>
+        <p>Tekst-naar-spraak · Alle browserstemmen + Google (indien beschikbaar)</p>
+    </div>
+    <div class="content">
+        <div class="textarea-group">
+            <label><span>📝</span> Voer je tekst in (NL / BE)</label>
+            <textarea id="textInput" rows="4" placeholder="Bijvoorbeeld: Hallo, dit is een test met een natuurlijke Nederlandse stem. Ook Belgisch Nederlands wordt ondersteund!">Hallo! Dit is een demo met alle Nederlandse en Belgische stemmen uit jouw browser, inclusief Google-stemmen als die aanwezig zijn.</textarea>
+        </div>
+
+        <div class="voice-panel">
+            <div class="voice-selector">
+                <div class="select-wrapper">
+                    <label>🎙️ Kies een stem (NL / BE):</label>
+                    <select id="voiceSelect"></select>
+                </div>
+                <div class="voice-info" id="voiceInfo">
+                    ⚡ Taal & provider
+                </div>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button id="speakBtn" class="btn btn-primary">🔊 Spreek voor</button>
+            <button id="stopBtn" class="btn btn-secondary">⏹️ Stop</button>
+        </div>
+
+        <div id="statusMsg" class="status">
+            <span>🔍</span> <span id="statusText">Stemmen laden...</span>
+        </div>
+        <footer>
+            💡 Toont ALLE stemmen met Nederlands (NL) of Belgisch (BE) — inclusief Google, Microsoft, Apple, en systeemstemmen.<br>
+            📢 Werkt via Web Speech API (SpeechSynthesis). Niet alle browsers ondersteunen evenveel stemmen, maar toont maximaal.
+        </footer>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // DOM elementen
+        const textarea = document.getElementById('textInput');
+        const voiceSelect = document.getElementById('voiceSelect');
+        const speakBtn = document.getElementById('speakBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const statusSpan = document.getElementById('statusText');
+        const voiceInfoSpan = document.getElementById('voiceInfo');
+
+        // Globale variabelen
+        let availableVoices = [];      // array met alle stemmen die voldoen aan NL/BE
+        let currentUtterance = null;
+        let speechSynth = window.speechSynthesis;
+        let voicesLoaded = false;
+        let retryCount = 0;
+
+        // ---- Helper: detectie Nederlandse/Belgische taal (NL of BE)
+        function isDutchOrBelgianVoice(voice) {
+            // taal van de stem (bijv 'nl-NL', 'nl-BE', 'nl', 'nl_NL', 'nl_BE')
+            const lang = voice.lang.toLowerCase().replace(/_/g, '-');
+            // Controleer of het begint met 'nl-' of precies 'nl' is (sommige browsers geven 'nl')
+            if (lang === 'nl' || lang.startsWith('nl-')) {
+                // Daarnaast willen we geen andere talen zoals 'nl-us' (bestaat niet, maar zeker)
+                // maar ook check op 'be' specifiek voor volledigheid: als het 'nl-be' bevat -> Belgisch
+                // Alle nl varianten zijn welkom (Nederland of Belgie)
+                return true;
+            }
+            // extra check: sommige stemmen hebben 'dutch' in naam maar taal is foutief, maar we vertrouwen op .lang
+            // Soms 'nl-BE' of 'nl-NL' zijn perfect.
+            return false;
+        }
+
+        // Filters alle stemmen die nederlands / belgisch zijn
+        function filterDutchAndBelgianVoices(voices) {
+            return voices.filter(voice => isDutchOrBelgianVoice(voice));
+        }
+
+        // Maak een leesbare weergave van een stem: naam + taal (NL/BE) + provider hint
+        function getVoiceLabel(voice) {
+            let name = voice.name || 'Onbekende stem';
+            let langCode = voice.lang.toUpperCase();
+            // Bepaal of Belgisch of Nederlands 
+            let region = (langCode.includes('BE') || (voice.lang && voice.lang.toLowerCase().includes('be'))) ? '🇧🇪 BE' : '🇳🇱 NL';
+            // Provider herkennen op basis van naam
+            let provider = '';
+            if (name.toLowerCase().includes('google')) provider = 'Google';
+            else if (name.toLowerCase().includes('microsoft')) provider = 'Microsoft';
+            else if (name.toLowerCase().includes('apple')) provider = 'Apple';
+            else if (name.toLowerCase().includes('samantha') || name.toLowerCase().includes('siri')) provider = 'Apple';
+            else if (name.toLowerCase().includes('windows')) provider = 'Windows';
+            else if (name.toLowerCase().includes('natural')) provider = 'Natural';
+            else if (name.toLowerCase().includes('espeak')) provider = 'eSpeak';
+            else provider = 'Systeem';
+            
+            return `${name} (${region}) ${provider ? `· ${provider}` : ''}`;
+        }
+
+        // Vul de select box met gefilterde stemmen
+        function populateVoiceList() {
+            const allVoices = speechSynth.getVoices();
+            if (!allVoices || allVoices.length === 0) {
+                statusSpan.innerText = '⚠️ Nog geen stemmen beschikbaar. Probeer opnieuw of herlaad de pagina.';
+                return false;
+            }
+            
+            const dutchVoices = filterDutchAndBelgianVoices(allVoices);
+            if (dutchVoices.length === 0) {
+                statusSpan.innerText = '⚠️ Geen Nederlandse of Belgische stem gevonden. Controleer browserondersteuning.';
+                voiceSelect.innerHTML = '<option value="">— Geen stemmen beschikbaar —</option>';
+                availableVoices = [];
+                return false;
+            }
+            
+            // Sorteer op naam & regio (NL voorop, daarna BE)
+            dutchVoices.sort((a, b) => {
+                let aIsBe = a.lang.toLowerCase().includes('be');
+                let bIsBe = b.lang.toLowerCase().includes('be');
+                if (aIsBe !== bIsBe) return aIsBe ? 1 : -1;
+                return a.name.localeCompare(b.name);
+            });
+            
+            availableVoices = dutchVoices;
+            voiceSelect.innerHTML = '';
+            dutchVoices.forEach((voice, idx) => {
+                const option = document.createElement('option');
+                option.value = idx;
+                option.textContent = getVoiceLabel(voice);
+                // Zet eventueel een default als we een 'prettige' stem herkennen (google of standaard)
+                voiceSelect.appendChild(option);
+            });
+            
+            // Selecteer de eerst mogelijke stem die Google of mooie default is
+            let preferredIndex = 0;
+            for (let i = 0; i < dutchVoices.length; i++) {
+                let v = dutchVoices[i];
+                if (v.name.toLowerCase().includes('google') || v.name.toLowerCase().includes('natural')) {
+                    preferredIndex = i;
+                    break;
+                }
+            }
+            voiceSelect.selectedIndex = preferredIndex;
+            updateVoiceInfoDisplay(preferredIndex);
+            statusSpan.innerText = `✅ ${dutchVoices.length} Nederlandse/Belgische stem(men) geladen. Kies een stem en druk op 'Spreek voor'.`;
+            return true;
+        }
+
+        function updateVoiceInfoDisplay(selectedIdx) {
+            if (availableVoices.length === 0 || !availableVoices[selectedIdx]) {
+                voiceInfoSpan.innerHTML = '🎤 Geen stem geselecteerd';
+                return;
+            }
+            const voice = availableVoices[selectedIdx];
+            let langUpper = voice.lang.toUpperCase();
+            let regio = langUpper.includes('BE') ? 'België (Vlaams)' : 'Nederland';
+            let providerRaw = '';
+            if (voice.name.toLowerCase().includes('google')) providerRaw = 'Google Web Speech';
+            else if (voice.name.toLowerCase().includes('microsoft')) providerRaw = 'Microsoft';
+            else if (voice.name.toLowerCase().includes('apple')) providerRaw = 'Apple';
+            else providerRaw = 'Systeem / Browser';
+            voiceInfoSpan.innerHTML = `🗣️ ${regio} · ${providerRaw} · ${voice.lang}`;
+        }
+
+        // herladen van stemmen met event listener (sommige browsers laden asynchroon)
+        function refreshVoiceListAndRepopulate() {
+            const voices = speechSynth.getVoices();
+            if (voices && voices.length > 0) {
+                populateVoiceList();
+                voicesLoaded = true;
+            } else {
+                // wacht totdat voices geladen zijn (event wordt later getriggerd)
+                if (retryCount < 8) {
+                    retryCount++;
+                    setTimeout(refreshVoiceListAndRepopulate, 200);
+                } else {
+                    statusSpan.innerText = '❌ Kon stemmen niet laden. Probeer de pagina te herladen.';
+                }
+            }
+        }
+
+        // Stop elke spraak die bezig is
+        function stopSpeaking() {
+            if (speechSynth.speaking || speechSynth.pending) {
+                speechSynth.cancel();
+            }
+            if (currentUtterance) {
+                // extra cleanup
+                currentUtterance.onend = null;
+                currentUtterance.onerror = null;
+                currentUtterance = null;
+            }
+            statusSpan.innerText = '⏸️ Spraak gestopt.';
+            setTimeout(() => {
+                if (!speechSynth.speaking) {
+                    // reset status als er niets speelt, maar niet overschrijven als nieuwe spraak start
+                    if (statusSpan.innerText.includes('gestopt')) {
+                        statusSpan.innerText = statusSpan.innerText.replace('⏸️ Spraak gestopt.', '✅ Kies tekst & stem en spreek.');
+                    }
+                }
+            }, 800);
+        }
+
+        // Spreek de huidige tekst met geselecteerde stem
+        function speakText() {
+            // Stop eventuele lopende spraak om conflicten te voorkomen
+            stopSpeaking();
+            
+            const textToSpeak = textarea.value.trim();
+            if (!textToSpeak) {
+                statusSpan.innerText = '⚠️ Voer tekst in het tekstveld.';
+                return;
+            }
+            
+            if (availableVoices.length === 0) {
+                statusSpan.innerText = '⚠️ Geen Nederlandse/Belgische stem beschikbaar. Herlaad of probeer een andere browser.';
+                return;
+            }
+            
+            const selectedIndex = voiceSelect.selectedIndex;
+            if (selectedIndex === -1 || !availableVoices[selectedIndex]) {
+                statusSpan.innerText = '⚠️ Selecteer een geldige stem.';
+                return;
+            }
+            
+            const selectedVoice = availableVoices[selectedIndex];
+            const utterance = new SpeechSynthesisUtterance(textToSpeak);
+            utterance.voice = selectedVoice;
+            utterance.lang = selectedVoice.lang;  // zorgt voor correcte uitspraak
+            utterance.rate = 1;
+            utterance.pitch = 1;
+            utterance.volume = 1;
+            
+            // Event handlers
+            utterance.onstart = () => {
+                statusSpan.innerText = `🔊 Bezig met spreken via: ${selectedVoice.name} (${selectedVoice.lang})`;
+                currentUtterance = utterance;
+            };
+            utterance.onend = () => {
+                if (currentUtterance === utterance) {
+                    statusSpan.innerText = '✅ Spraak voltooid.';
+                    currentUtterance = null;
+                }
+            };
+            utterance.onerror = (event) => {
+                console.error('Speech error:', event);
+                let errorMsg = '⚠️ Fout bij spraakweergave.';
+                if (event.error === 'not-allowed') errorMsg = '❌ Spraak niet toegestaan (geen gebruikersinteractie?). Klik opnieuw.';
+                else if (event.error === 'synthesis-unavailable') errorMsg = '❌ Synthese niet beschikbaar.';
+                statusSpan.innerText = errorMsg;
+                currentUtterance = null;
+            };
+            
+            currentUtterance = utterance;
+            speechSynth.speak(utterance);
+            
+            // Fix voor Chrome: soms als cancel net daarvoor werd aangeroepen, moet speak opnieuw worden ingepland
+            // Maar we roepen stopSpeaking() aan die cancel doet, kleine pauze is veilig.
+            // Sommige browsers vereisen een korte delay als cancel nog bezig is
+            // Double-check: Als speaking nog true is? cancel heeft async effect. 
+            // We doen een fallback:
+            if (speechSynth.pending === false && speechSynth.speaking === false) {
+                // alles ok, speech al gestart
+            } else {
+                // kleine herstel poging indien nog bezig
+                setTimeout(() => {
+                    if (!speechSynth.speaking && currentUtterance && !currentUtterance._started) {
+                        speechSynth.speak(utterance);
+                    }
+                }, 50);
+            }
+        }
+        
+        // Event voor als de selectie verandert: info bijwerken
+        voiceSelect.addEventListener('change', function() {
+            const idx = voiceSelect.selectedIndex;
+            if (availableVoices && availableVoices[idx]) {
+                updateVoiceInfoDisplay(idx);
+            }
+        });
+        
+        // Knoppen
+        speakBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            speakText();
+        });
+        
+        stopBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            stopSpeaking();
+        });
+        
+        // Initialisatie van stemmen: omdat speechSynthesis.getVoices() soms asynchroon is
+        if (speechSynth.onvoiceschanged !== undefined) {
+            speechSynth.onvoiceschanged = () => {
+                refreshVoiceListAndRepopulate();
+            };
+        }
+        
+        // Eerste poging laden
+        refreshVoiceListAndRepopulate();
+        
+        // Fallback voor als onvoiceschanged niet werkt of te laat (handmatig interval)
+        let fallbackTimer = setTimeout(() => {
+            if (availableVoices.length === 0) {
+                const voicesNow = speechSynth.getVoices();
+                if (voicesNow && voicesNow.length > 0) {
+                    refreshVoiceListAndRepopulate();
+                } else {
+                    statusSpan.innerText = '⏳ Wachten op stemmen... klik eventueel op "Spreek voor" na laden.';
+                }
+            }
+        }, 500);
+        
+        // Extra: om gebruikersinteractie problemen te voorkomen (sommige browsers vereisen user gesture voor audio)
+        // Dit is opgelost doordat spreken pas start na klik op knop. Dat is voldoende.
+        // Daarnaast laat ik ook een extra 'preload' stemmen zien
+        // Zorg ervoor dat tekst altijd wordt uitgesproken met de gekozen stem
+        // Als de gebruiker de pagina opent en stemmen niet geladen zijn, tonen we bericht
+        window.addEventListener('load', () => {
+            // extra sync call
+            if (speechSynth.getVoices().length > 0 && availableVoices.length === 0) {
+                refreshVoiceListAndRepopulate();
+            }
+        });
+        
+        // Edge-case: bij sommige Android browsers kunnen stemmen laat binnenkomen
+        setInterval(() => {
+            if (availableVoices.length === 0 && speechSynth.getVoices().length > 0) {
+                refreshVoiceListAndRepopulate();
+            }
+        }, 1000);
+    })();
+</script>
+</body>
+</html>
