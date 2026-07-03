@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pixel · center convergence · full cycle</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            background: #1a1e2c;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+        }
+        .card {
+            background: #262b3a;
+            padding: 2rem 2rem 1.8rem;
+            border-radius: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.2rem;
+            transition: 0.2s;
+            max-width: 700px;
+            width: fit-content;
+        }
+        canvas {
+            display: block;
+            background: #000000;
+            border-radius: 28px;
+            box-shadow: inset 0 0 0 1px #4b526a, 0 12px 24px rgba(0,0,0,0.7);
+            width: 600px;
+            height: 600px;
+            object-fit: contain;
+        }
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem 1.8rem;
+            width: 100%;
+        }
+        .file-label {
+            background: #3d445b;
+            padding: 0.65rem 1.6rem;
+            border-radius: 60px;
+            color: #f0f3fc;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.15s;
+            box-shadow: 0 4px 0 #1a1e2c;
+            border: 1px solid #5b6482;
+            letter-spacing: 0.3px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .file-label:hover {
+            background: #4e5672;
+            transform: scale(0.97);
+        }
+        .file-label input {
+            display: none;
+        }
+        .btn {
+            background: #5f6b92;
+            border: none;
+            padding: 0.65rem 2.2rem;
+            border-radius: 60px;
+            font-weight: 600;
+            color: white;
+            font-size: 1.05rem;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #2b3142, 0 6px 12px rgba(0,0,0,0.4);
+            transition: 0.08s linear;
+            border: 1px solid #8390bb;
+            letter-spacing: 0.3px;
+        }
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0px 0 #2b3142;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #2b3142;
+            pointer-events: none;
+        }
+        .status {
+            color: #b3bedd;
+            font-size: 0.9rem;
+            background: #1e2332;
+            padding: 0.2rem 1.4rem;
+            border-radius: 60px;
+            border: 1px solid #3e4660;
+            white-space: nowrap;
+        }
+        .queue-badge {
+            background: #3d445b;
+            padding: 0.2rem 1rem;
+            border-radius: 60px;
+            color: #c8d2f0;
+            font-size: 0.8rem;
+            border: 1px solid #5b6482;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .queue-badge span {
+            font-weight: 600;
+            color: white;
+            background: #1a1e2c;
+            padding: 0 8px;
+            border-radius: 40px;
+        }
+        .flex-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 0.6rem 1.2rem;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <canvas id="canvas" width="600" height="600"></canvas>
+
+    <div class="controls">
+        <div class="flex-row">
+            <label class="file-label">
+                📁 upload multiple
+                <input type="file" id="uploader" accept="image/*" multiple>
+            </label>
+            <button class="btn" id="startBtn">▶ start</button>
+            <span class="status" id="statusMsg">idle</span>
+        </div>
+        <div class="queue-badge" id="queueBadge">
+            📋 queue: <span id="queueCount">0</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const uploader = document.getElementById('uploader');
+        const startBtn = document.getElementById('startBtn');
+        const statusMsg = document.getElementById('statusMsg');
+        const queueCountEl = document.getElementById('queueCount');
+
+        // ---------- core data ----------
+        let imageWidth = 0;
+        let imageHeight = 0;
+        let colpairs = null;
+        let pixelData = null; // voor snelle toegang
+
+        // animation state
+        let animId = null;
+        let startTimeMs = 0;
+        const DURATION_MS = 8000;
+        let running = false;
+        let animPhase = 'idle';
+        let currentImageData = null;
+
+        // center
+        let centerX = 0;
+        let centerY = 0;
+
+        // pixel arrays voor animatie
+        let pixels = [];
+        let pixelPositions = [];
+
+        // ---------- multi-upload queue ----------
+        let imageQueue = [];
+        let processingQueue = false;
+        let waitingForNext = false;
+
+        // ---------- helpers ----------
+        function clearCanvas() {
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function updateQueueBadge() {
+            const count = imageQueue.length;
+            queueCountEl.textContent = count;
+            document.getElementById('queueBadge').style.opacity = count === 0 ? '0.6' : '1';
+        }
+
+        // ---------- build pixel data ----------
+        function buildPixelData(imageData) {
+            const w = imageData.width;
+            const h = imageData.height;
+            const data = imageData.data;
+
+            const col = Array(w);
+            for (let x = 0; x < w; x++) {
+                col[x] = Array(h);
+                for (let y = 0; y < h; y++) {
+                    const idx = (y * w + x) * 4;
+                    col[x][y] = [
+                        data[idx], data[idx+1], data[idx+2], data[idx+3]
+                    ];
+                }
+            }
+            return col;
+        }
+
+        // ---------- bouw pixel arrays voor animatie ----------
+        function buildPixelArrays(imageData) {
+            const w = imageData.width;
+            const h = imageData.height;
+            const data = imageData.data;
+            const pixels = [];
+
+            for (let y = 0; y < h; y++) {
+                for (let x = 0; x < w; x++) {
+                    const idx = (y * w + x) * 4;
+                    const r = data[idx];
+                    const g = data[idx+1];
+                    const b = data[idx+2];
+                    const a = data[idx+3];
+                    if (a === 0) continue;
+
+                    // Snelheid op basis van kleur (lichte pixels sneller)
+                    const verhouding = (r + g + b) / (255 * 3);
+                    const snelheid = 0.5 + 3 * verhouding;
+
+                    // Startpositie: links of rechts buiten beeld
+                    const startX = (x < w / 2) ? -50 - Math.random() * 100 : w + 50 + Math.random() * 100;
+                    const startY = y + (Math.random() - 0.5) * 20;
+
+                    pixels.push({
+                        origX: x,
+                        origY: y,
+                        startX: startX,
+                        startY: startY,
+                        r, g, b, a,
+                        snelheid: snelheid
+                    });
+                }
+            }
+            return pixels;
+        }
+
+        // ---------- load image from file ----------
+        function loadImageFromFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => resolve(img);
+                    img.onerror = () => reject('image decode error');
+                    img.src = e.target.result;
+                };
+                reader.onerror = () => reject('file read error');
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // ---------- prepare image data ----------
+        async function prepareImageData(img) {
+            let w = img.width;
+            let h = img.height;
+            const MAX_DIM = 320;
+            if (w > MAX_DIM || h > MAX_DIM) {
+                const scale = Math.min(MAX_DIM / w, MAX_DIM / h);
+                w = Math.floor(w * scale);
+                h = Math.floor(h * scale);
+            }
+            w = Math.max(1, w);
+            h = Math.max(1, h);
+
+            canvas.width = w;
+            canvas.height = h;
+            imageWidth = w;
+            imageHeight = h;
+            centerX = w / 2;
+            centerY = h / 2;
+
+            ctx.clearRect(0, 0, w, h);
+            ctx.drawImage(img, 0, 0, w, h);
+            const imageData = ctx.getImageData(0, 0, w, h);
+            colpairs = buildPixelData(imageData);
+            currentImageData = imageData;
+
+            // Bouw pixel arrays voor animatie (van links/rechts naar binnen)
+            pixels = buildPixelArrays(imageData);
+
+            // Zwart scherm
+            clearCanvas();
+
+            return { w, h };
+        }
+
+        // ---------- render fase 1: pixels schuiven van links/rechts naar binnen ----------
+        function renderSlideIn(progress) {
+            const width = canvas.width;
+            const height = canvas.height;
+
+            ctx.fillStyle = 'black';
+            ctx.fillRect(0, 0, width, height);
+
+            const imgData = ctx.createImageData(width, height);
+            const data = imgData.data;
+
+            for (let i = 0; i < pixels.length; i++) {
+                const p = pixels[i];
+                // Bereken huidige positie: van start naar origineel
+                const factor = Math.min(progress * p.snelheid, 1);
+                const huidigX = Math.round(p.startX + (p.origX - p.startX) * factor);
+                const huidigY = Math.round(p.startY + (p.origY - p.startY) * factor);
+
+                if (huidigX >= 0 && huidigX < width && huidigY >= 0 && huidigY < height) {
+                    const targetIndex = (huidigY * width + huidigX) * 4;
+                    data[targetIndex] = p.r;
+                    data[targetIndex + 1] = p.g;
+                    data[targetIndex + 2] = p.b;
+                    data[targetIndex + 3] = p.a;
+                }
+            }
+
+            ctx.putImageData(imgData, 0, 0);
+        }
+
+        // ---------- render fase 2: pixels trekken naar midden ----------
+        function renderPullToCenter(progress) {
+            const width = canvas.width;
+            const height = canvas.height;
+
+            ctx.fillStyle = 'black';
+            ctx.fillRect(0, 0, width, height);
+
+            const imgData = ctx.createImageData(width, height);
+            const data = imgData.data;
+
+            for (let i = 0; i < pixels.length; i++) {
+                const p = pixels[i];
+                // Van originele positie naar midden
+                const dx = centerX - p.origX;
+                const dy = centerY - p.origY;
+                const factor = Math.min(progress * p.snelheid, 1);
+                const huidigX = Math.round(p.origX + dx * factor);
+                const huidigY = Math.round(p.origY + dy * factor);
+
+                if (huidigX >= 0 && huidigX < width && huidigY >= 0 && huidigY < height) {
+                    const targetIndex = (huidigY * width + huidigX) * 4;
+                    data[targetIndex] = p.r;
+                    data[targetIndex + 1] = p.g;
+                    data[targetIndex + 2] = p.b;
+                    data[targetIndex + 3] = p.a;
+                }
+            }
+
+            ctx.putImageData(imgData, 0, 0);
+        }
+
+        // ---------- volledige cyclus: slide in → pull to center ----------
+        function startFullCycle() {
+            if (!colpairs || imageWidth === 0) return;
+
+            if (animId) {
+                cancelAnimationFrame(animId);
+                animId = null;
+            }
+
+            running = true;
+            startBtn.disabled = true;
+
+            // Fase 1: slide in (zwart → beeld)
+            animPhase = 'slide-in';
+            statusMsg.textContent = '⏳ sliding in ...';
+            let progress = 0;
+            startTimeMs = performance.now();
+
+            function animateSlideIn() {
+                if (!running) return;
+
+                const elapsed = (performance.now() - startTimeMs) / DURATION_MS;
+                progress = Math.min(elapsed, 1);
+
+                renderSlideIn(progress);
+
+                if (progress < 1) {
+                    animId = requestAnimationFrame(animateSlideIn);
+                } else {
+                    // Fase 1 klaar: toon volledig beeld
+                    const fullData = ctx.createImageData(imageWidth, imageHeight);
+                    const fullOut = fullData.data;
+                    for (let x = 0; x < imageWidth; x++) {
+                        for (let y = 0; y < imageHeight; y++) {
+                            const pixel = colpairs[x][y];
+                            const idx = (y * imageWidth + x) * 4;
+                            fullOut[idx] = pixel[0];
+                            fullOut[idx + 1] = pixel[1];
+                            fullOut[idx + 2] = pixel[2];
+                            fullOut[idx + 3] = pixel[3];
+                        }
+                    }
+                    ctx.putImageData(fullData, 0, 0);
+
+                    // Korte pauze, dan fase 2
+                    statusMsg.textContent = '⏳ preparing pull ...';
+                    setTimeout(() => {
+                        if (!running) return;
+
+                        // Fase 2: pull to center (beeld → zwart)
+                        animPhase = 'pull-to-center';
+                        statusMsg.textContent = '⏳ pulling to center ...';
+                        progress = 0;
+                        startTimeMs = performance.now();
+
+                        function animatePull() {
+                            if (!running) return;
+
+                            const elapsed2 = (performance.now() - startTimeMs) / DURATION_MS;
+                            progress = Math.min(elapsed2, 1);
+
+                            renderPullToCenter(progress);
+
+                            if (progress < 1) {
+                                animId = requestAnimationFrame(animatePull);
+                            } else {
+                                // Alles klaar: scherm is zwart
+                                clearCanvas();
+                                running = false;
+                                startBtn.disabled = false;
+                                animPhase = 'idle';
+                                animId = null;
+                                statusMsg.textContent = `✔️ done · ${imageQueue.length} in queue`;
+
+                                // Start volgende afbeelding
+                                if (imageQueue.length > 0 && !processingQueue && !waitingForNext) {
+                                    waitingForNext = true;
+                                    statusMsg.textContent = `⏩ loading next ...`;
+                                    setTimeout(() => {
+                                        waitingForNext = false;
+                                        if (!running && !animId) {
+                                            processNextImage().then(() => {
+                                                if (colpairs && imageQueue.length >= 0 && !running && !animId) {
+                                                    statusMsg.textContent = `▶ starting next`;
+                                                    startFullCycle();
+                                                }
+                                            });
+                                        }
+                                    }, 400);
+                                } else if (imageQueue.length === 0) {
+                                    statusMsg.textContent = `✔️ all done`;
+                                }
+                            }
+                        }
+                        animId = requestAnimationFrame(animatePull);
+                    }, 600);
+                }
+            }
+            animId = requestAnimationFrame(animateSlideIn);
+        }
+
+        // ---------- process next image ----------
+        async function processNextImage() {
+            if (processingQueue) return;
+            if (imageQueue.length === 0) {
+                if (!running && !animId) {
+                    statusMsg.textContent = '⏺ queue empty';
+                }
+                updateQueueBadge();
+                return;
+            }
+
+            if (animId) {
+                cancelAnimationFrame(animId);
+                animId = null;
+                running = false;
+                startBtn.disabled = false;
+            }
+
+            processingQueue = true;
+            const item = imageQueue.shift();
+            updateQueueBadge();
+
+            try {
+                statusMsg.textContent = `⏳ loading ${item.name} ...`;
+                const img = await loadImageFromFile(item.file);
+                const { w, h } = await prepareImageData(img);
+                statusMsg.textContent = `✅ ${w}×${h} ready · ${imageQueue.length} left`;
+                startBtn.disabled = false;
+            } catch (err) {
+                statusMsg.textContent = `⚠️ error: ${item.name}`;
+                console.warn(err);
+            }
+            processingQueue = false;
+
+            if (imageQueue.length > 0 && !running && !animId) {
+                statusMsg.textContent = `📋 ${imageQueue.length} waiting · press start`;
+            }
+        }
+
+        // ---------- handle files upload ----------
+        async function handleFilesUpload(fileList) {
+            if (!fileList || fileList.length === 0) return;
+
+            if (animId) {
+                cancelAnimationFrame(animId);
+                animId = null;
+                running = false;
+                startBtn.disabled = false;
+            }
+
+            for (let i = 0; i < fileList.length; i++) {
+                const file = fileList[i];
+                if (file.type.startsWith('image/')) {
+                    imageQueue.push({ file, name: file.name || `image${i+1}` });
+                }
+            }
+            updateQueueBadge();
+
+            if (imageQueue.length > 0 && !processingQueue) {
+                await processNextImage();
+            }
+        }
+
+        // ---------- start animation ----------
+        function startAnimation() {
+            if (running) return;
+            if (!colpairs || imageWidth === 0 || imageHeight === 0) {
+                if (imageQueue.length > 0 && !processingQueue) {
+                    processNextImage().then(() => {
+                        if (colpairs && !running) {
+                            startFullCycle();
+                        }
+                    });
+                } else {
+                    statusMsg.textContent = '⛔ upload image first';
+                }
+                return;
+            }
+
+            startFullCycle();
+        }
+
+        // ---------- event binding ----------
+        uploader.addEventListener('change', (e) => {
+            const files = e.target.files;
+            if (files && files.length > 0) {
+                handleFilesUpload(files);
+            }
+            uploader.value = '';
+        });
+
+        startBtn.addEventListener('click', () => {
+            if (!colpairs && imageQueue.length > 0 && !processingQueue) {
+                processNextImage().then(() => {
+                    if (colpairs && !running) {
+                        startAnimation();
+                    }
+                });
+                return;
+            }
+            startAnimation();
+        });
+
+        // initial state
+        clearCanvas();
+        statusMsg.textContent = '⏺ upload images';
+        startBtn.disabled = true;
+        updateQueueBadge();
+
+        canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+
+        console.log('pixel convergence · full cycle ready');
+    })();
+</script>
+</body>
+</html>
