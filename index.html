@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Living Room Scene — Realistic</title>
+<style>
+  html, body {
+    margin: 0; padding: 0; width: 100%; height: 100%;
+    overflow: hidden; background: #0e0b08;
+  }
+  canvas { display: block; width: 100vw; height: 100vh; }
+  #hud {
+    position: fixed; top: 16px; left: 16px;
+    background: rgba(18,14,10,0.82);
+    color: #f1e6d8;
+    padding: 11px 16px; border-radius: 11px;
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 14px; letter-spacing: .3px;
+    border: 1px solid rgba(255,255,255,0.08);
+    backdrop-filter: blur(8px);
+    pointer-events: none; min-width: 200px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.4);
+  }
+  #hud .t {
+    opacity: .55; font-size: 12px; margin-top: 4px;
+    font-variant-numeric: tabular-nums;
+  }
+  #restart {
+    position: fixed; bottom: 18px; right: 18px;
+    background: rgba(18,14,10,0.82);
+    color: #f1e6d8;
+    border: 1px solid rgba(255,255,255,0.14);
+    padding: 10px 20px; border-radius: 11px;
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 14px; cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: background .15s;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+  }
+  #restart:hover { background: rgba(48,38,28,0.95); }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud">
+  <div id="phase">entering the room…</div>
+  <div class="t" id="clock">t = 0.0s</div>
+</div>
+<button id="restart">Restart</button>
+
+<script>
+(function(){
+'use strict';
+
+/* ============================================================
+   CANVAS + PERSPECTIVE RIG
+   ============================================================ */
+const canvas = document.getElementById('c');
+const ctx    = canvas.getContext('2d');
+const phaseLabel = document.getElementById('phase');
+const clockLabel = document.getElementById('clock');
+const restartBtn = document.getElementById('restart');
+
+let W = 0, H = 0, DPR = 1;
+let VPX = 0, VPY = 0, F = 0;
+
+const CAMH  = 1.60;    // camera eye height (m)
+const ZBACK = 6.00;    // distance to back wall (m)
+const HALF_W = 2.05;   // room half-width (m)
+const WALL_H = 2.72;   // wall height (m)
+
+function resize(){
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  W = canvas.width  = Math.floor(window.innerWidth  * DPR);
+  H = canvas.height = Math.floor(window.innerHeight * DPR);
+  canvas.style.width  = window.innerWidth  + 'px';
+  canvas.style.height = window.innerHeight + 'px';
+
+  VPX = W * 0.5;
+  VPY = H * 0.44;
+  // back-wall floor line sits at H * 0.69 for z = ZBACK
+  F = (H * 0.69 - VPY) * ZBACK / CAMH;
+}
+window.addEventListener('resize', resize);
+resize();
+
+// project a 3-D point in metres to screen pixels
+function P(xm, ym, zm){
+  return [ VPX + F * xm / zm, VPY - F * (ym - CAMH) / zm ];
+}
+// pixels-per-metre at a given depth
+function S(zm){ return F / zm; }
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+const clamp = (v,a,b) => v<a?a:v>b?b:v;
+const lerp  = (a,b,t) => a+(b-a)*t;
+const ease  = t => { t = clamp(t,0,1); return t*t*(3-2*t); };
+
+function mulberry32(a){
+  return function(){
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function shade(hex, amt){
+  const n = parseInt(hex.slice(1),16);
+  const r = clamp(((n>>16)&255) + amt*255, 0, 255)|0;
+  const g = clamp(((n>>8)&255)  + amt*255, 0, 255)|0;
+  const b = clamp((n&255)       + amt*255, 0, 255)|0;
+  return 'rgb('+r+','+g+','+b+')';
+}
+
+/* ============================================================
+   PALETTES
+   ============================================================ */
+const SKINS  = ['#f7dcc2','#f2d0b0','#eec19c','#e0aa80','#d19a6d',
+                '#c98f63','#b07a4e','#a9714a','#8d5c38','#77502f',
+                '#5f3f26','#4a2e1a','#f4c9a4','#dcae86','#c98a5e'];
+const HAIRS  = ['#141010','#1e1712','#2c1f16','#3d2a1a','#4f3520',
+                '#5a3d22','#7a5530','#a37b45','#c9a86a','#8e8e8e',
+                '#5a5a5a','#3a2a20','#4b2e2a','#6b4a2a','#2a2a30',
+                '#d8c8a0','#a05030'];
+const SHIRTS = ['#8c3b3b','#3b5a8c','#4a7a55','#8c7a3b','#5a3b8c',
+                '#3b8c86','#8c5a3b','#c96a4d','#4d7fc9','#c9a54d',
+                '#5fae72','#a35fc9','#c9574d','#6b6b7a','#d8d2c4',
+                '#2f3a44','#7a4b6b','#4d6a7a','#b8a58c','#3f4f3a'];
+const PANTS  = ['#2b3242','#33383d','#3a3228','#22262e','#44403a',
+                '#2e3a2e','#3d2f2f','#1f2429','#4a4238','#2a3040',
+                '#3a3a44','#242830','#5a4a3a'];
+const SHOES  = ['#1a1a1c','#2a2420','#3a2a20','#22262b','#4a4a4a',
+                '#5a4a3a','#1e1e22','#6a3a2a'];
+
+/* ============================================================
+   PEOPLE
+   ============================================================ */
+const SPOTS = [
+  { xm:-1.05, zm:4.25 },
+  { xm:-0.55, zm:3.65 },
+  { xm: 0.05, zm:4.60 },
+  { xm: 0.65, zm:3.80 },
+  { xm: 1.10, zm:4.40 },
+  { xm:-0.30, zm:5.00 }
+];
+const DOOR_X = -1.30;   // door centre (metres)
+const DOOR_Z = 5.85;
+
+function makePeople(){
+  const out = [];
+  for (let i = 0; i < SPOTS.length; i++){
+    const r = mulberry32((Math.random()*1e9)|0);
+    const pick = arr => arr[(r()*arr.length)|0];
+
+    out.push({
+      id: i,
+      heightM : 1.52 + r()*0.38,
+      build   : 0.82 + r()*0.34,
+
+      skin      : pick(SKINS),
+      hairColor : pick(HAIRS),
+      hairStyle : (r()*6)|0,
+      shirt     : pick(SHIRTS),
+      pants     : pick(PANTS),
+      shoes     : pick(SHOES),
+      sleeve    : r() < 0.55 ? 1 : 0,
+
+      // walk path (door → spot)
+      x0: DOOR_X + (r()-0.5)*0.55,
+      z0: DOOR_Z + (r()-0.5)*0.30,
+      x1: SPOTS[i].xm,
+      z1: SPOTS[i].zm,
+
+      walkStart : i * 0.55,
+      seed      : r()*1000,
+
+      // nervous shake window
+      nervStart : 0,
+      nervEnd   : 0,
+
+      // convulsion timing
+      convStart : 0,
+      fallStart : 0,
+      fallDur   : 0,
+
+      // fall params
+      fallDir     : r()<0.5 ? -1 : 1,
+      fallRotMax  : 1.10 + r()*0.55,
+      fallDrop    : 0.05 + r()*0.16,
+      fallArm     : 0.55 + r()*0.70,
+      fallFore    : 0.30 + r()*0.55,
+      fallLeg     : 0.25 + r()*0.45,
+      fallTwist   : (r()-0.5) * 0.8
+    });
+  }
+  // schedule event timings
+  for (const p of out){
+    const arrival = p.walkStart + 3.4;
+    p.nervStart = arrival + 0.10 + Math.random()*0.45;
+    p.nervEnd   = p.nervStart + 0.60 + Math.random()*1.60;
+    p.convStart = 6.60 + Math.random()*1.40;
+    p.fallStart = p.convStart + 0.70 + 1.90 + Math.random()*2.20;
+    p.fallDur   = 1.00 + Math.random()*0.60;
+  }
+  return out;
+}
+let people = makePeople();
+let startTime = null;
+
+/* ============================================================
+   ROOM RENDERING
+   ============================================================ */
+function quad(pts, fill){
+  ctx.beginPath();
+  for (let i=0;i<pts.length;i++){
+    const p = pts[i];
+    i ? ctx.lineTo(p[0],p[1]) : ctx.moveTo(p[0],p[1]);
+  }
+  ctx.closePath();
+  ctx.fillStyle = fill;
+  ctx.fill();
+}
+
+function drawRoom(){
+  const zFront = 0.55;  // front clipping plane for room surfaces
+
+  /* ---- ceiling ---- */
+  quad([
+    P(-HALF_W, WALL_H, ZBACK),
+    P( HALF_W, WALL_H, ZBACK),
+    P( HALF_W, WALL_H, zFront),
+    P(-HALF_W, WALL_H, zFront)
+  ], '#1d1812');
+
+  /* ---- floor (gradient) ---- */
+  ctx.save();
+  ctx.beginPath();
+  let p = P(-HALF_W,0,ZBACK); ctx.moveTo(p[0],p[1]);
+  p = P( HALF_W,0,ZBACK);     ctx.lineTo(p[0],p[1]);
+  p = P( HALF_W,0,zFront);    ctx.lineTo(p[0],p[1]);
+  p = P(-HALF_W,0,zFront);    ctx.lineTo(p[0],p[1]);
+  ctx.closePath();
+  ctx.clip();
+
+  const fg = ctx.createLinearGradient(0, VPY + F*CAMH/ZBACK, 0, H);
+  fg.addColorStop(0, '#4a382a');
+  fg.addColorStop(0.55,'#5e4832');
+  fg.addColorStop(1, '#7a5a3a');
+  ctx.fillStyle = fg;
+  ctx.fillRect(0,0,W,H);
+
+  // floor planks
+  ctx.strokeStyle = 'rgba(0,0,0,0.20)';
+  ctx.lineWidth = Math.max(1.5, H*0.0018);
+  for (let i = -10; i <= 10; i++){
+    const xm = i * 0.42;
+    const a = P(xm,0,ZBACK);
+    const b = P(xm,0,zFront);
+    ctx.beginPath();
+    ctx.moveTo(a[0],a[1]);
+    ctx.lineTo(b[0],b[1]);
+    ctx.stroke();
+  }
+  // cross-lines (horizontal boards at fixed z)
+  ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+  ctx.lineWidth = Math.max(1, H*0.0012);
+  for (let z = 1.2; z < ZBACK; z += 0.9){
+    const a = P(-HALF_W,0,z);
+    const b = P( HALF_W,0,z);
+    ctx.beginPath();
+    ctx.moveTo(a[0],a[1]);
+    ctx.lineTo(b[0],b[1]);
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  /* ---- rug (perspective ellipse) ---- */
+  (function(){
+    const c  = P(0, 0, 2.55);          // rug centre on floor
+    const rx = F * 0.95 / 2.55;        // ~0.95m radius in x
+    const ry = F * 1.05 / 2.55 * 0.38; // foreshortened y
+    ctx.save();
+    ctx.beginPath();
+    ctx.ellipse(c[0], c[1], rx, ry, 0, 0, Math.PI*2);
+    const rg = ctx.createRadialGradient(c[0], c[1]-ry*0.4, 30, c[0], c[1], rx);
+    rg.addColorStop(0, '#8f4642');
+    rg.addColorStop(1, '#5a2c2c');
+    ctx.fillStyle = rg;
+    ctx.fill();
+    ctx.strokeStyle = '#482222';
+    ctx.lineWidth = Math.max(4, H*0.006);
+    ctx.stroke();
+    // inner rings
+    ctx.beginPath();
+    ctx.ellipse(c[0], c[1], rx*0.74, ry*0.74, 0, 0, Math.PI*2);
+    ctx.strokeStyle = 'rgba(220,190,150,0.24)';
+    ctx.lineWidth = Math.max(3, H*0.004);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.ellipse(c[0], c[1], rx*0.52, ry*0.52, 0, 0, Math.PI*2);
+    ctx.strokeStyle = 'rgba(220,190,150,0.16)';
+    ctx.lineWidth = Math.max(2, H*0.003);
+    ctx.stroke();
+    ctx.restore();
+  })();
+
+  /* ---- back wall ---- */
+  ctx.save();
+  ctx.beginPath();
+  p = P(-HALF_W,0,ZBACK);       ctx.moveTo(p[0],p[1]);
+  p = P( HALF_W,0,ZBACK);       ctx.lineTo(p[0],p[1]);
+  p = P( HALF_W,WALL_H,ZBACK);  ctx.lineTo(p[0],p[1]);
+  p = P(-HALF_W,WALL_H,ZBACK);  ctx.lineTo(p[0],p[1]);
+  ctx.closePath();
+  ctx.clip();
+
+  const wg = ctx.createLinearGradient(0, P(0,WALL_H,ZBACK)[1], 0, P(0,0,ZBACK)[1]);
+  wg.addColorStop(0, '#52412f');
+  wg.addColorStop(0.55,'#463626');
+  wg.addColorStop(1, '#33271c');
+  ctx.fillStyle = wg;
+  ctx.fillRect(0,0,W,H);
+  ctx.restore();
+
+  /* ---- left wall ---- */
+  (function(){
+    ctx.save();
+    ctx.beginPath();
+    p = P(-HALF_W,WALL_H,ZBACK);  ctx.moveTo(p[0],p[1]);
+    p = P(-HALF_W,0,ZBACK);       ctx.lineTo(p[0],p[1]);
+    p = P(-HALF_W,0,zFront);      ctx.lineTo(p[0],p[1]);
+    p = P(-HALF_W,WALL_H,zFront); ctx.lineTo(p[0],p[1]);
+    ctx.closePath();
+    const lg = ctx.createLinearGradient(0,0,W*0.35,0);
+    lg.addColorStop(0, '#2a2018');
+    lg.addColorStop(1, '#463526');
+    ctx.fillStyle = lg;
+    ctx.fill();
+    ctx.restore();
+  })();
+
+  /* ---- right wall ---- */
+  (function(){
+    ctx.save();
+    ctx.beginPath();
+    p = P(HALF_W,WALL_H,ZBACK);  ctx.moveTo(p[0],p[1]);
+    p = P(HALF_W,0,ZBACK);       ctx.lineTo(p[0],p[1]);
+    p = P(HALF_W,0,zFront);      ctx.lineTo(p[0],p[1]);
+    p = P(HALF_W,WALL_H,zFront); ctx.lineTo(p[0],p[1]);
+    ctx.closePath();
+    const rg = ctx.createLinearGradient(W,0,W*0.65,0);
+    rg.addColorStop(0, '#241c15');
+    rg.addColorStop(1, '#453626');
+    ctx.fillStyle = rg;
+    ctx.fill();
+    ctx.restore();
+  })();
+
+  /* ---- crown moulding ---- */
+  const cmH = 0.10;
+  quad([
+    P(-HALF_W, WALL_H,       ZBACK),
+    P( HALF_W, WALL_H,       ZBACK),
+    P( HALF_W, WALL_H-cmH,   ZBACK),
+    P(-HALF_W, WALL_H-cmH,   ZBACK)
+  ], '#241b14');
+
+  /* ---- baseboard on back wall ---- */
+  const bbH = 0.13;
+  quad([
+    P(-HALF_W, bbH, ZBACK),
+    P( HALF_W, bbH, ZBACK),
+    P( HALF_W, 0,   ZBACK),
+    P(-HALF_W, 0,   ZBACK)
+  ], '#2b2118');
+
+  /* ---- baseboards on side walls ---- */
+  (function(){
+    ctx.fillStyle = '#2b2118';
+    // left
+    ctx.beginPath();
+    p = P(-HALF_W, bbH, ZBACK);  ctx.moveTo(p[0],p[1]);
+    p = P(-HALF_W, 0,   ZBACK);  ctx.lineTo(p[0],p[1]);
+    p = P(-HALF_W, 0,   zFront); ctx.lineTo(p[0],p[1]);
+    p = P(-HALF_W, bbH, zFront); ctx.lineTo(p[0],p[1]);
+    ctx.closePath(); ctx.fill();
+    // right
+    ctx.beginPath();
+    p = P(HALF_W, bbH, ZBACK);   ctx.moveTo(p[0],p[1]);
+    p = P(HALF_W, 0,   ZBACK);   ctx.lineTo(p[0],p[1]);
+    p = P(HALF_W, 0,   zFront);  ctx.lineTo(p[0],p[1]);
+    p = P(HALF_W, bbH, zFront);  ctx.lineTo(p[0],p[1]);
+    ctx.closePath(); ctx.fill();
+  })();
+
+  /* ---- window on back wall (right side) ---- */
+  (function(){
+    const wx0 = 0.35, wx1 = 1.55, wy0 = 0.95, wy1 = 2.30;
+    const a = P(wx0, wy1, ZBACK);
+    const b = P(wx1, wy0, ZBACK);
+    const x = a[0], y = a[1], w = b[0]-a[0], h = b[1]-a[1];
+
+    // outer frame
+    ctx.fillStyle = '#231a13';
+    ctx.fillRect(x-11, y-11, w+22, h+22);
+    // glass
+    const wgd = ctx.createLinearGradient(x, y, x, y+h);
+    wgd.addColorStop(0,   '#7ba3c6');
+    wgd.addColorStop(0.5, '#4a7192');
+    wgd.addColorStop(1,   '#263e54');
+    ctx.fillStyle = wgd;
+    ctx.fillRect(x, y, w, h);
+    // light glow
+    const gl = ctx.createLinearGradient(x, y, x, y+h);
+    gl.addColorStop(0, 'rgba(255,238,195,0.42)');
+    gl.addColorStop(1, 'rgba(255,238,195,0)');
+    ctx.fillStyle = gl;
+    ctx.fillRect(x, y, w, h);
+    // mullions
+    ctx.strokeStyle = '#2a1f16';
+    ctx.lineWidth = 8;
+    ctx.strokeRect(x, y, w, h);
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.moveTo(x + w*0.50, y); ctx.lineTo(x + w*0.50, y+h);
+    ctx.moveTo(x, y + h*0.42); ctx.lineTo(x+w, y + h*0.42);
+    ctx.stroke();
+    // sill
+    ctx.fillStyle = '#3a2c20';
+    ctx.fillRect(x-16, y+h+8, w+32, 11);
+  })();
+
+  /* ---- door on back wall (left side) ---- */
+  (function(){
+    const dx0 = DOOR_X - 0.48, dx1 = DOOR_X + 0.48, dy1 = 2.10;
+    const a = P(dx0, dy1, ZBACK);
+    const b = P(dx1, 0,   ZBACK);
+    const x = a[0], y = a[1], w = b[0]-a[0], h = b[1]-a[1];
+
+    // frame
+    ctx.fillStyle = '#1a130e';
+    ctx.fillRect(x-13, y-13, w+26, h+13);
+    // door slab (dark, opening)
+    const dg = ctx.createLinearGradient(x, y, x+w, y);
+    dg.addColorStop(0,   '#140f0c');
+    dg.addColorStop(0.5, '#241b14');
+    dg.addColorStop(1,   '#140f0c');
+    ctx.fillStyle = dg;
+    ctx.fillRect(x, y, w, h);
+    // recessed panels
+    ctx.strokeStyle = 'rgba(255,255,255,0.045)';
+    ctx.lineWidth = 2.5;
+    ctx.strokeRect(x + w*0.16, y + h*0.07, w*0.68, h*0.35);
+    ctx.strokeRect(x + w*0.16, y + h*0.53, w*0.68, h*0.40);
+    // handle
+    ctx.fillStyle = '#b8934f';
+    ctx.beginPath();
+    ctx.arc(x + w*0.87, y + h*0.55, 7, 0, Math.PI*2);
+    ctx.fill();
+    // handle highlight
+    ctx.fillStyle = 'rgba(255,235,180,0.55)';
+    ctx.beginPath();
+    ctx.arc(x + w*0.87 - 1.5, y + h*0.55 - 1.5, 2.4, 0, Math.PI*2);
+    ctx.fill();
+  })();
+
+  /* ---- framed picture on back wall (centre-left) ---- */
+  (function(){
+    const a = P(-0.62, 1.95, ZBACK);
+    const b = P( 0.06, 1.30, ZBACK);
+    const x = a[0], y = a[1], w = b[0]-a[0], h = b[1]-a[1];
+    ctx.fillStyle = '#2e241a';
+    ctx.fillRect(x-8, y-8, w+16, h+16);
+    ctx.fillStyle = '#6b5a44';
+    ctx.fillRect(x-3, y-3, w+6, h+6);
+    const pg = ctx.createLinearGradient(x, y, x, y+h);
+    pg.addColorStop(0, '#8a7c62');
+    pg.addColorStop(1, '#5a4f3c');
+    ctx.fillStyle = pg;
+    ctx.fillRect(x, y, w, h);
+    // abstract art
+    ctx.fillStyle = 'rgba(180,120,90,0.55)';
+    ctx.beginPath();
+    ctx.ellipse(x + w*0.42, y + h*0.55, w*0.22, h*0.30, 0.3, 0, Math.PI*2);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(90,110,130,0.45)';
+    ctx.beginPath();
+    ctx.ellipse(x + w*0.66, y + h*0.42, w*0.16, h*0.22, -0.2, 0, Math.PI*2);
+    ctx.fill();
+  })();
+
+  /* ---- couch on the right wall ---- */
+  (function(){
+    const cf  = '#42342a';  // cushion front
+    const ct  = '#4e3e31';  // top
+    const cs  = '#352a21';  // side
+    const cfd = '#3a2d24';
+
+    function box(x0,x1,y0,y1,z0,z1, top, front, side){
+      // top face
+      quad([P(x0,y1,z0),P(x1,y1,z0),P(x1,y1,z1),P(x0,y1,z1)], top);
+      // front (nearest z)
+      quad([P(x0,y0,z0),P(x1,y0,z0),P(x1,y1,z0),P(x0,y1,z0)], front);
+      // inner side (left-facing, visible because x0 > 0)
+      quad([P(x0,y0,z0),P(x0,y0,z1),P(x0,y1,z1),P(x0,y1,z0)], side);
+    }
+    // backrest
+    box(2.02, 2.32, 0.40, 0.92, 4.20, 6.00, ct, cfd, cs);
+    // seat base
+    box(1.42, 2.32, 0.00, 0.40, 4.20, 6.00, ct, cf, cs);
+    // seat cushions
+    box(1.46, 2.02, 0.40, 0.47, 4.28, 5.06, ct, cf, cs);
+    box(1.46, 2.02, 0.40, 0.47, 5.12, 5.92, ct, cf, cs);
+    // near armrest
+    box(1.42, 2.32, 0.40, 0.63, 4.20, 4.52, ct, cf, cs);
+    // far armrest
+    box(1.42, 2.32, 0.40, 0.63, 5.68, 6.00, ct, cf, cs);
+  })();
+
+  /* ---- ambient occlusion at wall/floor junction ---- */
+  (function(){
+    const a = P(0,0,ZBACK);
+    const ao = ctx.createLinearGradient(0, a[1]-H*0.06, 0, a[1]+H*0.03);
+    ao.addColorStop(0, 'rgba(0,0,0,0)');
+    ao.addColorStop(1, 'rgba(0,0,0,0.50)');
+    ctx.fillStyle = ao;
+    ctx.fillRect(0, a[1]-H*0.06, W, H*0.09);
+  })();
+
+  /* ---- warm window light on the floor ---- */
+  (function(){
+    const c = P(0.9, 0, 3.2);
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    const lg = ctx.createRadialGradient(c[0], c[1], 20, c[0], c[1], F*1.6);
+    lg.addColorStop(0, 'rgba(255,215,150,0.13)');
+    lg.addColorStop(1, 'rgba(255,215,150,0)');
+    ctx.fillStyle = lg;
+    ctx.fillRect(0, VPY, W, H-VPY);
+    ctx.restore();
+  })();
+
+  /* ---- vignette ---- */
+  (function(){
+    const vg = ctx.createRadialGradient(W*0.5, H*0.5, Math.min(W,H)*0.28,
+                                          W*0.5, H*0.5, Math.max(W,H)*0.72);
+    vg.addColorStop(0, 'rgba(0,0,0,0)');
+    vg.addColorStop(1, 'rgba(0,0,0,0.52)');
+    ctx.fillStyle = vg;
+    ctx.fillRect(0,0,W,H);
+  })();
+}
+
+/* ============================================================
+   FIGURE — local units: 1 = person height, feet at (0,0)
+   ============================================================ */
+
+function drawLeg(hipX, hipY, swing, lift, fa, p, side){
+  const thighLen = 0.230;
+  const shinLen  = 0.245;
+  const B = p.build;
+
+  // thigh angle (radians, forward positive)
+  const thighAng = swing * 0.20 - lift * 0.10 + fa * side * p.fallLeg;
+
+  // knee bend — increases with lift and during fall
+  const kneeBend = lift * 0.95 + fa * (0.55 + p.fallLeg);
+
+  const kneeX = hipX + Math.sin(thighAng) * thighLen;
+  const kneeY = hipY + Math.cos(thighAng) * thighLen;
+
+  const shinAng = thighAng - kneeBend;
+  const ankleX = kneeX + Math.sin(shinAng) * shinLen;
+  const ankleY = kneeY + Math.cos(shinAng) * shinLen;
+
+  // draw as a two-segment stroke
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.strokeStyle = p.pants;
+  ctx.lineWidth = 0.075 * B;
+  ctx.beginPath();
+  ctx.moveTo(hipX, hipY);
+  ctx.lineTo(kneeX, kneeY);
+  ctx.lineTo(ankleX, ankleY);
+  ctx.stroke();
+
+  // foot
+  const footAng = shinAng * 0.4;
+  ctx.save();
+  ctx.translate(ankleX, ankleY);
+  ctx.rotate(footAng);
+  ctx.fillStyle = p.shoes;
+  ctx.beginPath();
+  ctx.ellipse(side * 0.008, 0.010, 0.032, 0.016, 0, 0, Math.PI*2);
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawArm(shoX, shoY, side, swing, sh, fa, p, t){
+  const upperLen = 0.205;
+  const foreLen  = 0.185;
+  const B = p.build;
+  const s = p.seed;
+
+  // upper-arm angle from vertical (side = ±1 → outward)
+  const upperAng =
+      side * 0.16
+    + side * Math.abs(swing) * 0.12
+    + side * sh * 0.30 * Math.sin(t*19 + side*2.1 + s)
+    + fa * side * p.fallArm;
+
+  const elbX = shoX + Math.sin(upperAng) * upperLen;
+  const elbY = shoY + Math.cos(upperAng) * upperLen;
+
+  // forearm angle
+  const foreAng = upperAng
+    + side * 0.22
+    + side * sh * 0.40 * Math.sin(t*23 + side*3.3 + s*1.7)
+    + fa * side * p.fallFore;
+
+  const wriX = elbX + Math.sin(foreAng) * foreLen;
+  const wriY = elbY + Math.cos(foreAng) * foreLen;
+
+  // upper arm
+  ctx.strokeStyle = shade(p.shirt, -0.03);
+  ctx.lineWidth = 0.048 * B;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(shoX, shoY + 0.010);
+  ctx.lineTo(elbX, elbY);
+  ctx.stroke();
+
+  // forearm (bare skin if short sleeves)
+  if (p.sleeve){
+    ctx.strokeStyle = p.skin;
+    ctx.lineWidth = 0.035 * B;
+  } else {
+    ctx.strokeStyle = shade(p.shirt, -0.03);
+    ctx.lineWidth = 0.042 * B;
+  }
+  ctx.beginPath();
+  ctx.moveTo(elbX, elbY);
+  ctx.lineTo(wriX, wriY);
+  ctx.stroke();
+
+  // hand with fingers
+  drawHand(wriX, wriY, foreAng, side, sh, fa, p, t, s);
+}
+
+function drawHand(x, y, angle, side, sh, fa, p, t, seed){
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(angle);
+  ctx.fillStyle = p.skin;
+
+  // palm
+  ctx.beginPath();
+  ctx.ellipse(0, 0.014, 0.017, 0.022, 0, 0, Math.PI*2);
+  ctx.fill();
+
+  // finger jitter — nervous shake & convulsion
+  const wigAmt = 0.0012 + sh * 0.006 + fa * 0.004;
+
+  // 4 fingers
+  const spread = 0.0075;
+  for (let i = 0; i < 4; i++){
+    const fx = (i - 1.5) * spread;
+    const baseLen = 0.011 - Math.abs(i-1.5) * 0.0015;
+    const wig = Math.sin(t*3.1 + i*1.7 + seed) * wigAmt;
+    const curl = fa * 0.006 * (1 + (i%2));
+
+    ctx.beginPath();
+    ctx.ellipse(fx + wig*0.4,
+                0.030 + baseLen*0.5 + wig - curl,
+                0.0042, baseLen + wig,
+                0, 0, Math.PI*2);
+    ctx.fill();
+  }
+
+  // thumb
+  ctx.beginPath();
+  ctx.ellipse(side * 0.021,
+              0.008 + Math.sin(t*2.7 + seed)*wigAmt,
+              0.0050, 0.0095,
+              side * 0.55, 0, Math.PI*2);
+  ctx.fill();
+
+  ctx.restore();
+}
+
+function drawHairBack(p, headCX, headCY, headRx, headRy){
+  ctx.fillStyle = p.hairColor;
+  const st = p.hairStyle;
+
+  if (st === 1){                     // long
+    ctx.beginPath();
+    ctx.moveTo(headCX - headRx*1.15, headCY - headRy*0.30);
+    ctx.quadraticCurveTo(headCX - headRx*2.00, headCY + headRy*1.70,
+                         headCX - headRx*1.10, headCY + headRy*3.40);
+    ctx.lineTo(headCX + headRx*1.10, headCY + headRy*3.40);
+    ctx.quadraticCurveTo(headCX + headRx*2.00, headCY + headRy*1.70,
+                         headCX + headRx*1.15, headCY - headRy*0.30);
+    ctx.closePath();
+    ctx.fill();
+  } else if (st === 4){              // afro
+    ctx.beginPath();
+    ctx.arc(headCX, headCY - headRy*0.14, headRx*1.58, 0, Math.PI*2);
+    ctx.fill();
+  } else if (st === 2){              // bun
+    ctx.beginPath();
+    ctx.arc(headCX + headRx*0.15, headCY - headRy*1.32, headRx*0.64, 0, Math.PI*2);
+    ctx.fill();
+  } else if (st === 3){              // ponytail
+    ctx.beginPath();
+    ctx.moveTo(headCX + headRx*0.55, headCY - headRy*0.55);
+    ctx.quadraticCurveTo(headCX + headRx*2.35, headCY + headRy*0.35,
+                         headCX + headRx*1.50, headCY + headRy*2.35);
+    ctx.quadraticCurveTo(headCX + headRx*1.15, headCY + headRy*1.10,
+                         headCX + headRx*0.70, headCY + headRy*0.15);
+    ctx.closePath();
+    ctx.fill();
+  }
+}
+
+function drawHairFront(p, headCX, headCY, headRx, headRy){
+  ctx.fillStyle = p.hairColor;
+  const st = p.hairStyle;
+
+  if (st === 5){                     // receding
+    ctx.beginPath();
+    ctx.ellipse(headCX, headCY - headRy*0.68, headRx*0.96, headRy*0.42,
+                0, Math.PI, Math.PI*2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(headCX - headRx*0.95, headCY - headRy*0.10, headRx*0.22, headRy*0.42, 0, 0, Math.PI*2);
+    ctx.ellipse(headCX + headRx*0.95, headCY - headRy*0.10, headRx*0.22, headRy*0.42, 0, 0, Math.PI*2);
+    ctx.fill();
+  } else if (st === 4){              // afro fringe
+    ctx.beginPath();
+    ctx.ellipse(headCX, headCY - headRy*0.34, headRx*1.10, headRy*0.72,
+                0, Math.PI, Math.PI*2);
+    ctx.fill();
+  } else if (st === 1){              // long — cap + sweep
+    ctx.beginPath();
+    ctx.ellipse(headCX, headCY - headRy*0.40, headRx*1.08, headRy*0.64,
+                0, Math.PI, Math.PI*2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(headCX - headRx*1.08, headCY - headRy*0.30);
+    ctx.quadraticCurveTo(headCX - headRx*0.4, headCY - headRy*0.05,
+                         headCX + headRx*1.05, headCY - headRy*0.42);
+    ctx.lineTo(headCX + headRx*1.05, headCY - headRy*0.70);
+    ctx.quadraticCurveTo(headCX, headCY - headRy*1.15,
+                         headCX - headRx*1.05, headCY - headRy*0.70);
+    ctx.closePath();
+    ctx.fill();
+  } else {                            // default cap
+    ctx.beginPath();
+    ctx.ellipse(headCX, headCY - headRy*0.40, headRx*1.07, headRy*0.63,
+                0, Math.PI, Math.PI*2);
+    ctx.fill();
+  }
+}
+
+function drawFace(p, t, headCX, headCY, headRx, headRy){
+  const eyeY  = headCY + headRy*0.03;
+  const eyeDX = headRx * 0.42;
+  const eRx   = headRx * 0.20;
+  const eRy   = headRy * 0.13;
+
+  // blink
+  const blinkT = (t * 0.65 + p.seed * 0.13) % 3.7;
+  const blinking = blinkT < 0.09;
+
+  if (blinking){
+    ctx.strokeStyle = shade(p.skin, -0.38);
+    ctx.lineWidth = headRx * 0.10;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(headCX - eyeDX - eRx, eyeY);
+    ctx.lineTo(headCX - eyeDX + eRx, eyeY);
+    ctx.moveTo(headCX + eyeDX - eRx, eyeY);
+    ctx.lineTo(headCX + eyeDX + eRx, eyeY);
+    ctx.stroke();
+  } else {
+    // sclera
+    ctx.fillStyle = '#f6f1ea';
+    ctx.beginPath(); ctx.ellipse(headCX - eyeDX, eyeY, eRx, eRy, 0, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(headCX + eyeDX, eyeY, eRx, eRy, 0, 0, Math.PI*2); ctx.fill();
+    // iris
+    ctx.fillStyle = '#4a3524';
+    ctx.beginPath(); ctx.arc(headCX - eyeDX, eyeY, eRx*0.62, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(headCX + eyeDX, eyeY, eRx*0.62, 0, Math.PI*2); ctx.fill();
+    // pupil
+    ctx.fillStyle = '#150f0b';
+    ctx.beginPath(); ctx.arc(headCX - eyeDX, eyeY, eRx*0.30, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(headCX + eyeDX, eyeY, eRx*0.30, 0, Math.PI*2); ctx.fill();
+    // highlight
+    ctx.fillStyle = 'rgba(255,255,255,0.88)';
+    ctx.beginPath();
+    ctx.arc(headCX - eyeDX + eRx*0.22, eyeY - eRy*0.30, eRx*0.13, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath();
+    ctx.arc(headCX + eyeDX + eRx*0.22, eyeY - eRy*0.30, eRx*0.13, 0, Math.PI*2); ctx.fill();
+    // lash line
+    ctx.strokeStyle = 'rgba(40,25,15,0.55)';
+    ctx.lineWidth = headRx * 0.055;
+    ctx.beginPath();
+    ctx.arc(headCX - eyeDX, eyeY, eRx, Math.PI*1.08, Math.PI*1.92);
+    ctx.arc(headCX + eyeDX, eyeY, eRx, Math.PI*1.08, Math.PI*1.92);
+    ctx.stroke();
+  }
+
+  // eyebrows
+  ctx.strokeStyle = p.hairColor;
+  ctx.lineWidth = headRx * 0.11;
+  ctx.lineCap = 'round';
+  const bY = eyeY - headRy * 0.38;
+  ctx.beginPath();
+  ctx.moveTo(headCX - eyeDX - eRx*1.10, bY + headRy*0.03);
+  ctx.lineTo(headCX - eyeDX + eRx*0.95, bY - headRy*0.05);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(headCX + eyeDX + eRx*1.10, bY + headRy*0.03);
+  ctx.lineTo(headCX + eyeDX - eRx*0.95, bY - headRy*0.05);
+  ctx.stroke();
+
+  // nose
+  ctx.strokeStyle = shade(p.skin, -0.18);
+  ctx.lineWidth = headRx * 0.08;
+  ctx.beginPath();
+  ctx.moveTo(headCX, eyeY + headRy*0.14);
+  ctx.lineTo(headCX, eyeY + headRy*0.36);
+  ctx.stroke();
+
+  // mouth
+  ctx.strokeStyle = shade(p.skin, -0.32);
+  ctx.lineWidth = headRx * 0.10;
+  ctx.beginPath();
+  ctx.arc(headCX, eyeY + headRy*0.26, headRx*0.32,
+          Math.PI*0.22, Math.PI*0.78);
+  ctx.stroke();
+
+  // chin shadow
+  ctx.fillStyle = 'rgba(0,0,0,0.06)';
+  ctx.beginPath();
+  ctx.ellipse(headCX, headCY + headRy*0.72, headRx*0.42, headRy*0.14, 0, 0, Math.PI*2);
+  ctx.fill();
+}
+
+function drawFigure(p, t, st){
+  const skin = p.skin;
+  const B    = p.build;
+  const s    = p.seed;
+
+  /* ---------- walk cycle ---------- */
+  const walkP  = st.phase;
+  const walkAmt = st.walkAmt;
+  const walking = st.walking;
+
+  const fwdL  = walking ?  Math.cos(walkP) * walkAmt : 0;
+  const fwdR  = walking ? -Math.cos(walkP) * walkAmt : 0;
+  const liftL = walking ? Math.max(0, -Math.sin(walkP)) * walkAmt : 0;
+  const liftR = walking ? Math.max(0,  Math.sin(walkP)) * walkAmt : 0;
+
+  const bob   = walking ? Math.abs(Math.sin(walkP)) * 0.012 * walkAmt : 0;
+  const sway  = walking ? Math.sin(walkP) * 0.010 * walkAmt : 0;
+
+  /* ---------- shake ---------- */
+  const sh = st.shake;
+  const shT = t * 26;
+
+  const shX = (Math.sin(shT*1.10 + s)       * 0.011
+             + Math.sin(shT*2.30 + s*1.7)   * 0.005) * sh;
+  const shY = (Math.cos(shT*0.93 + s*0.9)   * 0.009
+             + Math.sin(shT*3.10 + s*2.1)   * 0.004) * sh;
+
+  /* ---------- fall ---------- */
+  const fa = st.fall;
+
+  /* ---------- base skeleton ---------- */
+  const hipY  = -0.505 - bob;
+  const shoY  = -0.815 - bob;
+  const hipX  = sway + shX * 0.5;
+  const shoX  = sway * 0.6 + shX;
+
+  const headRY = 0.068;
+  const headRX = 0.048;
+  const headCX = sway * 0.4 + shX * 1.6;
+  const headCY = -0.932 - bob + shY;
+
+  const hipHalf = 0.052 * B;
+  const shoHalf = 0.098 * B;
+
+  ctx.save();
+
+  /* ---------- fall transform (rotate about feet) ---------- */
+  if (fa > 0){
+    ctx.translate(0, fa * p.fallDrop);
+    ctx.rotate(fa * p.fallRotMax * p.fallDir);
+  }
+
+  /* ---------- hair (back layer) ---------- */
+  drawHairBack(p, headCX, headCY, headRX, headRY);
+
+  /* ---------- legs ---------- */
+  drawLeg(-hipHalf + hipX, hipY, fwdL, liftL, fa, p, -1);
+  drawLeg( hipHalf + hipX, hipY, fwdR, liftR, fa, p,  1);
+
+  /* ---------- neck (drawn BEFORE torso so torso covers bottom) ---------- */
+  const neckHalf = 0.027 * B;
+  ctx.fillStyle = shade(skin, -0.14);
+  ctx.beginPath();
+  ctx.moveTo(shoX - neckHalf, shoY + 0.010);
+  ctx.lineTo(headCX - neckHalf*0.92, headCY + headRY*0.55);
+  ctx.lineTo(headCX + neckHalf*0.92, headCY + headRY*0.55);
+  ctx.lineTo(shoX + neckHalf, shoY + 0.010);
+  ctx.closePath();
+  ctx.fill();
+
+  /* ---------- torso ---------- */
+  const waistY = -0.610;
+  const waistHalf = 0.072 * B;
+
+  const tg = ctx.createLinearGradient(0, shoY, 0, hipY);
+  tg.addColorStop(0,    shade(p.shirt,  0.08));
+  tg.addColorStop(0.55, p.shirt);
+  tg.addColorStop(1,    shade(p.shirt, -0.18));
+  ctx.fillStyle = tg;
+
+  ctx.beginPath();
+  ctx.moveTo(shoX - shoHalf, shoY);
+  ctx.quadraticCurveTo(shoX - shoHalf*0.92, waistY, hipX - hipHalf, hipY);
+  ctx.lineTo(hipX + hipHalf, hipY);
+  ctx.quadraticCurveTo(shoX + shoHalf*0.92, waistY, shoX + shoHalf, shoY);
+  ctx.quadraticCurveTo(shoX, shoY + 0.030, shoX - shoHalf, shoY);
+  ctx.closePath();
+  ctx.fill();
+
+  // subtle chest shading
+  ctx.fillStyle = 'rgba(0,0,0,0.07)';
+  ctx.beginPath();
+  ctx.ellipse(shoX, (shoY + hipY) * 0.5, shoHalf * 0.62, 0.055, 0, 0, Math.PI*2);
+  ctx.fill();
+
+  /* ---------- arms + hands ---------- */
+  const armSw = walking ? Math.sin(walkP) * 0.35 * walkAmt : 0;
+  drawArm(shoX - shoHalf, shoY, -1,  armSw, sh, fa, p, t);
+  drawArm(shoX + shoHalf, shoY,  1, -armSw, sh, fa, p, t);
+
+  /* ---------- head ---------- */
+  const hg = ctx.createRadialGradient(
+    headCX - headRX*0.35, headCY - headRY*0.35, headRX*0.08,
+    headCX,               headCY,               headRY*1.35);
+  hg.addColorStop(0, shade(skin,  0.09));
+  hg.addColorStop(1, shade(skin, -0.10));
+  ctx.fillStyle = hg;
+  ctx.beginPath();
+  ctx.ellipse(headCX, headCY, headRX, headRY, 0, 0, Math.PI*2);
+  ctx.fill();
+
+  // ears
+  ctx.fillStyle = shade(skin, -0.06);
+  ctx.beginPath();
+  ctx.ellipse(headCX - headRX*0.98, headCY + headRY*0.05,
+              headRX*0.14, headRY*0.22, 0, 0, Math.PI*2);
+  ctx.ellipse(headCX + headRX*0.98, headCY + headRY*0.05,
+              headRX*0.14, headRY*0.22, 0, 0, Math.PI*2);
+  ctx.fill();
+
+  /* ---------- face ---------- */
+  drawFace(p, t, headCX, headCY, headRX, headRY);
+
+  /* ---------- hair (front layer) ---------- */
+  drawHairFront(p, headCX, headCY, headRX, headRY);
+
+  ctx.restore();
+}
+
+/* ============================================================
+   PERSON UPDATE
+   ============================================================ */
+const WALK_DURATION = 3.40;
+const WALK_CYCLES   = 4.00;   // full stride cycles over the walk
+
+function personState(p, t){
+  // ---- walk ----
+  const u = (t - p.walkStart) / WALK_DURATION;
+  const walking = u > 0 && u < 1;
+
+  let phase = 0;
+  let walkAmt = 1;
+  if (walking){
+    const eu = ease(clamp(u, 0, 1));
+    phase = eu * Math.PI * 2 * WALK_CYCLES;
+    // ease leg motion to neutral over the last 15 % of the walk
+    if (u > 0.85) walkAmt = 1 - ease((u - 0.85) / 0.15);
+  } else if (u >= 1){
+    walkAmt = 0;
+  } else {
+    walkAmt = 0;
+  }
+
+  // ---- position along the path ----
+  const eu = ease(clamp(u, 0, 1));
+  const xm = lerp(p.x0, p.x1, eu);
+  const zm = lerp(p.z0, p.z1, eu);
+
+  // ---- nervous jitter ----
+  let nervous = 0;
+  if (t > p.nervStart && t < p.nervEnd){
+    const a = clamp((t - p.nervStart) / 0.30, 0, 1);
+    const b = clamp((p.nervEnd - t)      / 0.30, 0, 1);
+    nervous = Math.min(a, b);
+  }
+
+  // ---- convulsion + fall ----
+  let shake = 0, fall = 0;
+  if (t > p.convStart){
+    const cs = t - p.convStart;
+    const RAMP = 0.70;
+    if (cs < RAMP){
+      shake = ease(cs / RAMP) * 0.55;
+    } else if (t < p.fallStart){
+      const dur = Math.max(0.01, p.fallStart - p.convStart - RAMP);
+      shake = 0.55 + 0.45 * ease((cs - RAMP) / dur);
+    } else {
+      const ft = (t - p.fallStart) / p.fallDur;
+      if (ft < 1){
+        fall  = ease(ft);
+        shake = Math.max(0, 1 - ft * 1.7);
+      } else {
+        fall  = 1;
+        shake = 0;
+      }
+    }
+  }
+
+  // combine nervous into shake for drawing (small amplitude)
+  const totalShake = Math.max(shake, nervous * 0.35);
+
+  return { walking, phase, walkAmt, xm, zm, shake: totalShake, fall };
+}
+
+function drawPerson(p, t, st){
+  const appear = clamp((t - p.walkStart) / 0.45, 0, 1);
+  if (appear <= 0) return;
+
+  const sx     = VPX + F * st.xm / st.zm;
+  const syFeet = VPY + F * CAMH / st.zm;
+  const hPx    = F * p.heightM / st.zm;
+
+  /* ---------- contact shadow ---------- */
+  ctx.save();
+  ctx.globalAlpha = 0.32 * appear * (1 - st.fall * 0.6);
+  ctx.fillStyle = '#000';
+  ctx.beginPath();
+  ctx.ellipse(sx, syFeet + hPx * 0.008,
+              hPx * 0.20 * (1 + st.fall * 1.4),
+              hPx * 0.050 * (1 + st.fall * 0.5),
+              0, 0, Math.PI*2);
+  ctx.fill();
+  ctx.restore();
+
+  /* ---------- figure ---------- */
+  ctx.save();
+  ctx.globalAlpha = appear;
+  ctx.translate(sx, syFeet);
+  ctx.scale(hPx, hPx);
+  drawFigure(p, t, st);
+  ctx.restore();
+}
+
+/* ============================================================
+   PHASE LABEL
+   ============================================================ */
+function phaseLabelFor(t){
+  if (t < 0.25)  return 'entering the room…';
+  if (t < 6.0)   return 'gathered, talking quietly…';
+  if (t < 8.5)   return 'something changes…';
+  if (t < 11.0)  return 'convulsive movement';
+  if (t < 13.5)  return 'collapsing…';
+  return 'still';
+}
+
+/* ============================================================
+   MAIN LOOP
+   ============================================================ */
+function frame(now){
+  if (startTime === null) startTime = now;
+  const t = (now - startTime) / 1000;
+
+  ctx.clearRect(0, 0, W, H);
+  drawRoom();
+
+  const list = people.map(p => ({ p, st: personState(p, t) }));
+  // depth-sort: farther people drawn first
+  list.sort((a, b) => b.st.zm - a.st.zm);
+
+  for (const item of list) drawPerson(item.p, t, item.st);
+
+  phaseLabel.textContent = phaseLabelFor(t);
+  clockLabel.textContent = 't = ' + t.toFixed(1) + 's';
+
+  requestAnimationFrame(frame);
+}
+
+/* ============================================================
+   RESTART
+   ============================================================ */
+restartBtn.addEventListener('click', () => {
+  people = makePeople();
+  startTime = null;
+});
+
+requestAnimationFrame(frame);
+
+})();
+</script>
+</body>
+</html>
